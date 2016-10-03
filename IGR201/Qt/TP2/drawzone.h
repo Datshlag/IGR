@@ -5,6 +5,7 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QMouseEvent>
+#include <iostream>
 
 class DrawZone : public QWidget
 {
@@ -14,9 +15,9 @@ public:
 
 private:
     QWidget* parent;
-    int drawingLine=0;
-    float currentXPos=0;
-    float currentYPos=0;
+    QPointF pointA;
+    QPointF pointB;
+    int lineNotDrawn=0;
     void mousePressEvent(QMouseEvent*);
     void mouseMoveEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
