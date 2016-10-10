@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     colorPreview = ui->widget_2;
     colorPreview->setDrawable(0);
-    colorPreview->fillDrawZone(Qt::GlobalColor::black);
+    colorPreview->fillDrawZone(Qt::black);
 
     penJoinStyleActionGroup = new QActionGroup(this);
     penJoinStyleActionGroup->addAction(ui->actionMiter_join);

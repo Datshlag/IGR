@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QDebug>
 #include <QAction>
+#include <Qt>
 
 class DrawZone : public QWidget
 {
@@ -22,9 +23,13 @@ public:
 private:
     QWidget* parent;
     int drawable;
+    int drawingLine;
+    int drawingCircle;
 
-    QPoint* currentPointA;
-    QPoint* currentPointB;
+    QPoint currentPointA;
+    QPoint currentPointB;
+    int currentRadius;
+
     QColor currentPenColor;
     QColor fillingColor;
     int currentPenWidth;
@@ -32,13 +37,14 @@ private:
     Qt::PenJoinStyle currentPenJoinStyle;
     int indexCurrent;
 
-    QVector<QPair<QPoint, QPoint>> lineDrawList;
+    QVector<QPair<QPoint, QPoint> > lineDrawList;
+    QVector<QPainterPath > objectsDrawList;
     QVector<int> penWidthDrawList;
     QVector<QColor> penColorDrawList;
     QVector<Qt::PenCapStyle> penCapStyleDrawList;
     QVector<Qt::PenJoinStyle> penJoinStyleDrawList;
 
-    int lineNotDrawn=0;
+    int lineNotDrawn;
 
     void mousePressEvent(QMouseEvent*);
     void mouseMoveEvent(QMouseEvent*);
@@ -69,6 +75,8 @@ public slots:
 private slots:
     void setCurrentPenJoinStyle(Qt::PenJoinStyle);
     void setCurrentPenCapStyle(Qt::PenCapStyle);
+    void drawLine(QPoint, QPoint);
+    void drawCircle(QPoint, int);
 
 };
 

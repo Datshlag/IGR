@@ -5,29 +5,30 @@ DrawZone::DrawZone(QWidget *parent)
 
     this->parent=parent;
     drawable=1;
-    fillingColor = Qt::GlobalColor::white;
+    fillingColor = Qt::white;
 
     indexCurrent=0;
+    lineNotDrawn=0;
+    currentRadius=0;
 
-    currentPenCapStyle=Qt::PenCapStyle::SquareCap;
-    currentPenJoinStyle=Qt::PenJoinStyle::BevelJoin;
+    currentPenCapStyle=Qt::SquareCap;
+    currentPenJoinStyle=Qt::BevelJoin;
     currentPenWidth=0;
-    currentPenColor=Qt::GlobalColor::black;
-    currentPointA = new QPoint(-1,-1);
-    currentPointB = new QPoint(-1,-1);
+    currentPenColor=Qt::black;
+    currentPointA = QPoint(-1,-1);
+    currentPointB = QPoint(-1,-1);
 
-    lineDrawList.append(QPair<QPoint,QPoint>(*currentPointA,*currentPointB));
     penWidthDrawList.append(currentPenWidth);
     penColorDrawList.append(currentPenColor);
     penCapStyleDrawList.append(currentPenCapStyle);
     penJoinStyleDrawList.append(currentPenJoinStyle);
+    objectsDrawList.append(QPainterPath());
 
 }
 
 DrawZone::~DrawZone()
 {
-    delete currentPointA;
-    delete currentPointB;
+
 }
 
 void DrawZone::paintEvent(QPaintEvent *e)
@@ -48,13 +49,12 @@ void DrawZone::paintEvent(QPaintEvent *e)
         QPen pen;
         for(int i=0; i<=indexCurrent; i++)
         {
-            if(lineDrawList.at(i).first.x()!=-1){
-                pen.setWidth(penWidthDrawList.at(i));
-                pen.setColor(penColorDrawList.at(i));
-                pen.setCapStyle(penCapStyleDrawList.at(i));
-                painter.setPen(pen);
-                painter.drawLine(lineDrawList.at(i).first,lineDrawList.at(i).second);
-            }
+            pen.setWidth(penWidthDrawList.at(i));
+            pen.setColor(penColorDrawList.at(i));
+            pen.setCapStyle(penCapStyleDrawList.at(i));
+            painter.setPen(pen);
+            painter.drawPath(objectsDrawList.at(i));
+
         }
     }
 }
@@ -63,8 +63,9 @@ void DrawZone::mousePressEvent(QMouseEvent * e)
 {
     if(e->button()==Qt::LeftButton){
 
-        lineDrawList[indexCurrent].first=e->pos();
-        lineDrawList[indexCurrent].second=e->pos();
+        currentPointA=e->pos();
+        currentPointB=e->pos();
+        this->drawLine(currentPointA,currentPointB);
         lineNotDrawn=1;
         update();
     }
@@ -75,7 +76,8 @@ void DrawZone::mousePressEvent(QMouseEvent * e)
 void DrawZone::mouseMoveEvent(QMouseEvent * e)
 {
     if(lineNotDrawn){
-        lineDrawList[indexCurrent].second=e->pos();
+        currentPointB=e->pos();
+        this->drawLine(currentPointA,currentPointB);
         update();
     }
 }
@@ -84,7 +86,8 @@ void DrawZone::mouseReleaseEvent(QMouseEvent * e)
 {
     if(e->button()==Qt::LeftButton){
 
-        lineDrawList[indexCurrent].second=e->pos();
+        currentPointB=e->pos();
+        this->drawLine(currentPointA,currentPointB);
         lineNotDrawn=0;
         this->expandDrawList();
         update();
@@ -125,13 +128,13 @@ void DrawZone::setCurrentPenCapStyle(int n)
     qDebug()<<n;
     switch(n){
         case(0):
-            this->setCurrentPenCapStyle(Qt::PenCapStyle::SquareCap);
+            this->setCurrentPenCapStyle(Qt::SquareCap);
             break;
         case(1):
-            this->setCurrentPenCapStyle(Qt::PenCapStyle::FlatCap);
+            this->setCurrentPenCapStyle(Qt::FlatCap);
             break;
         case(2):
-            this->setCurrentPenCapStyle(Qt::PenCapStyle::RoundCap);
+            this->setCurrentPenCapStyle(Qt::RoundCap);
     }
     emit penCapStyleChanged(n);
 }
@@ -141,13 +144,13 @@ void DrawZone::setCurrentPenJoinStyle(int n)
 
     switch(n){
         case(0):
-            this->setCurrentPenJoinStyle(Qt::PenJoinStyle::BevelJoin);
+            this->setCurrentPenJoinStyle(Qt::BevelJoin);
             break;
         case(1):
-            this->setCurrentPenJoinStyle(Qt::PenJoinStyle::MiterJoin);
+            this->setCurrentPenJoinStyle(Qt::MiterJoin);
             break;
         case(2):
-            this->setCurrentPenJoinStyle(Qt::PenJoinStyle::RoundJoin);
+            this->setCurrentPenJoinStyle(Qt::RoundJoin);
     }
     emit penJoinStyleChanged(n);
 }
@@ -157,9 +160,9 @@ void DrawZone::setCurrentPenCapStyle(QAction * action)
 
     QString s=action->text();
     int i;
-    if(s=="Square Cap") {setCurrentPenCapStyle(Qt::PenCapStyle::SquareCap); i=0;}
-    else if(s=="Flat Cap") {setCurrentPenCapStyle(Qt::PenCapStyle::FlatCap); i=1;}
-    else {setCurrentPenCapStyle(Qt::PenCapStyle::RoundCap); i=2;}
+    if(s=="Square Cap") {setCurrentPenCapStyle(Qt::SquareCap); i=0;}
+    else if(s=="Flat Cap") {setCurrentPenCapStyle(Qt::FlatCap); i=1;}
+    else {setCurrentPenCapStyle(Qt::RoundCap); i=2;}
     emit penCapStyleChanged(i);
 }
 
@@ -168,9 +171,9 @@ void DrawZone::setCurrentPenJoinStyle(QAction * action)
 
     QString s=action->text();
     int i;
-    if(s=="Bevel Join") {setCurrentPenJoinStyle(Qt::PenJoinStyle::BevelJoin); i=0;}
-    else if(s=="Miter Join") {setCurrentPenJoinStyle(Qt::PenJoinStyle::MiterJoin); i=1;}
-    else {setCurrentPenJoinStyle(Qt::PenJoinStyle::RoundJoin); i=2;}
+    if(s=="Bevel Join") {setCurrentPenJoinStyle(Qt::BevelJoin); i=0;}
+    else if(s=="Miter Join") {setCurrentPenJoinStyle(Qt::MiterJoin); i=1;}
+    else {setCurrentPenJoinStyle(Qt::RoundJoin); i=2;}
     emit penJoinStyleChanged(i);
 }
 
@@ -178,7 +181,7 @@ void DrawZone::expandDrawList()
 {
 
     indexCurrent++;
-    lineDrawList.append(QPair<QPoint,QPoint>(*currentPointA,*currentPointB));
+    objectsDrawList.append(QPainterPath());
     penWidthDrawList.append(currentPenWidth);
     penColorDrawList.append(currentPenColor);
     penCapStyleDrawList.append(currentPenCapStyle);
@@ -202,4 +205,23 @@ void DrawZone::fillDrawZone(QColor color)
 
     setFillingColor(color);
     update();
+}
+
+void DrawZone::drawCircle(QPoint center, int r)
+{
+
+    QPainterPath painter = QPainterPath();
+    painter.moveTo(center);
+    painter.addEllipse(QRect(QPoint(center.x()-r,center.y()-r),QPoint(center.x()+r,center.y()+r)));
+    objectsDrawList[indexCurrent]=painter;
+
+}
+
+void DrawZone::drawLine(QPoint A, QPoint B)
+{
+    QPainterPath painter=QPainterPath();
+    painter.moveTo(QPointF(A));
+    painter.lineTo(QPointF(B));
+    objectsDrawList[indexCurrent]=painter;
+
 }

@@ -15,6 +15,7 @@
 #include <QComboBox>
 #include <QTabWidget>
 #include <QtUiTools/QtUiTools>
+#include <Qt>
 
 namespace Ui {
 class MainWindow;
