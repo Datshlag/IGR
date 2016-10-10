@@ -14,7 +14,7 @@ DrawZone::DrawZone(QWidget *parent)
 
 DrawZone::~DrawZone()
 {
-    delete this;
+    
 }
 
 void DrawZone::paintEvent(QPaintEvent *e)
