@@ -10,6 +10,11 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <drawzone.h>
+#include <QColorDialog>
+#include <QSpinBox>
+#include <QComboBox>
+#include <QTabWidget>
+#include <QtUiTools/QtUiTools>
 
 namespace Ui {
 class MainWindow;
@@ -25,12 +30,11 @@ public:
 
 private:
     DrawZone * zone;
-    //void closeEvent(QCloseEvent *event);
+    DrawZone * colorPreview;
+    //DrawZone * penPreview;
 
 public slots:
-    /*void openFile();
-    void saveFile();
-    void quitFile();*/
+    void openColorSelectionDialog();
 
 private:
     Ui::MainWindow *ui;

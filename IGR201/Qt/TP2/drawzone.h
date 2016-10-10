@@ -8,6 +8,7 @@
 #include <iostream>
 #include <QColor>
 #include <QObject>
+#include <QDebug>
 
 class DrawZone : public QWidget
 {
@@ -19,12 +20,22 @@ public:
 
 private:
     QWidget* parent;
-    QPoint* pointA;
-    QPoint* pointB;
-    QColor* penColor;
+    int drawable;
 
-    float penThickness;
-    Qt::PenCapStyle penCapStyle;
+    QPoint* currentPointA;
+    QPoint* currentPointB;
+    QColor currentPenColor;
+    QColor fillingColor;
+    int currentPenWidth;
+    Qt::PenCapStyle currentPenCapStyle;
+    Qt::PenJoinStyle currentPenJoinStyle;
+    int indexCurrent;
+
+    QVector<QPair<QPoint, QPoint>> lineDrawList;
+    QVector<int> penWidthDrawList;
+    QVector<QColor> penColorDrawList;
+    QVector<Qt::PenCapStyle> penCapStyleDrawList;
+    QVector<Qt::PenJoinStyle> penJoinStyleDrawList;
 
     int lineNotDrawn=0;
 
@@ -36,11 +47,19 @@ protected:
     virtual void paintEvent(QPaintEvent*);
 
 signals:
+    void drawZoneClicked();
 
 public slots:
-    void setPenColor(QColor*);
-    void setThickness(float);
-    void setCapStyle(Qt::PenCapStyle);
+    void setCurrentPenColor(QColor);
+    void setCurrentPenWidth(int);
+    void setCurrentPenCapStyle(Qt::PenCapStyle);
+    void setCurrentPenJoinStyle(Qt::PenJoinStyle);
+    void setCurrentPenCapStyleFromInt(int);
+    void setCurrentPenJoinStyleFromInt(int);
+    void expandDrawList();
+    void setFillingColor(QColor);
+    void fillDrawZone(QColor);
+    void setDrawable(int);
 
 };
 

@@ -5,46 +5,52 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    //ui->setupUi(this);
+    ui->setupUi(this);
+    zone=ui->widget;
 
-    statusBar()->show();
+    //QAction * changeColorAction = new QAction("Select Color", this);
 
-    /*QMenuBar * menuBar = this->menuBar();
+    QSpinBox* spinBox = ui->penSizeSpinBox;
+    spinBox->setMinimum(0);
+    spinBox->setValue(0);
+    spinBox->setSpecialValueText(tr(" Pen Width "));
 
-    QMenu * fileMenu = menuBar->addMenu(tr("&File"));
-    QAction * openAction = new QAction( QIcon(":open.png"), tr("&Open..."), this);
-    fileMenu->addAction(openAction);
-    openAction->setShortcut(tr("Ctrl+O"));
-    connect(openAction, SIGNAL(triggered()),this,SLOT(openFile()));
+    QComboBox* comboBox1 = ui->capStyleComboBox;
+    comboBox1->addItem("Square Cap");
+    comboBox1->addItem("Flat Cap");
+    comboBox1->addItem("Round Cap");
 
+    QComboBox* comboBox2 = ui->joinStyleComboBox;
+    comboBox2->addItem("Bevel Join");
+    comboBox2->addItem("Miter Join");
+    comboBox2->addItem("Round Join");
 
-    QAction * saveAction = new QAction( QIcon(":save.png"), tr("&Save..."), this);
-    fileMenu->addAction(saveAction);
-    saveAction->setShortcut(tr("Ctrl+S"));
-    connect(saveAction, SIGNAL(triggered()),this,SLOT(saveFile()));
+    //QPushButton* pushButton = ui->pushButton;
+    colorPreview = ui->widget_2;
+    colorPreview->setDrawable(0);
+    colorPreview->fillDrawZone(Qt::GlobalColor::black);
 
-    QAction * quitAction = new QAction( QIcon(":quit.png"), tr("&Quit..."), this);
-    fileMenu->addAction(quitAction);
-    quitAction->setShortcut(tr("Ctrl+Q"));
-    connect(quitAction, SIGNAL(triggered()),this,SLOT(quitFile()));
-
-    QToolBar * toolBar = this->addToolBar( tr("File") );
-    toolBar->addAction(openAction);
-    toolBar->addAction(saveAction);
-    toolBar->addAction(quitAction);
-
-    text = new QTextEdit(this);
-    setCentralWidget(text);*/
-
-    zone = new DrawZone(this);
-    zone->setMinimumSize(800,600);
-    setCentralWidget(zone);
+    connect(spinBox, SIGNAL(valueChanged(int)), zone, SLOT(setCurrentPenWidth(int)));
+    connect(colorPreview, SIGNAL(drawZoneClicked()), this, SLOT(openColorSelectionDialog()));
+    connect(comboBox1, SIGNAL(currentIndexChanged(int)),zone, SLOT(setCurrentPenCapStyleFromInt(int)));
+    connect(comboBox2, SIGNAL(currentIndexChanged(int)), zone, SLOT(setCurrentPenJoinStyleFromInt(int)));
 
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+
+}
+
+void MainWindow::openColorSelectionDialog()
+{
+
+    QColorDialog *dialog = new QColorDialog(this);
+    connect(dialog, SIGNAL(colorSelected(QColor)), zone, SLOT(setCurrentPenColor(QColor)));
+    connect(dialog,SIGNAL(colorSelected(QColor)), colorPreview, SLOT(fillDrawZone(QColor)));
+    dialog->exec();
+    delete dialog;
 }
 
 /*void MainWindow::closeEvent(QCloseEvent *event)

@@ -1,24 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>565</width>
+    <height>356</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5,1">
+      <item>
+       <widget class="DrawZone" name="widget" native="true">
+        <zorder>plainTextEdit</zorder>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <widget class="QWidget" name="tab">
+         <attribute name="title">
+          <string>Tab 1</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <layout class="QFormLayout" name="formLayout">
+            <property name="labelAlignment">
+             <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+            </property>
+            <property name="formAlignment">
+             <set>Qt::AlignJustify|Qt::AlignVCenter</set>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="capStyleLabel">
+              <property name="text">
+               <string>Pen cap style :</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="capStyleComboBox"/>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="joinStyleLabel">
+              <property name="text">
+               <string>Pen join style :</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="joinStyleComboBox"/>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="penSizeLabel">
+              <property name="text">
+               <string>Pen size :</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QSpinBox" name="penSizeSpinBox"/>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="colorSelectionLabel">
+              <property name="text">
+               <string>Pen color :</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="DrawZone" name="widget_2" native="true"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>Tab 2</string>
+         </attribute>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>565</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFichier">
+    <property name="title">
+     <string>Fichier</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuStylo">
+    <property name="title">
+     <string>Stylo</string>
+    </property>
+   </widget>
+   <addaction name="menuFichier"/>
+   <addaction name="menuStylo"/>
+  </widget>
  </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>DrawZone</class>
+   <extends>QWidget</extends>
+   <header>drawzone.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
