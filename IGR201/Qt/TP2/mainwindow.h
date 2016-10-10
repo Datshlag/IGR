@@ -31,10 +31,15 @@ public:
 private:
     DrawZone * zone;
     DrawZone * colorPreview;
+    QActionGroup* penCapStyleActionGroup;
+    QActionGroup* penJoinStyleActionGroup;
     //DrawZone * penPreview;
 
 public slots:
     void openColorSelectionDialog();
+    void openSizeSelectionBox();
+    void actualizePenCapStyleUi(int);
+    void actualizePenJoinStyleUi(int);
 
 private:
     Ui::MainWindow *ui;

@@ -9,6 +9,7 @@
 #include <QColor>
 #include <QObject>
 #include <QDebug>
+#include <QAction>
 
 class DrawZone : public QWidget
 {
@@ -48,18 +49,26 @@ protected:
 
 signals:
     void drawZoneClicked();
+    void penCapStyleChanged(int);
+    void penJoinStyleChanged(int);
+    void penCapStyleChanged(QString);
+    void penJoinStyleChanged(QString);
 
 public slots:
     void setCurrentPenColor(QColor);
     void setCurrentPenWidth(int);
-    void setCurrentPenCapStyle(Qt::PenCapStyle);
-    void setCurrentPenJoinStyle(Qt::PenJoinStyle);
-    void setCurrentPenCapStyleFromInt(int);
-    void setCurrentPenJoinStyleFromInt(int);
+    void setCurrentPenCapStyle(int);
+    void setCurrentPenCapStyle(QAction *);
+    void setCurrentPenJoinStyle(int);
+    void setCurrentPenJoinStyle(QAction *);
     void expandDrawList();
     void setFillingColor(QColor);
     void fillDrawZone(QColor);
     void setDrawable(int);
+
+private slots:
+    void setCurrentPenJoinStyle(Qt::PenJoinStyle);
+    void setCurrentPenCapStyle(Qt::PenCapStyle);
 
 };
 

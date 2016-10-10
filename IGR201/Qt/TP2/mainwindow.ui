@@ -18,15 +18,16 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5,1">
       <item>
-       <widget class="DrawZone" name="widget" native="true">
-        <zorder>plainTextEdit</zorder>
-       </widget>
+       <widget class="DrawZone" name="widget" native="true"/>
       </item>
       <item>
        <widget class="QTabWidget" name="tabWidget">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
-          <string>Tab 1</string>
+          <string>Pen</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
@@ -96,7 +97,7 @@
         </widget>
         <widget class="QWidget" name="tab_2">
          <attribute name="title">
-          <string>Tab 2</string>
+          <string>Shapes</string>
          </attribute>
         </widget>
        </widget>
@@ -123,10 +124,100 @@
     <property name="title">
      <string>Stylo</string>
     </property>
+    <widget class="QMenu" name="menuPen_join_style">
+     <property name="title">
+      <string>Pen cap style...</string>
+     </property>
+     <addaction name="actionSquare_cap"/>
+     <addaction name="actionFlat_cap"/>
+     <addaction name="actionRound_cap"/>
+    </widget>
+    <widget class="QMenu" name="menuPen_join_style_2">
+     <property name="title">
+      <string>Pen join style...</string>
+     </property>
+     <addaction name="actionBevel_join"/>
+     <addaction name="actionMiter_join"/>
+     <addaction name="actionRound_join"/>
+    </widget>
+    <addaction name="actionPen_color"/>
+    <addaction name="actionPen_size"/>
+    <addaction name="menuPen_join_style"/>
+    <addaction name="menuPen_join_style_2"/>
+   </widget>
+   <widget class="QMenu" name="menuShapes">
+    <property name="title">
+     <string>Shapes</string>
+    </property>
    </widget>
    <addaction name="menuFichier"/>
    <addaction name="menuStylo"/>
+   <addaction name="menuShapes"/>
   </widget>
+  <action name="actionPen_color">
+   <property name="text">
+    <string>Pen color</string>
+   </property>
+  </action>
+  <action name="actionPen_size">
+   <property name="text">
+    <string>Pen size</string>
+   </property>
+  </action>
+  <action name="actionSquare_cap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Square Cap</string>
+   </property>
+  </action>
+  <action name="actionFlat_cap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Flat Cap</string>
+   </property>
+  </action>
+  <action name="actionRound_cap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Round Cap</string>
+   </property>
+  </action>
+  <action name="actionBevel_join">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Bevel Join</string>
+   </property>
+  </action>
+  <action name="actionMiter_join">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Miter Join</string>
+   </property>
+  </action>
+  <action name="actionRound_join">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Round Join</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

@@ -8,8 +8,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     zone=ui->widget;
 
-    //QAction * changeColorAction = new QAction("Select Color", this);
-
     QSpinBox* spinBox = ui->penSizeSpinBox;
     spinBox->setMinimum(0);
     spinBox->setValue(0);
@@ -25,21 +23,43 @@ MainWindow::MainWindow(QWidget *parent) :
     comboBox2->addItem("Miter Join");
     comboBox2->addItem("Round Join");
 
-    //QPushButton* pushButton = ui->pushButton;
     colorPreview = ui->widget_2;
     colorPreview->setDrawable(0);
     colorPreview->fillDrawZone(Qt::GlobalColor::black);
 
+    penJoinStyleActionGroup = new QActionGroup(this);
+    penJoinStyleActionGroup->addAction(ui->actionMiter_join);
+    penJoinStyleActionGroup->addAction(ui->actionBevel_join);
+    penJoinStyleActionGroup->addAction(ui->actionRound_join);
+    penJoinStyleActionGroup->setExclusive(true);
+
+    penCapStyleActionGroup = new QActionGroup(this);
+    penCapStyleActionGroup->addAction(ui->actionSquare_cap);
+    penCapStyleActionGroup->addAction(ui->actionFlat_cap);
+    penCapStyleActionGroup->addAction(ui->actionRound_cap);
+    penCapStyleActionGroup->setExclusive(true);
+
     connect(spinBox, SIGNAL(valueChanged(int)), zone, SLOT(setCurrentPenWidth(int)));
+    connect(ui->actionPen_size, SIGNAL(triggered(bool)), this, SLOT(openSizeSelectionBox()));
+
     connect(colorPreview, SIGNAL(drawZoneClicked()), this, SLOT(openColorSelectionDialog()));
-    connect(comboBox1, SIGNAL(currentIndexChanged(int)),zone, SLOT(setCurrentPenCapStyleFromInt(int)));
-    connect(comboBox2, SIGNAL(currentIndexChanged(int)), zone, SLOT(setCurrentPenJoinStyleFromInt(int)));
+    connect(ui->actionPen_color,SIGNAL(triggered(bool)),this,SLOT(openColorSelectionDialog()));
+
+    connect(comboBox1, SIGNAL(currentIndexChanged(int)),zone, SLOT(setCurrentPenCapStyle(int)));
+    connect(zone, SIGNAL(penCapStyleChanged(int)), this, SLOT(actualizePenCapStyleUi(int)));
+    connect(penCapStyleActionGroup, SIGNAL(triggered(QAction*)),zone,SLOT(setCurrentPenCapStyle(QAction*)));
+
+    connect(comboBox2, SIGNAL(currentIndexChanged(int)), zone, SLOT(setCurrentPenJoinStyle(int)));   
+    connect(zone, SIGNAL(penJoinStyleChanged(int)), this, SLOT(actualizePenJoinStyleUi(int)));
+    connect(penJoinStyleActionGroup, SIGNAL(triggered(QAction*)), zone, SLOT(setCurrentPenJoinStyle(QAction*)));
 
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete penJoinStyleActionGroup;
+    delete penCapStyleActionGroup;
 
 }
 
@@ -48,9 +68,50 @@ void MainWindow::openColorSelectionDialog()
 
     QColorDialog *dialog = new QColorDialog(this);
     connect(dialog, SIGNAL(colorSelected(QColor)), zone, SLOT(setCurrentPenColor(QColor)));
-    connect(dialog,SIGNAL(colorSelected(QColor)), colorPreview, SLOT(fillDrawZone(QColor)));
+    connect(dialog, SIGNAL(colorSelected(QColor)), colorPreview, SLOT(fillDrawZone(QColor)));
     dialog->exec();
     delete dialog;
+}
+
+void MainWindow::openSizeSelectionBox()
+{
+
+    ui->penSizeSpinBox->clear();
+    ui->penSizeSpinBox->setFocus();
+}
+
+void MainWindow::actualizePenCapStyleUi(int n)
+{
+
+    ui->capStyleComboBox->setCurrentIndex(n);
+    switch(n){
+    case(0):
+        ui->actionSquare_cap->setChecked(true);
+        break;
+    case(1):
+        ui->actionFlat_cap->setChecked(true);
+        break;
+    case(2):
+        ui->actionRound_cap->setChecked(true);
+        break;
+    }
+}
+
+void MainWindow::actualizePenJoinStyleUi(int n)
+{
+
+    ui->joinStyleComboBox->setCurrentIndex(n);
+    switch(n){
+    case(0):
+        ui->actionBevel_join->setChecked(true);
+        break;
+    case(1):
+        ui->actionMiter_join->setChecked(true);
+        break;
+    case(2):
+        ui->actionRound_join->setChecked(true);
+        break;
+    }
 }
 
 /*void MainWindow::closeEvent(QCloseEvent *event)

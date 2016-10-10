@@ -13,8 +13,8 @@ DrawZone::DrawZone(QWidget *parent)
     currentPenJoinStyle=Qt::PenJoinStyle::BevelJoin;
     currentPenWidth=0;
     currentPenColor=Qt::GlobalColor::black;
-    currentPointA = new QPoint();
-    currentPointB = new QPoint();
+    currentPointA = new QPoint(-1,-1);
+    currentPointB = new QPoint(-1,-1);
 
     lineDrawList.append(QPair<QPoint,QPoint>(*currentPointA,*currentPointB));
     penWidthDrawList.append(currentPenWidth);
@@ -26,7 +26,8 @@ DrawZone::DrawZone(QWidget *parent)
 
 DrawZone::~DrawZone()
 {
-
+    delete currentPointA;
+    delete currentPointB;
 }
 
 void DrawZone::paintEvent(QPaintEvent *e)
@@ -47,11 +48,13 @@ void DrawZone::paintEvent(QPaintEvent *e)
         QPen pen;
         for(int i=0; i<=indexCurrent; i++)
         {
-            pen.setWidth(penWidthDrawList.at(i));
-            pen.setColor(penColorDrawList.at(i));
-            pen.setCapStyle(penCapStyleDrawList.at(i));
-            painter.setPen(pen);
-            painter.drawLine(lineDrawList.at(i).first,lineDrawList.at(i).second);
+            if(lineDrawList.at(i).first.x()!=-1){
+                pen.setWidth(penWidthDrawList.at(i));
+                pen.setColor(penColorDrawList.at(i));
+                pen.setCapStyle(penCapStyleDrawList.at(i));
+                painter.setPen(pen);
+                painter.drawLine(lineDrawList.at(i).first,lineDrawList.at(i).second);
+            }
         }
     }
 }
@@ -73,8 +76,8 @@ void DrawZone::mouseMoveEvent(QMouseEvent * e)
 {
     if(lineNotDrawn){
         lineDrawList[indexCurrent].second=e->pos();
+        update();
     }
-    update();
 }
 
 void DrawZone::mouseReleaseEvent(QMouseEvent * e)
@@ -83,8 +86,8 @@ void DrawZone::mouseReleaseEvent(QMouseEvent * e)
 
         lineDrawList[indexCurrent].second=e->pos();
         lineNotDrawn=0;
-        update();
         this->expandDrawList();
+        update();
     }
 }
 
@@ -116,7 +119,7 @@ void DrawZone::setCurrentPenJoinStyle(Qt::PenJoinStyle pjs)
     currentPenJoinStyle=pjs;
 }
 
-void DrawZone::setCurrentPenCapStyleFromInt(int n)
+void DrawZone::setCurrentPenCapStyle(int n)
 {
 
     qDebug()<<n;
@@ -130,9 +133,10 @@ void DrawZone::setCurrentPenCapStyleFromInt(int n)
         case(2):
             this->setCurrentPenCapStyle(Qt::PenCapStyle::RoundCap);
     }
+    emit penCapStyleChanged(n);
 }
 
-void DrawZone::setCurrentPenJoinStyleFromInt(int n)
+void DrawZone::setCurrentPenJoinStyle(int n)
 {
 
     switch(n){
@@ -145,6 +149,29 @@ void DrawZone::setCurrentPenJoinStyleFromInt(int n)
         case(2):
             this->setCurrentPenJoinStyle(Qt::PenJoinStyle::RoundJoin);
     }
+    emit penJoinStyleChanged(n);
+}
+
+void DrawZone::setCurrentPenCapStyle(QAction * action)
+{
+
+    QString s=action->text();
+    int i;
+    if(s=="Square Cap") {setCurrentPenCapStyle(Qt::PenCapStyle::SquareCap); i=0;}
+    else if(s=="Flat Cap") {setCurrentPenCapStyle(Qt::PenCapStyle::FlatCap); i=1;}
+    else {setCurrentPenCapStyle(Qt::PenCapStyle::RoundCap); i=2;}
+    emit penCapStyleChanged(i);
+}
+
+void DrawZone::setCurrentPenJoinStyle(QAction * action)
+{
+
+    QString s=action->text();
+    int i;
+    if(s=="Bevel Join") {setCurrentPenJoinStyle(Qt::PenJoinStyle::BevelJoin); i=0;}
+    else if(s=="Miter Join") {setCurrentPenJoinStyle(Qt::PenJoinStyle::MiterJoin); i=1;}
+    else {setCurrentPenJoinStyle(Qt::PenJoinStyle::RoundJoin); i=2;}
+    emit penJoinStyleChanged(i);
 }
 
 void DrawZone::expandDrawList()
@@ -160,6 +187,7 @@ void DrawZone::expandDrawList()
 
 void DrawZone::setDrawable(int n)
 {
+
     drawable=n;
 }
 
