@@ -10,13 +10,19 @@
     <height>356</height>
    </rect>
   </property>
+  <property name="mouseTracking">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="mouseTracking">
+    <bool>true</bool>
+   </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="6,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="6,1">
       <item>
        <widget class="DrawZone" name="widget" native="true">
         <property name="sizePolicy">
@@ -25,133 +31,247 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="mouseTracking">
-         <bool>false</bool>
+        <property name="minimumSize">
+         <size>
+          <width>800</width>
+          <height>600</height>
+         </size>
         </property>
-        <zorder>tabWidget</zorder>
-        <zorder>tabWidget</zorder>
+        <property name="mouseTracking">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
-       <widget class="QTabWidget" name="tabWidget">
-        <property name="currentIndex">
-         <number>1</number>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>Pen attributes</string>
         </property>
-        <widget class="QWidget" name="tab">
-         <attribute name="title">
-          <string>Pen</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <layout class="QFormLayout" name="formLayout">
-            <property name="labelAlignment">
-             <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-            </property>
-            <property name="formAlignment">
-             <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="capStyleLabel">
-              <property name="text">
-               <string>Pen cap style :</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="capStyleComboBox"/>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="joinStyleLabel">
-              <property name="text">
-               <string>Pen join style :</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QComboBox" name="joinStyleComboBox"/>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="penSizeLabel">
-              <property name="text">
-               <string>Pen size :</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QSpinBox" name="penSizeSpinBox"/>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="colorSelectionLabel">
-              <property name="text">
-               <string>Pen color :</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="DrawZone" name="widget_2" native="true"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tab_2">
-         <attribute name="title">
-          <string>Shapes</string>
-         </attribute>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0">
-           <layout class="QFormLayout" name="formLayout_2">
-            <property name="fieldGrowthPolicy">
-             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-            </property>
-            <item row="0" column="0">
-             <widget class="QRadioButton" name="radioButton">
-              <property name="text">
-               <string>RadioButton</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QRadioButton" name="radioButton_2">
-              <property name="text">
-               <string>RadioButton</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QRadioButton" name="radioButton_3">
-              <property name="text">
-               <string>RadioButton</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QRadioButton" name="radioButton_4">
-              <property name="text">
-               <string>RadioButton</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="0">
-           <widget class="DrawZone" name="widget_3" native="true"/>
-          </item>
-         </layout>
-        </widget>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_2" stretch="4,4,0,0">
+           <item>
+            <widget class="QGroupBox" name="groupBox_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title">
+              <string>Pen</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_3">
+              <item row="0" column="0">
+               <layout class="QFormLayout" name="formLayout">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="penSizeLabel">
+                  <property name="text">
+                   <string>Pen size :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="capStyleLabel">
+                  <property name="text">
+                   <string>Pen cap style :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QSpinBox" name="penSizeSpinBox"/>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="capStyleComboBox">
+                  <item>
+                   <property name="text">
+                    <string>Square Cap</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Flat Cap</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Round Cap</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QComboBox" name="joinStyleComboBox">
+                  <item>
+                   <property name="text">
+                    <string>Bevel Join</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Miter Join</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Round Join</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="joinStyleLabel">
+                  <property name="text">
+                   <string>Pen join style :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="colorSelectionLabel">
+                  <property name="text">
+                   <string>Pen color :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="DrawZone" name="widget_2" native="true"/>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title">
+              <string>Shape</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="0" column="0">
+               <layout class="QFormLayout" name="formLayout_2">
+                <item row="1" column="0">
+                 <widget class="QCheckBox" name="checkBox">
+                  <property name="text">
+                   <string>Fill shape</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="fillRuleComboBox">
+                  <item>
+                   <property name="text">
+                    <string>Odd Even Fill</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Winding Fill</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QCheckBox" name="checkBox_2">
+                  <property name="text">
+                   <string>Antialiasing</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Type :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="shapeTypeComboBox">
+                  <item>
+                   <property name="text">
+                    <string>Line</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Free Draw</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Poly Line</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Rectangle</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Ellipse</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Polygon</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_4">
+             <property name="title">
+              <string>Mode</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_6">
+              <item row="0" column="0">
+               <layout class="QFormLayout" name="formLayout_5">
+                <item row="0" column="0">
+                 <widget class="QRadioButton" name="radioButton_7">
+                  <property name="text">
+                   <string>Draw</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QRadioButton" name="radioButton_8">
+                  <property name="text">
+                   <string>Select</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -164,17 +284,17 @@
      <x>0</x>
      <y>0</y>
      <width>565</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFichier">
     <property name="title">
-     <string>Fichier</string>
+     <string>File</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuStylo">
     <property name="title">
-     <string>Stylo</string>
+     <string>Pen</string>
     </property>
     <widget class="QMenu" name="menuPen_join_style">
      <property name="title">
@@ -186,7 +306,7 @@
     </widget>
     <widget class="QMenu" name="menuPen_join_style_2">
      <property name="title">
-      <string>Pen join style...</string>
+      <string>Pen Join Style...</string>
      </property>
      <addaction name="actionBevel_join"/>
      <addaction name="actionMiter_join"/>
@@ -194,26 +314,44 @@
     </widget>
     <addaction name="actionPen_color"/>
     <addaction name="actionPen_size"/>
+    <addaction name="separator"/>
     <addaction name="menuPen_join_style"/>
     <addaction name="menuPen_join_style_2"/>
    </widget>
    <widget class="QMenu" name="menuShapes">
     <property name="title">
-     <string>Shapes</string>
+     <string>Shape</string>
     </property>
+    <addaction name="actionLine"/>
+    <addaction name="actionFree_draw"/>
+    <addaction name="actionCircle"/>
+    <addaction name="actionRectangle"/>
+    <addaction name="actionPolygon"/>
+    <addaction name="actionPolyline"/>
+   </widget>
+   <widget class="QMenu" name="menuEdition">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionAnnuler"/>
+    <addaction name="actionClear"/>
+    <addaction name="separator"/>
+    <addaction name="actionD_ssin"/>
+    <addaction name="actionS_l_ction"/>
    </widget>
    <addaction name="menuFichier"/>
+   <addaction name="menuEdition"/>
    <addaction name="menuStylo"/>
    <addaction name="menuShapes"/>
   </widget>
   <action name="actionPen_color">
    <property name="text">
-    <string>Pen color</string>
+    <string>Pen Color</string>
    </property>
   </action>
   <action name="actionPen_size">
    <property name="text">
-    <string>Pen size</string>
+    <string>Pen Size</string>
    </property>
   </action>
   <action name="actionSquare_cap">
@@ -268,6 +406,83 @@
    </property>
    <property name="text">
     <string>Round Join</string>
+   </property>
+  </action>
+  <action name="actionCircle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Ellipse</string>
+   </property>
+  </action>
+  <action name="actionLine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Line</string>
+   </property>
+  </action>
+  <action name="actionRectangle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Rectangle</string>
+   </property>
+  </action>
+  <action name="actionPolygon">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Polygon</string>
+   </property>
+  </action>
+  <action name="actionFree_draw">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Free draw</string>
+   </property>
+  </action>
+  <action name="actionD_ssin">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dessin</string>
+   </property>
+  </action>
+  <action name="actionS_l_ction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Select</string>
+   </property>
+  </action>
+  <action name="actionAnnuler">
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+  </action>
+  <action name="actionPolyline">
+   <property name="text">
+    <string>Polyline</string>
    </property>
   </action>
  </widget>

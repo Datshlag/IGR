@@ -6,6 +6,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setMouseTracking(true);
+    ui->centralWidget->setMouseTracking(true);
+    ui->widget->setMouseTracking(true);
     zone=ui->widget;
 
     QSpinBox* spinBox = ui->penSizeSpinBox;
@@ -13,19 +16,14 @@ MainWindow::MainWindow(QWidget *parent) :
     spinBox->setValue(0);
     spinBox->setSpecialValueText(tr(" Pen Width "));
 
-    QComboBox* comboBox1 = ui->capStyleComboBox;
-    comboBox1->addItem("Square Cap");
-    comboBox1->addItem("Flat Cap");
-    comboBox1->addItem("Round Cap");
-
-    QComboBox* comboBox2 = ui->joinStyleComboBox;
-    comboBox2->addItem("Bevel Join");
-    comboBox2->addItem("Miter Join");
-    comboBox2->addItem("Round Join");
+    QComboBox* capStyleComboBox = ui->capStyleComboBox;
+    QComboBox* joinStyleComboBox = ui->joinStyleComboBox;
+    QComboBox* shapeTypeComboBox = ui->shapeTypeComboBox;
+    QComboBox* fillRuleComboBox=ui->fillRuleComboBox;
 
     colorPreview = ui->widget_2;
-    colorPreview->setDrawable(0);
     colorPreview->fillDrawZone(Qt::black);
+    colorPreview->setEditionMode(-1);
 
     penJoinStyleActionGroup = new QActionGroup(this);
     penJoinStyleActionGroup->addAction(ui->actionMiter_join);
@@ -45,22 +43,42 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(colorPreview, SIGNAL(drawZoneClicked()), this, SLOT(openColorSelectionDialog()));
     connect(ui->actionPen_color,SIGNAL(triggered(bool)),this,SLOT(openColorSelectionDialog()));
 
-    connect(comboBox1, SIGNAL(currentIndexChanged(int)),zone, SLOT(setCurrentPenCapStyle(int)));
+    connect(capStyleComboBox, SIGNAL(currentIndexChanged(int)),zone, SLOT(setCurrentPenCapStyle(int)));
     connect(zone, SIGNAL(penCapStyleChanged(int)), this, SLOT(actualizePenCapStyleUi(int)));
     connect(penCapStyleActionGroup, SIGNAL(triggered(QAction*)),zone,SLOT(setCurrentPenCapStyle(QAction*)));
 
-    connect(comboBox2, SIGNAL(currentIndexChanged(int)), zone, SLOT(setCurrentPenJoinStyle(int)));   
+    connect(joinStyleComboBox, SIGNAL(currentIndexChanged(int)), zone, SLOT(setCurrentPenJoinStyle(int)));
     connect(zone, SIGNAL(penJoinStyleChanged(int)), this, SLOT(actualizePenJoinStyleUi(int)));
     connect(penJoinStyleActionGroup, SIGNAL(triggered(QAction*)), zone, SLOT(setCurrentPenJoinStyle(QAction*)));
+
+    connect(shapeTypeComboBox, SIGNAL(currentIndexChanged(int)), zone, SLOT(set);
+
+
+    shapeStyleActionGroup = new QActionGroup(this);
+    shapeStyleActionGroup->addAction(ui->actionLine);
+    shapeStyleActionGroup->addAction(ui->actionCircle);
+    shapeStyleActionGroup->addAction(ui->actionRectangle);
+    shapeStyleActionGroup->addAction(ui->actionPolygon);
+    shapeStyleActionGroup->addAction(ui->actionFree_draw);
+    shapeStyleActionGroup->setExclusive(true);
+    connect(shapeStyleActionGroup, SIGNAL(triggered(QAction*)), zone, SLOT(setObjectToDraw(QAction*)));
+
+    editionModeActionGroup = new QActionGroup(this);
+    editionModeActionGroup->addAction(ui->actionD_ssin);
+    editionModeActionGroup->addAction(ui->actionS_l_ction);
+    editionModeActionGroup->setExclusive(true);
+    connect(editionModeActionGroup, SIGNAL(triggered(QAction*)), zone, SLOT(setEditionMode(QAction*)));
+
 
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
     delete penJoinStyleActionGroup;
     delete penCapStyleActionGroup;
-
+    delete shapeStyleActionGroup;
+    delete editionModeActionGroup;
+    delete ui;
 }
 
 void MainWindow::openColorSelectionDialog()

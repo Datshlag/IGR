@@ -23,12 +23,15 @@ public:
 private:
     QWidget* parent;
     int drawable;
-    int drawingLine;
-    int drawingCircle;
+    int drawingShape;
+    int drawingPolygon;
 
-    QPoint currentPointA;
-    QPoint currentPointB;
+    QPointF currentPointA;
+    QPointF currentPointB;
     int currentRadius;
+
+    int itemSelected;
+    int movingShape;
 
     QColor currentPenColor;
     QColor fillingColor;
@@ -36,6 +39,10 @@ private:
     Qt::PenCapStyle currentPenCapStyle;
     Qt::PenJoinStyle currentPenJoinStyle;
     int indexCurrent;
+    int objectType;
+
+    int drawingMode;
+    int selectingMode;
 
     QVector<QPair<QPoint, QPoint> > lineDrawList;
     QVector<QPainterPath > objectsDrawList;
@@ -67,16 +74,31 @@ public slots:
     void setCurrentPenCapStyle(QAction *);
     void setCurrentPenJoinStyle(int);
     void setCurrentPenJoinStyle(QAction *);
-    void expandDrawList();
+    void setObjectToDraw(QAction *);
     void setFillingColor(QColor);
     void fillDrawZone(QColor);
     void setDrawable(int);
+    void setEditionMode(int);
+    void setEditionMode(QAction *);
+
 
 private slots:
     void setCurrentPenJoinStyle(Qt::PenJoinStyle);
     void setCurrentPenCapStyle(Qt::PenCapStyle);
-    void drawLine(QPoint, QPoint);
-    void drawCircle(QPoint, int);
+    void drawLine(QPointF, QPointF);
+    void drawEllipse(QPointF, QPointF);
+    void drawRectangle(QPointF, QPointF);
+    void startFreePath(QPointF);
+    void addFreeDraw(QPointF);
+    void startPolygon(QPointF);
+    void addSegment(QPointF);
+    void endPolygon(QPointF);
+    void expandDrawList();
+    int reduceDrawList();
+    void emptyDrawList();
+    int findShapeSelected(QPointF);
+    void clearLastElement();
+    void translateShape(int, float, float);
 
 };
 

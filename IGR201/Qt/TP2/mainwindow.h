@@ -34,6 +34,9 @@ private:
     DrawZone * colorPreview;
     QActionGroup* penCapStyleActionGroup;
     QActionGroup* penJoinStyleActionGroup;
+    QActionGroup* shapeStyleActionGroup;
+    QActionGroup* editionModeActionGroup;
+    //QActionGroup*
     //DrawZone * penPreview;
 
 public slots:
