@@ -10,7 +10,9 @@
 #include <QObject>
 #include <QDebug>
 #include <QAction>
+#include <QVector>
 #include <Qt>
+#include "shape.h"
 
 class DrawZone : public QWidget
 {
@@ -25,31 +27,35 @@ private:
     int drawable;
     int drawingShape;
     int drawingPolygon;
-
     QPointF currentPointA;
     QPointF currentPointB;
-    int currentRadius;
-
-    int itemSelected;
-    int movingShape;
-
-    QColor currentPenColor;
+    QPointF lastPointB;
     QColor fillingColor;
-    int currentPenWidth;
+    int movingShape;
+    bool isAAOn;
+    int currentMode;
+
+    int indexCurrent;
+    QColor currentPenColor;
+    int currentPenSize;
     Qt::PenCapStyle currentPenCapStyle;
     Qt::PenJoinStyle currentPenJoinStyle;
-    int indexCurrent;
-    int objectType;
-
-    int drawingMode;
-    int selectingMode;
+    bool filling;
+    Qt::FillRule currentFillingRule;
+    int currentShapeType;
 
     QVector<QPair<QPoint, QPoint> > lineDrawList;
     QVector<QPainterPath > objectsDrawList;
-    QVector<int> penWidthDrawList;
-    QVector<QColor> penColorDrawList;
-    QVector<Qt::PenCapStyle> penCapStyleDrawList;
-    QVector<Qt::PenJoinStyle> penJoinStyleDrawList;
+    QVector<int > penWidthDrawList;
+    QVector<QColor > penColorDrawList;
+    QVector<Qt::PenCapStyle > penCapStyleDrawList;
+    QVector<Qt::PenJoinStyle > penJoinStyleDrawList;
+    QVector<Qt::FillRule> fillingRuleDrawList;
+    QVector<bool > fillStatusDrawList;
+
+    QVector<Shape > shapeDrawList;
+    Shape * currentShape;
+    Shape * shapeSelected;
 
     int lineNotDrawn;
 
@@ -64,8 +70,11 @@ signals:
     void drawZoneClicked();
     void penCapStyleChanged(int);
     void penJoinStyleChanged(int);
-    void penCapStyleChanged(QString);
-    void penJoinStyleChanged(QString);
+    void shapeStyleChanged(int);
+    void currentModeChanged(int);
+    void AAStateChanged(bool);
+    void fillingStateChanged(bool);
+    void fillingRuleChanged(int);
 
 public slots:
     void setCurrentPenColor(QColor);
@@ -74,31 +83,28 @@ public slots:
     void setCurrentPenCapStyle(QAction *);
     void setCurrentPenJoinStyle(int);
     void setCurrentPenJoinStyle(QAction *);
-    void setObjectToDraw(QAction *);
+    void setCurrentObjectToDraw(QAction *);
+    void setCurrentObjectToDraw(int);
     void setFillingColor(QColor);
-    void fillDrawZone(QColor);
+    void setCurrentMode(int);
+    void setCurrentMode(QAction *);
     void setDrawable(int);
-    void setEditionMode(int);
-    void setEditionMode(QAction *);
+    void setFillingRule(Qt::FillRule);
+    void setFillingRule(int);
 
+    void fillDrawZone(QColor);
+    void toggleAA(bool);
+    void toggleFilling(bool);
 
 private slots:
     void setCurrentPenJoinStyle(Qt::PenJoinStyle);
     void setCurrentPenCapStyle(Qt::PenCapStyle);
-    void drawLine(QPointF, QPointF);
-    void drawEllipse(QPointF, QPointF);
-    void drawRectangle(QPointF, QPointF);
-    void startFreePath(QPointF);
-    void addFreeDraw(QPointF);
-    void startPolygon(QPointF);
-    void addSegment(QPointF);
-    void endPolygon(QPointF);
+
     void expandDrawList();
     int reduceDrawList();
+    void cancel();
     void emptyDrawList();
-    int findShapeSelected(QPointF);
-    void clearLastElement();
-    void translateShape(int, float, float);
+    void findShapeSelected(QPointF);
 
 };
 

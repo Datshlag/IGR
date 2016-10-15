@@ -12,26 +12,30 @@ DrawZone::DrawZone(QWidget *parent)
     indexCurrent=0;
     lineNotDrawn=0;
     drawingShape=0;
-    currentRadius=0;
 
-    drawingMode=1;
-    selectingMode=0;
+    currentMode=0;
     movingShape=0;
+    isAAOn=true;
+    filling=false;
 
     currentPenCapStyle=Qt::SquareCap;
     currentPenJoinStyle=Qt::BevelJoin;
-    currentPenWidth=0;
+    currentFillingRule=Qt::OddEvenFill;
+    currentPenSize=0;
     currentPenColor=Qt::black;
     currentPointA = QPointF(-1,-1);
     currentPointB = QPointF(-1,-1);
 
-    objectType=0;
+    currentShapeType=0;
 
-    penWidthDrawList.append(currentPenWidth);
-    penColorDrawList.append(currentPenColor);
-    penCapStyleDrawList.append(currentPenCapStyle);
-    penJoinStyleDrawList.append(currentPenJoinStyle);
-    objectsDrawList.append(QPainterPath());
+    shapeDrawList.append(Shape(this,
+                               currentPenColor,
+                               currentPenSize,
+                               currentPenCapStyle,
+                               currentPenJoinStyle,
+                               filling,
+                               currentFillingRule));
+    currentShape=&(shapeDrawList[0]);
 
 }
 
@@ -45,7 +49,8 @@ void DrawZone::paintEvent(QPaintEvent *e)
 
     QWidget::paintEvent(e);
     QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
+
+    if(isAAOn) painter.setRenderHint(QPainter::Antialiasing);
 
     QRect rectangle;
     rectangle.setCoords(-1,-1,this->width(),this->height());
@@ -54,16 +59,18 @@ void DrawZone::paintEvent(QPaintEvent *e)
     painter.drawRect(rectangle);
 
     QPen pen;
-    for(int i=0; i<=indexCurrent; i++)
+    for(int i=0; i<=shapeDrawList.length()-1; i++)
     {
-        pen.setWidth(penWidthDrawList.at(i));
-        pen.setColor(penColorDrawList.at(i));
-        pen.setCapStyle(penCapStyleDrawList.at(i));
-        pen.setJoinStyle(penJoinStyleDrawList.at(i));
-        //painter.setBrush(QBrush(penColorDrawList.at(i)));
-        painter.setBrush(QColor(0, 0, 0, 0));
+
+        pen.setWidth(shapeDrawList[i].getSize());
+        pen.setColor(shapeDrawList[i].getColor());
+        pen.setCapStyle(shapeDrawList[i].getCapStyle());
+        pen.setJoinStyle(shapeDrawList[i].getJoinStyle());
+        if(shapeDrawList[i].getFilling()) painter.setBrush(QBrush(shapeDrawList[i].getColor()));
+        else painter.setBrush(QBrush(Qt::transparent));
         painter.setPen(pen);
-        painter.drawPath(objectsDrawList.at(i));
+        painter.drawPath(shapeDrawList[i].getPath());
+
     }
 }
 
@@ -71,59 +78,63 @@ void DrawZone::mousePressEvent(QMouseEvent * e)
 {
     if(e->button()==Qt::LeftButton){
 
-        if(drawingMode)
+        if(currentMode==0)
         {
-            if(objectType==0)
+            if(currentShapeType==0)
             {
 
                 currentPointA=e->pos();
                 currentPointB=e->pos();
-                this->drawLine(currentPointA,currentPointB);
+                currentShape->clear();
+                currentShape->addLine(e->pos(),e->pos());
                 lineNotDrawn=1;
+                drawingShape=1;
                 update();
+            }
+
+            if(currentShapeType==1||currentShapeType==2)
+            {
+
                 drawingShape=1;
             }
 
-            if(objectType==1)
+            if(currentShapeType==3)
             {
 
                 currentPointA=e->pos();
-                this->drawEllipse(currentPointA,currentPointA);
-                update();
+                currentShape->clear();
+                currentShape->addEllipse(e->pos(),e->pos());
                 drawingShape=1;
+                update();
             }
 
-            if(objectType==2)
+            if(currentShapeType==4)
             {
 
                 currentPointA=e->pos();
-                this->drawRectangle(currentPointA,currentPointA);
+                currentShape->clear();
+                currentShape->addRectangle(e->pos(),e->pos());
+                drawingShape=1;
                 update();
-                drawingShape=1;
             }
 
-            if(objectType==3)
-            {
-
-                drawingShape=1;
-            }
-
-            if(objectType==4)
+            if(currentShapeType==5)
             {
 
                 currentPointA=e->pos();
-                this->startFreePath(currentPointA);
+                //this->startFreePath(currentPointA);
+                currentShape->startFreePath(e->pos());
                 update();
                 drawingShape=1;
             }
         }
-        if(selectingMode)
+        if(currentMode==1)
         {
 
             currentPointA=e->pos();
             currentPointB=e->pos();
-            itemSelected=findShapeSelected(currentPointA);
-            if(itemSelected!=-1)
+            findShapeSelected(currentPointA);
+            if(shapeSelected!=NULL)
             {
 
                 movingShape=1;
@@ -137,11 +148,12 @@ void DrawZone::mousePressEvent(QMouseEvent * e)
         if(drawingPolygon)
         {
 
-            this->endPolygon(currentPointA);
-            this->drawLine(currentPointA, currentPointA);
-            update();
+            if(currentShapeType==2) currentShape->endPolygon(currentPointA);
+            if(currentShapeType==1) currentShape->endPolygon(e->pos());
             drawingPolygon=0;
             drawingShape=0;
+            update();
+            expandDrawList();
         }
     }
 
@@ -150,61 +162,65 @@ void DrawZone::mousePressEvent(QMouseEvent * e)
 
 void DrawZone::mouseMoveEvent(QMouseEvent * e)
 {
-    if(drawingMode)
+    if(currentMode==0)
     {
         if(drawingShape)
         {
-            if(objectType==0)
+            if(currentShapeType==0)
             {
 
                 currentPointB=e->pos();
-                this->drawLine(currentPointA,currentPointB);
+                currentShape->clear();
+                currentShape->addLine(currentPointA,currentPointB);
                 update();
             }
 
-            if(objectType==1)
+            if(currentShapeType==1||currentShapeType==2)
             {
 
-                currentPointB=e->pos();
-                this->drawEllipse(currentPointA,currentPointB);
-                update();
-            }
-
-            if(objectType==2)
-            {
-
-                currentPointB=e->pos();
-                this->drawRectangle(currentPointA,currentPointB);
-                update();
-            }
-
-            if(objectType==3)
-            {
-                qDebug()<<i++;
                 if(drawingPolygon)
                 {
-                    this->drawLine(currentPointB,e->pos());
+
+                    currentShape->previewPolygon(currentPointB, e->pos());
                     update();
                 }
             }
 
-            if(objectType==4)
+            if(currentShapeType==3)
+            {
+
+                currentPointB=e->pos();
+                currentShape->clear();
+                currentShape->addEllipse(currentPointA,currentPointB);
+                update();
+            }
+
+            if(currentShapeType==4)
+            {
+
+                currentPointB=e->pos();
+                currentShape->clear();
+                currentShape->addRectangle(currentPointA,currentPointB);
+                update();
+            }
+
+            if(currentShapeType==5)
             {
 
                 currentPointA=e->pos();
-                this->addFreeDraw(currentPointA);
+                currentShape->addFreeDraw(currentPointA);
                 currentPointA=e->pos();
                 update();
             }
         }
     }
-    if(selectingMode)
+    if(currentMode==1)
     {
 
         if(movingShape)
         {
 
-            this->translateShape(itemSelected, e->pos().x()-currentPointB.x(), e->pos().y()-currentPointB.y());
+            shapeSelected->translate(e->pos().x()-currentPointB.x(), e->pos().y()-currentPointB.y());
             currentPointB=e->pos();
             update();
         }
@@ -213,122 +229,124 @@ void DrawZone::mouseMoveEvent(QMouseEvent * e)
 
 void DrawZone::mouseReleaseEvent(QMouseEvent * e)
 {
-    if(drawingMode)
+    if(currentMode==0)
     {
         if(drawingShape)
         {
             if(e->button()==Qt::LeftButton)
             {
-                if(objectType==0)
+                if(currentShapeType==0)
                 {
                     currentPointB=e->pos();
-                    this->drawLine(currentPointA,currentPointB);
+                    currentShape->clear();
+                    currentShape->addLine(currentPointA,currentPointB);
                     lineNotDrawn=0;
-                    this->expandDrawList();
-                    update();
                     drawingShape=0;
+                    update();
+                    this->expandDrawList();
                 }
 
-                if(objectType==1)
-                {
-
-                    currentPointB=e->pos();
-                    this->drawEllipse(currentPointA,currentPointB);
-                    this->expandDrawList();
-                    update();
-                    drawingShape=0;
-                }
-
-                if(objectType==2)
-                {
-                    currentPointB=e->pos();
-                    this->drawRectangle(currentPointA, currentPointB);
-                    this->expandDrawList();
-                    update();
-                    drawingShape=0;
-                }
-
-                if(objectType==3)
+                if(currentShapeType==1||currentShapeType==2)
                 {
                     if(!drawingPolygon)
                     {
                         currentPointA=e->pos();
                         currentPointB=e->pos();
-                        this->startPolygon(currentPointA);
-                        this->expandDrawList();
+                        currentShape->startPolygon(currentPointA);
                         drawingPolygon=1;
                     }
                     else
                     {
 
-                        this->addSegment(e->pos());
-                        this->clearLastElement();
+                        currentShape->addSegment(e->pos());
                         currentPointB=e->pos();
                     }
 
                     update();
                 }
 
-                if(objectType==4)
+                if(currentShapeType==3)
+                {
+
+                    currentPointB=e->pos();
+                    currentShape->clear();
+                    currentShape->addEllipse(currentPointA,currentPointB);
+                    drawingShape=0;
+                    update();
+                    this->expandDrawList();
+                }
+
+                if(currentShapeType==4)
+                {
+                    currentPointB=e->pos();
+                    currentShape->clear();
+                    currentShape->addRectangle(currentPointA,currentPointB);
+                    drawingShape=0;
+                    update();
+                    this->expandDrawList();
+                }
+
+                if(currentShapeType==5)
                 {
 
                     currentPointA=e->pos();
-                    this->addFreeDraw(currentPointA);
-                    this->expandDrawList();
-                    update();
+                    currentShape->addFreeDraw(currentPointA);
                     drawingShape=0;
+                    update();
+                    this->expandDrawList();
                 }
             }
         }
     }
-    if(selectingMode)
+    if(currentMode==1)
     {
 
         movingShape=0;
     }
 }
 
+
 void DrawZone::setCurrentPenColor(QColor color)
 {
 
     currentPenColor=color;
-    penColorDrawList[indexCurrent]=color;
+    currentShape->setColor(color);
 }
 
 void DrawZone::setCurrentPenWidth(int n)
 {
 
-    currentPenWidth=n;
-    penWidthDrawList[indexCurrent]=n;
+    currentPenSize=n;
+    currentShape->setSize(n);
 }
 
 void DrawZone::setCurrentPenCapStyle(Qt::PenCapStyle pcs)
 {
 
-    penCapStyleDrawList[indexCurrent]=pcs;
+    //penCapStyleDrawList[indexCurrent]=pcs;
     currentPenCapStyle=pcs;
+    currentShape->setCapStyle(pcs);
 }
 
 void DrawZone::setCurrentPenJoinStyle(Qt::PenJoinStyle pjs)
 {
 
-    penJoinStyleDrawList[indexCurrent]=pjs;
     currentPenJoinStyle=pjs;
+    currentShape->setJoinStyle(pjs);
 }
 
 void DrawZone::setCurrentPenCapStyle(int n)
 {
 
-    qDebug()<<n;
     switch(n){
         case(0):
-            this->setCurrentPenCapStyle(Qt::SquareCap);
+            setCurrentPenCapStyle(Qt::SquareCap);
             break;
         case(1):
-            this->setCurrentPenCapStyle(Qt::FlatCap);
+            setCurrentPenCapStyle(Qt::FlatCap);
             break;
         case(2):
-            this->setCurrentPenCapStyle(Qt::RoundCap);
+            setCurrentPenCapStyle(Qt::RoundCap);
     }
     emit penCapStyleChanged(n);
 }
@@ -338,13 +356,13 @@ void DrawZone::setCurrentPenJoinStyle(int n)
 
     switch(n){
         case(0):
-            this->setCurrentPenJoinStyle(Qt::BevelJoin);
+            setCurrentPenJoinStyle(Qt::BevelJoin);
             break;
         case(1):
-            this->setCurrentPenJoinStyle(Qt::MiterJoin);
+            setCurrentPenJoinStyle(Qt::MiterJoin);
             break;
         case(2):
-            this->setCurrentPenJoinStyle(Qt::RoundJoin);
+            setCurrentPenJoinStyle(Qt::RoundJoin);
     }
     emit penJoinStyleChanged(n);
 }
@@ -371,38 +389,27 @@ void DrawZone::setCurrentPenJoinStyle(QAction * action)
     emit penJoinStyleChanged(i);
 }
 
-void DrawZone::expandDrawList()
+void DrawZone::toggleFilling(bool b)
 {
 
-    indexCurrent++;
-    objectsDrawList.append(QPainterPath());
-    penWidthDrawList.append(currentPenWidth);
-    penColorDrawList.append(currentPenColor);
-    penCapStyleDrawList.append(currentPenCapStyle);
-    penJoinStyleDrawList.append(currentPenJoinStyle);
+    filling=b;
+    currentShape->toggleFilling(b);
+    emit fillingStateChanged(b);
 }
 
-int DrawZone::reduceDrawList()
+void DrawZone::setFillingRule(int n)
 {
 
-    if(indexCurrent>0)
-    {
-
-        indexCurrent--;
-        objectsDrawList.pop_back();
-        penWidthDrawList.pop_back();
-        penColorDrawList.pop_back();
-        penCapStyleDrawList.pop_back();
-        penJoinStyleDrawList.pop_back();
-        return 0;
-    }
-    return -1;
+    if(n==0) setFillingRule(Qt::OddEvenFill);
+    else if(n==1) setFillingRule(Qt::WindingFill);
+    qDebug()<<n;
 }
 
-void DrawZone::emptyDrawList()
+void DrawZone::setFillingRule(Qt::FillRule q)
 {
 
-    while(this->reduceDrawList()!=-1);
+    currentFillingRule=q;
+    currentShape->setFillRule(q);
 }
 
 void DrawZone::setDrawable(int n)
@@ -417,40 +424,115 @@ void DrawZone::setFillingColor(QColor color)
     fillingColor=color;
 }
 
-void DrawZone::setObjectToDraw(QAction * action)
+void DrawZone::setCurrentObjectToDraw(QAction * action)
 {
 
     QString s=action->text();
     if(s=="Line")
     {
-        objectType=0;
-    }
-    else if(s=="Ellipse")
-    {
-        objectType=1;
-    }
-    else if(s=="Rectangle")
-    {
-        objectType=2;
-    }
-    else if(s=="Polygon")
-    {
-        objectType=3;
-    }
-    else if(s=="Free Draw")
-    {
-        objectType=4;
+        currentShapeType=0;
     }
     else if(s=="Poly Line")
     {
-        objectType=5;
+        currentShapeType=1;
     }
+    else if(s=="Polygon")
+    {
+        currentShapeType=2;
+    }
+    else if(s=="Ellipse")
+    {
+        currentShapeType=3;
+    }
+    else if(s=="Rectangle")
+    {
+        currentShapeType=4;
+    }
+    else if(s=="Free Draw")
+    {
+        currentShapeType=5;
+    }
+
+    emit shapeStyleChanged(currentShapeType);
 }
 
-void DrawZone::setObjectToDraw(int)
+void DrawZone::setCurrentObjectToDraw(int n)
 {
 
+    currentShapeType=n;
+    emit shapeStyleChanged(n);
+}
 
+void DrawZone::setCurrentMode(QAction * q)
+{
+
+    QString s(q->text());
+    if(s=="Draw")
+    {
+
+        currentMode=0;
+    }
+    else
+    {
+
+        currentMode=1;
+    }
+    emit currentModeChanged(currentMode);
+}
+
+void DrawZone::setCurrentMode(int n)
+{
+
+    currentMode=n;
+    emit currentModeChanged(currentMode);
+}
+
+void DrawZone::toggleAA(bool n)
+{
+
+    isAAOn=n;
+    update();
+    emit AAStateChanged(isAAOn);
+}
+
+
+void DrawZone::expandDrawList()
+{
+
+    shapeDrawList.append(Shape(this,
+                               currentPenColor,
+                               currentPenSize,
+                               currentPenCapStyle,
+                               currentPenJoinStyle,
+                               filling,
+                               currentFillingRule
+                               ));
+    currentShape=&shapeDrawList.last();
+}
+
+int DrawZone::reduceDrawList()
+{
+
+    if(indexCurrent>0)
+    {
+        currentShape=&shapeDrawList[shapeDrawList.length()-1];
+        shapeDrawList.pop_back();
+        return 0;
+    }
+    return -1;
+}
+
+void DrawZone::emptyDrawList()
+{
+
+    while(this->reduceDrawList()!=-1);
+    expandDrawList();
+}
+
+void DrawZone::cancel()
+{
+
+    currentShape->clear();
 }
 
 void DrawZone::fillDrawZone(QColor color)
@@ -460,122 +542,12 @@ void DrawZone::fillDrawZone(QColor color)
     update();
 }
 
-/*void DrawZone::drawCircle(QPoint center, int r)
+void DrawZone::findShapeSelected(QPointF A)
 {
-
-    QPainterPath painter = QPainterPath();
-    painter.moveTo(center);
-    painter.addEllipse(QRect(QPoint(center.x()-r,center.y()-r),QPoint(center.x()+r,center.y()+r)));
-    objectsDrawList[indexCurrent]=painter;
-}*/
-
-void DrawZone::drawEllipse(QPointF A, QPointF B)
-{
-
-    QPainterPath painter = QPainterPath();
-    painter.moveTo(A);
-    painter.addEllipse(QRectF(A,B));
-    painter.setFillRule(Qt::WindingFill);
-    objectsDrawList[indexCurrent]=painter;
-}
-
-void DrawZone::drawLine(QPointF A, QPointF B)
-{
-    QPainterPath painter=QPainterPath();
-    painter.moveTo(A);
-    painter.lineTo(B);
-    objectsDrawList[indexCurrent]=painter;
-
-}
-
-void DrawZone::clearLastElement()
-{
-
-    QPainterPath path = QPainterPath();
-    objectsDrawList[indexCurrent]=path;
-}
-
-void DrawZone::drawRectangle(QPointF A, QPointF B)
-{
-
-    QPainterPath path = QPainterPath();
-    path.moveTo(A);
-    path.addRect(QRectF(A,B));
-    objectsDrawList[indexCurrent]=path;
-}
-
-void DrawZone::startFreePath(QPointF A)
-{
-
-    QPainterPath path = QPainterPath();
-    path.moveTo(A);
-    objectsDrawList[indexCurrent]=path;
-}
-
-void DrawZone::addFreeDraw(QPointF A)
-{
-
-    QPainterPath path = objectsDrawList[indexCurrent];
-    path.lineTo(A);
-    objectsDrawList[indexCurrent]=path;
-}
-
-void DrawZone::startPolygon(QPointF A)
-{
-
-    QPainterPath path = QPainterPath();
-    path.moveTo(A);
-    objectsDrawList[indexCurrent]=path;
-}
-
-void DrawZone::addSegment(QPointF A)
-{
-
-    QPainterPath path=objectsDrawList[indexCurrent-1];
-    path.lineTo(A);
-    objectsDrawList[indexCurrent-1]=path;
-}
-
-void DrawZone::endPolygon(QPointF start)
-{
-
-    this->addSegment(start);
-}
-
-int DrawZone::findShapeSelected(QPointF A)
-{
-
-    QRectF rect = QRectF(QPointF(A.x()-3,A.y()-3),QPointF(A.x()+3,A.y()+3));
-    for(int i=indexCurrent; i>=0; i--)
+    shapeSelected=NULL;
+    for(int i=0; i<shapeDrawList.length()-1; i++)
     {
-
-        QPainterPath path=objectsDrawList[i];
-        QPainterPathStroker stroke;
-        QPainterPath qpath = stroke.createStroke(path);
-        if(qpath.intersects(rect)) return i;
+        if(shapeDrawList[i].isShapeSelected(A)) shapeSelected=&shapeDrawList[i];
     }
-    return -1;
 }
 
-void DrawZone::translateShape(int index, float dx, float dy)
-{
-
-    objectsDrawList[index].translate(dx, dy);
-}
-
-void DrawZone::setEditionMode(int mode)
-{
-
-    if(mode==0) { drawingMode=1; selectingMode=0; }
-    else if(mode==1) { drawingMode=0; selectingMode=1; }
-    else { drawingMode=0; selectingMode=0 ;}
-}
-
-void DrawZone::setEditionMode(QAction * q)
-{
-
-    QString s=QString(q->text());
-    if(s=="Dessin") { drawingMode=1; selectingMode=0; }
-    else if(s=="Sélection") { drawingMode=0; selectingMode=1; }
-    else { drawingMode=0; selectingMode=0 ;}
-}

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>565</width>
-    <height>356</height>
+    <width>1084</width>
+    <height>641</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -136,6 +136,19 @@
                 <item row="3" column="1">
                  <widget class="DrawZone" name="widget_2" native="true"/>
                 </item>
+                <item row="4" column="0">
+                 <widget class="QCheckBox" name="AACheckBox">
+                  <property name="text">
+                   <string>Antialiasing</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QWidget" name="widget_3" native="true"/>
+                </item>
                </layout>
               </item>
              </layout>
@@ -156,9 +169,9 @@
               <item row="0" column="0">
                <layout class="QFormLayout" name="formLayout_2">
                 <item row="1" column="0">
-                 <widget class="QCheckBox" name="checkBox">
+                 <widget class="QCheckBox" name="fillCheckBox">
                   <property name="text">
-                   <string>Fill shape</string>
+                   <string>Fill Shape</string>
                   </property>
                  </widget>
                 </item>
@@ -174,13 +187,6 @@
                     <string>Winding Fill</string>
                    </property>
                   </item>
-                 </widget>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QCheckBox" name="checkBox_2">
-                  <property name="text">
-                   <string>Antialiasing</string>
-                  </property>
                  </widget>
                 </item>
                 <item row="0" column="0">
@@ -199,17 +205,12 @@
                   </item>
                   <item>
                    <property name="text">
-                    <string>Free Draw</string>
+                    <string>PolyLine</string>
                    </property>
                   </item>
                   <item>
                    <property name="text">
-                    <string>Poly Line</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Rectangle</string>
+                    <string>Polygon</string>
                    </property>
                   </item>
                   <item>
@@ -219,7 +220,12 @@
                   </item>
                   <item>
                    <property name="text">
-                    <string>Polygon</string>
+                    <string>Rectangle</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Free Draw</string>
                    </property>
                   </item>
                  </widget>
@@ -235,17 +241,20 @@
               <string>Mode</string>
              </property>
              <layout class="QFormLayout" name="formLayout_6">
-              <item row="0" column="0">
+              <item row="0" column="0" colspan="2">
                <layout class="QFormLayout" name="formLayout_5">
                 <item row="0" column="0">
-                 <widget class="QRadioButton" name="radioButton_7">
+                 <widget class="QRadioButton" name="drawRadioButton">
                   <property name="text">
                    <string>Draw</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QRadioButton" name="radioButton_8">
+                 <widget class="QRadioButton" name="selectRadioButton">
                   <property name="text">
                    <string>Select</string>
                   </property>
@@ -283,7 +292,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>565</width>
+     <width>1084</width>
      <height>21</height>
     </rect>
    </property>
@@ -317,17 +326,21 @@
     <addaction name="separator"/>
     <addaction name="menuPen_join_style"/>
     <addaction name="menuPen_join_style_2"/>
+    <addaction name="separator"/>
+    <addaction name="actionAntialiasing"/>
    </widget>
    <widget class="QMenu" name="menuShapes">
     <property name="title">
      <string>Shape</string>
     </property>
     <addaction name="actionLine"/>
-    <addaction name="actionFree_draw"/>
-    <addaction name="actionCircle"/>
-    <addaction name="actionRectangle"/>
-    <addaction name="actionPolygon"/>
     <addaction name="actionPolyline"/>
+    <addaction name="actionPolygon"/>
+    <addaction name="separator"/>
+    <addaction name="actionEllipse"/>
+    <addaction name="actionRectangle"/>
+    <addaction name="separator"/>
+    <addaction name="actionFree_draw"/>
    </widget>
    <widget class="QMenu" name="menuEdition">
     <property name="title">
@@ -336,8 +349,8 @@
     <addaction name="actionAnnuler"/>
     <addaction name="actionClear"/>
     <addaction name="separator"/>
-    <addaction name="actionD_ssin"/>
-    <addaction name="actionS_l_ction"/>
+    <addaction name="actionDraw"/>
+    <addaction name="actionSelect"/>
    </widget>
    <addaction name="menuFichier"/>
    <addaction name="menuEdition"/>
@@ -408,7 +421,7 @@
     <string>Round Join</string>
    </property>
   </action>
-  <action name="actionCircle">
+  <action name="actionEllipse">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -448,10 +461,10 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Free draw</string>
+    <string>Free Draw</string>
    </property>
   </action>
-  <action name="actionD_ssin">
+  <action name="actionDraw">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -459,10 +472,10 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Dessin</string>
+    <string>Draw</string>
    </property>
   </action>
-  <action name="actionS_l_ction">
+  <action name="actionSelect">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -474,15 +487,32 @@
    <property name="text">
     <string>Cancel</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
   </action>
   <action name="actionClear">
    <property name="text">
     <string>Clear</string>
    </property>
+   <property name="shortcut">
+    <string/>
+   </property>
   </action>
   <action name="actionPolyline">
    <property name="text">
     <string>Polyline</string>
+   </property>
+  </action>
+  <action name="actionAntialiasing">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Antialiasing</string>
    </property>
   </action>
  </widget>

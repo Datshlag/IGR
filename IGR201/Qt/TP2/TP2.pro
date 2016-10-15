@@ -16,9 +16,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    drawzone.cpp
+    drawzone.cpp \
+    shape.cpp
 
 HEADERS  += mainwindow.h \
-    drawzone.h
+    drawzone.h \
+    shape.h
 
 FORMS    += mainwindow.ui
