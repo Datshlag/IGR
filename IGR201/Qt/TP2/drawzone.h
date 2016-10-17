@@ -12,6 +12,8 @@
 #include <QAction>
 #include <QVector>
 #include <Qt>
+#include <QFileDialog>
+#include <QMessageBox>
 #include "shape.h"
 
 class DrawZone : public QWidget
@@ -43,15 +45,6 @@ private:
     bool filling;
     Qt::FillRule currentFillingRule;
     int currentShapeType;
-
-    QVector<QPair<QPoint, QPoint> > lineDrawList;
-    QVector<QPainterPath > objectsDrawList;
-    QVector<int > penWidthDrawList;
-    QVector<QColor > penColorDrawList;
-    QVector<Qt::PenCapStyle > penCapStyleDrawList;
-    QVector<Qt::PenJoinStyle > penJoinStyleDrawList;
-    QVector<Qt::FillRule> fillingRuleDrawList;
-    QVector<bool > fillStatusDrawList;
 
     QVector<Shape > shapeDrawList;
     Shape * currentShape;
@@ -95,6 +88,8 @@ public slots:
     void fillDrawZone(QColor);
     void toggleAA(bool);
     void toggleFilling(bool);
+    void emptyDrawList();
+    void clearSelectedElement();
 
 private slots:
     void setCurrentPenJoinStyle(Qt::PenJoinStyle);
@@ -103,7 +98,8 @@ private slots:
     void expandDrawList();
     int reduceDrawList();
     void cancel();
-    void emptyDrawList();
+    void saveDrawList();
+    void openDrawList();
     void findShapeSelected(QPointF);
 
 };

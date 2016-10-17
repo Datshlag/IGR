@@ -4,8 +4,7 @@ Shape::Shape()
 {
 
 }
-Shape::Shape(DrawZone *parent,
-             QColor currentColor,
+Shape::Shape(QColor currentColor,
              int currentSize,
              Qt::PenCapStyle currentPenCapStyle,
              Qt::PenJoinStyle currentPenJoinStyle,
@@ -13,13 +12,23 @@ Shape::Shape(DrawZone *parent,
              Qt::FillRule currentFillRule)
 {
 
-    this->parent=parent;
     this->color=currentColor;
     this->size=currentSize;
+
+    if(currentPenCapStyle==Qt::SquareCap) capStyle=0;
+    if(currentPenCapStyle==Qt::FlatCap) capStyle=1;
+    if(currentPenCapStyle==Qt::RoundCap) capStyle=2;
+
+    if(currentPenJoinStyle==Qt::BevelJoin) joinStyle=0;
+    if(currentPenJoinStyle==Qt::MiterJoin) joinStyle=1;
+    if(currentPenJoinStyle==Qt::RoundJoin) joinStyle=2;
+
     this->capStyle=currentPenCapStyle;
     this->joinStyle=currentPenJoinStyle;
     this->fill=filling;
-    this->fillRule=currentFillRule;
+
+    if(currentFillRule==Qt::OddEvenFill) fillRule=0;
+    if(currentFillRule==Qt::WindingFill) fillRule=1;
 }
 
 Shape::~Shape(){
@@ -34,23 +43,29 @@ void Shape::setSize(int size)
 {
     this->size=size;
 }
-void Shape::setCapStyle(Qt::PenCapStyle pcs)
-{
-    this->capStyle=pcs;
-}
-void Shape::setJoinStyle(Qt::PenJoinStyle pjs)
+void Shape::setCapStyle(Qt::PenCapStyle currentPenCapStyle)
 {
 
-    this->joinStyle=pjs;
+    if(currentPenCapStyle==Qt::SquareCap) capStyle=0;
+    if(currentPenCapStyle==Qt::FlatCap) capStyle=1;
+    if(currentPenCapStyle==Qt::RoundCap) capStyle=2;
+}
+void Shape::setJoinStyle(Qt::PenJoinStyle currentPenJoinStyle)
+{
+
+    if(currentPenJoinStyle==Qt::BevelJoin) joinStyle=0;
+    if(currentPenJoinStyle==Qt::MiterJoin) joinStyle=1;
+    if(currentPenJoinStyle==Qt::RoundJoin) joinStyle=2;
 }
 void Shape::toggleFilling(bool b)
 {
     this->fill=b;
 }
-void Shape::setFillRule(Qt::FillRule fr)
+void Shape::setFillRule(Qt::FillRule currentFillRule)
 {
-    path.setFillRule(fr);
-    this->fillRule=fr;
+    if(currentFillRule==Qt::OddEvenFill) fillRule=0;
+    if(currentFillRule==Qt::WindingFill) fillRule=1;
+    path.setFillRule(currentFillRule);
 }
 
 QPainterPath Shape::getPath()
@@ -67,11 +82,15 @@ int Shape::getSize()
 }
 Qt::PenCapStyle Shape::getCapStyle()
 {
-    return capStyle;
+    if(capStyle==0) return Qt::SquareCap;
+    if(capStyle==1) return Qt::FlatCap;
+    if(capStyle==2) return Qt::RoundCap;
 }
 Qt::PenJoinStyle Shape::getJoinStyle()
 {
-    return joinStyle;
+    if(joinStyle==0) return Qt::BevelJoin;
+    if(joinStyle==1) return Qt::MiterJoin;
+    if(joinStyle==2) return Qt::RoundJoin;
 }
 bool Shape::getFilling()
 {
@@ -79,7 +98,8 @@ bool Shape::getFilling()
 }
 Qt::FillRule Shape::getFillRule()
 {
-    return fillRule;
+    if(fillRule==0) return Qt::OddEvenFill;
+    else return Qt::WindingFill;
 }
 
 void Shape::addLine(QPointF A, QPointF B)
@@ -171,4 +191,39 @@ void Shape::clearLine(QPointF A, QPointF B)
     QPainterPath intersection=path.intersected(pathToSubstract);
     path=path.subtracted(pathToSubstract);
     path.addPath(intersection);
+}
+
+QDataStream & operator << (QDataStream & out, const Shape & Valeur)
+{
+
+    out << Valeur.path
+        << Valeur.color
+        << Valeur.size
+        << Valeur.capStyle
+        << Valeur.joinStyle
+        << Valeur.fillRule
+        << Valeur.fill;
+
+    return out;
+}
+
+QDataStream & operator >> (QDataStream & in, Shape & Valeur)
+{
+
+    in >> Valeur.path
+       >> Valeur.color
+       >> Valeur.size
+       >> Valeur.capStyle
+       >> Valeur.joinStyle
+       >> Valeur.fillRule
+       >> Valeur.fill;
+
+    return in;
+}
+
+void Shape::initShapeSystem()
+{
+
+    qRegisterMetaTypeStreamOperators<Shape>("Shape");
+    qMetaTypeId<Shape>();
 }

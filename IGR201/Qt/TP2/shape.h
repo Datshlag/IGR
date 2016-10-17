@@ -4,6 +4,8 @@
 #include <Qt>
 #include <QPainterPath>
 #include <QColor>
+#include <QVariant>
+#include <QDataStream>
 
 class DrawZone;
 
@@ -12,20 +14,23 @@ class Shape
 
 public:
     Shape();
-    Shape(DrawZone*, QColor, int, Qt::PenCapStyle,Qt::PenJoinStyle, bool, Qt::FillRule);
+    Shape( QColor, int, Qt::PenCapStyle,Qt::PenJoinStyle, bool, Qt::FillRule);
     ~Shape();
+    static void initShapeSystem();
 
 private:
     QPainterPath path;
     QPainterPath pathTemp;
-    DrawZone* parent;
     QColor color;
     int size;
-    Qt::PenCapStyle capStyle;
-    Qt::PenJoinStyle joinStyle;
-    Qt::FillRule fillRule;
+    int capStyle;
+    int joinStyle;
+    int fillRule;
     bool fill;
-    int shapeType;
+
+    friend QDataStream & operator << (QDataStream & out, const Shape & valeur);
+    friend QDataStream & operator >> (QDataStream & in, Shape & Valeur);
+
 
 public slots:
     void setColor(QColor);
@@ -62,5 +67,9 @@ public slots:
     void clearLine(QPointF,QPointF);
 
 };
+
+Q_DECLARE_METATYPE(Shape)
+QDataStream & operator << (QDataStream & out, const Shape & valeur);
+QDataStream & operator >> (QDataStream & in, Shape & Valeur);
 
 #endif // SHAPE_H

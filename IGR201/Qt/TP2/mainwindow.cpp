@@ -119,6 +119,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->AACheckBox, SIGNAL(toggled(bool)), zone, SLOT(toggleAA(bool)));
     connect(zone, SIGNAL(AAStateChanged(bool)), this, SLOT(actualizeAAStatusUi(bool)));
 
+    connect(ui->actionSave, SIGNAL(triggered(bool)), zone, SLOT(saveDrawList()));
+    connect(ui->actionOpen, SIGNAL(triggered(bool)), zone, SLOT(openDrawList()));
+    connect(ui->actionClear, SIGNAL(triggered(bool)), zone, SLOT(emptyDrawList()));
+    connect(ui->actionAnnuler, SIGNAL(triggered(bool)), zone, SLOT(cancel()));
+    connect(ui->actionDelete, SIGNAL(triggered(bool)), zone, SLOT(clearSelectedElement()));
+
 }
 
 MainWindow::~MainWindow()

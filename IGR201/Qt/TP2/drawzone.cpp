@@ -28,8 +28,7 @@ DrawZone::DrawZone(QWidget *parent)
 
     currentShapeType=0;
 
-    shapeDrawList.append(Shape(this,
-                               currentPenColor,
+    shapeDrawList.append(Shape(currentPenColor,
                                currentPenSize,
                                currentPenCapStyle,
                                currentPenJoinStyle,
@@ -122,7 +121,6 @@ void DrawZone::mousePressEvent(QMouseEvent * e)
             {
 
                 currentPointA=e->pos();
-                //this->startFreePath(currentPointA);
                 currentShape->startFreePath(e->pos());
                 update();
                 drawingShape=1;
@@ -250,6 +248,7 @@ void DrawZone::mouseReleaseEvent(QMouseEvent * e)
                 {
                     if(!drawingPolygon)
                     {
+                        //previousShapeDrawList=shapeDrawList;
                         currentPointA=e->pos();
                         currentPointB=e->pos();
                         currentShape->startPolygon(currentPointA);
@@ -322,8 +321,6 @@ void DrawZone::setCurrentPenWidth(int n)
 
 void DrawZone::setCurrentPenCapStyle(Qt::PenCapStyle pcs)
 {
-
-    //penCapStyleDrawList[indexCurrent]=pcs;
     currentPenCapStyle=pcs;
     currentShape->setCapStyle(pcs);
 }
@@ -499,8 +496,7 @@ void DrawZone::toggleAA(bool n)
 void DrawZone::expandDrawList()
 {
 
-    shapeDrawList.append(Shape(this,
-                               currentPenColor,
+    shapeDrawList.append(Shape(currentPenColor,
                                currentPenSize,
                                currentPenCapStyle,
                                currentPenJoinStyle,
@@ -513,7 +509,7 @@ void DrawZone::expandDrawList()
 int DrawZone::reduceDrawList()
 {
 
-    if(indexCurrent>0)
+    if(shapeDrawList.length()>0)
     {
         currentShape=&shapeDrawList[shapeDrawList.length()-1];
         shapeDrawList.pop_back();
@@ -525,14 +521,25 @@ int DrawZone::reduceDrawList()
 void DrawZone::emptyDrawList()
 {
 
+    drawingShape=0;
+    drawingPolygon=0;
     while(this->reduceDrawList()!=-1);
     expandDrawList();
+    update();
 }
 
 void DrawZone::cancel()
 {
 
-    currentShape->clear();
+    qDebug()<<"call to cancel";
+    if(drawingShape==1) (*currentShape).clear();
+    else
+    {
+        reduceDrawList();
+        currentShape=&shapeDrawList.last();
+        (*currentShape).clear();
+    }
+    update();
 }
 
 void DrawZone::fillDrawZone(QColor color)
@@ -551,3 +558,61 @@ void DrawZone::findShapeSelected(QPointF A)
     }
 }
 
+void DrawZone::saveDrawList()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,("Save File"));
+    if (fileName != "")
+    {
+          QFile file(fileName);
+          if (!file.open(QIODevice::WriteOnly))
+          {
+              QMessageBox::critical(this, ("Error"),("Could not open file"));// error message
+          }
+          else
+          {
+
+              QDataStream outStream(&file);
+              for(int i=0; i<shapeDrawList.length(); i++)
+              {
+
+                  outStream << shapeDrawList[i];
+              }
+          }
+          file.close();
+    }
+}
+
+void DrawZone::openDrawList()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,("Open File"));
+    if (fileName != "")
+    {
+          QFile file(fileName);
+          if (!file.open(QIODevice::ReadOnly))
+          {
+              QMessageBox::critical(this, ("Error"),("Could not open file"));// error message
+          }
+          else
+          {
+
+              QDataStream inStream(&file);
+              this->emptyDrawList();
+              while(!inStream.atEnd())
+              {
+
+                  inStream >> shapeDrawList[shapeDrawList.length()-1];
+                  expandDrawList();
+              }
+              update();
+          }
+          file.close();
+    }
+
+}
+
+void DrawZone::clearSelectedElement()
+{
+    if(currentMode==1)
+    (*shapeSelected).clear();
+    update();
+}
