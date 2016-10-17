@@ -50,11 +50,14 @@ private:
     Shape * currentShape;
     Shape * shapeSelected;
 
-    int lineNotDrawn;
-
     void mousePressEvent(QMouseEvent*);
     void mouseMoveEvent(QMouseEvent*);
     void mouseReleaseEvent(QMouseEvent*);
+    void setCurrentPenJoinStyle(Qt::PenJoinStyle);
+    void setCurrentPenCapStyle(Qt::PenCapStyle);
+    void expandDrawList();
+    int reduceDrawList();
+    void findShapeSelected(QPointF);
 
 protected:
     virtual void paintEvent(QPaintEvent*);
@@ -90,17 +93,9 @@ public slots:
     void toggleFilling(bool);
     void emptyDrawList();
     void clearSelectedElement();
-
-private slots:
-    void setCurrentPenJoinStyle(Qt::PenJoinStyle);
-    void setCurrentPenCapStyle(Qt::PenCapStyle);
-
-    void expandDrawList();
-    int reduceDrawList();
     void cancel();
     void saveDrawList();
     void openDrawList();
-    void findShapeSelected(QPointF);
 
 };
 

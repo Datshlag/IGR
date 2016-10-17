@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <drawzone.h>
+#include <QButtonGroup>
 #include <QColorDialog>
 #include <QSpinBox>
 #include <QComboBox>

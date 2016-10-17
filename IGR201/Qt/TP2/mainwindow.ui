@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1084</width>
-    <height>641</height>
+    <width>1097</width>
+    <height>645</height>
    </rect>
   </property>
   <property name="mouseTracking">
@@ -292,8 +292,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1084</width>
-     <height>21</height>
+     <width>1097</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFichier">
@@ -493,6 +493,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Z</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
    </property>
   </action>
   <action name="actionClear">

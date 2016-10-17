@@ -10,7 +10,6 @@ DrawZone::DrawZone(QWidget *parent)
     fillingColor = Qt::white;
 
     indexCurrent=0;
-    lineNotDrawn=0;
     drawingShape=0;
 
     currentMode=0;
@@ -58,7 +57,7 @@ void DrawZone::paintEvent(QPaintEvent *e)
     painter.drawRect(rectangle);
 
     QPen pen;
-    for(int i=0; i<=shapeDrawList.length()-1; i++)
+    for(int i=0; i<=shapeDrawList.size()-1; i++)
     {
 
         pen.setWidth(shapeDrawList[i].getSize());
@@ -86,7 +85,6 @@ void DrawZone::mousePressEvent(QMouseEvent * e)
                 currentPointB=e->pos();
                 currentShape->clear();
                 currentShape->addLine(e->pos(),e->pos());
-                lineNotDrawn=1;
                 drawingShape=1;
                 update();
             }
@@ -238,7 +236,6 @@ void DrawZone::mouseReleaseEvent(QMouseEvent * e)
                     currentPointB=e->pos();
                     currentShape->clear();
                     currentShape->addLine(currentPointA,currentPointB);
-                    lineNotDrawn=0;
                     drawingShape=0;
                     update();
                     this->expandDrawList();
@@ -509,9 +506,9 @@ void DrawZone::expandDrawList()
 int DrawZone::reduceDrawList()
 {
 
-    if(shapeDrawList.length()>0)
+    if(shapeDrawList.size()>0)
     {
-        currentShape=&shapeDrawList[shapeDrawList.length()-1];
+        currentShape=&shapeDrawList[shapeDrawList.size()-1];
         shapeDrawList.pop_back();
         return 0;
     }
@@ -531,7 +528,6 @@ void DrawZone::emptyDrawList()
 void DrawZone::cancel()
 {
 
-    qDebug()<<"call to cancel";
     if(drawingShape==1) (*currentShape).clear();
     else
     {
@@ -552,7 +548,7 @@ void DrawZone::fillDrawZone(QColor color)
 void DrawZone::findShapeSelected(QPointF A)
 {
     shapeSelected=NULL;
-    for(int i=0; i<shapeDrawList.length()-1; i++)
+    for(int i=0; i<shapeDrawList.size()-1; i++)
     {
         if(shapeDrawList[i].isShapeSelected(A)) shapeSelected=&shapeDrawList[i];
     }
@@ -572,7 +568,7 @@ void DrawZone::saveDrawList()
           {
 
               QDataStream outStream(&file);
-              for(int i=0; i<shapeDrawList.length(); i++)
+              for(int i=0; i<shapeDrawList.size(); i++)
               {
 
                   outStream << shapeDrawList[i];
@@ -600,7 +596,7 @@ void DrawZone::openDrawList()
               while(!inStream.atEnd())
               {
 
-                  inStream >> shapeDrawList[shapeDrawList.length()-1];
+                  inStream >> shapeDrawList[shapeDrawList.size()-1];
                   expandDrawList();
               }
               update();
