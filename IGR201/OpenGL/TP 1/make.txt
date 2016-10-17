@@ -1,0 +1,2 @@
+g++ -Wall -O2    -g -c -o Main.o Main.cpp
+g++  -o main Main.o    -lglut -lGLU -lGL -lm 
