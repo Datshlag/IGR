@@ -27,6 +27,8 @@ static string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pr
 static GLint window;
 static unsigned int screenWidth;
 static unsigned int screenHeight;
+static bool movingCamera;
+static bool settingCameraUp = true;
 
 // Camera parameters
 static float fovAngle;
@@ -43,8 +45,10 @@ static float camTargetZ;
 // Sphere parameters
 const int n1=30;
 const int n2=30;
-static float spherePositionArray[3*(n1-1)*n2+6];
-static unsigned int sphereIndexArray[6*n1*n2];
+static GLfloat spherePositionArray[3*(n1-1)*n2+6];
+static GLfloat sphereColorArray[3*(n1-1)*n2+6];
+static GLint sphereIndexArray[6*(n1-1)*n2];
+static GLint indexBufferId;
 
 void polar2Cartesian (float phi, float theta, float r, float & x, float & y, float & z) {
 	x = r * sin (theta) * cos (phi);
@@ -59,7 +63,7 @@ void glSphereV2(float xCoord, float yCoord, float zCoord, float radius){
 	glTranslatef (xCoord, yCoord, zCoord); // applique une translation à la matrice
 	glScalef(radius,radius,radius);
 
-	glDrawElements(GL_TRIANGLES, 6*n1*n2, GL_UNSIGNED_INT, (GLvoid*) sphereIndexArray);
+	glDrawElements(GL_TRIANGLES, 6*(n1-1)*n2, GL_UNSIGNED_INT, (GLvoid *) 0);
 
 	glPopMatrix (); // replace la matrice modèle vue courante original
 }
@@ -155,8 +159,8 @@ void init () {
 	fovAngle = 45.f;
 	nearPlane = 0.01;
 	farPlane = 10.0;
-	camPhi = M_PI/2.0;
-	camTheta = M_PI/4.0;
+	camPhi = 0;
+	camTheta = 0;
 	camDist2Target = 5.0;
 	camTargetX = 0.0;
 	camTargetY = 0.0;
@@ -170,17 +174,26 @@ void init () {
 	float z=0;
 
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 3*sizeof(float), (GLvoid*) spherePositionArray);
+	glVertexPointer(3, GL_FLOAT, 0, spherePositionArray);
+	
+	glEnableClientState(GL_COLOR_ARRAY);
+	glColorPointer(3, GL_FLOAT, 0, sphereColorArray);
 
 	polar2Cartesian(0,0,1.0,x,y,z);
 	spherePositionArray[0]=x;
 	spherePositionArray[1]=y;
 	spherePositionArray[2]=z;
+	sphereColorArray[0]=abs(x);
+	sphereColorArray[1]=abs(y);
+	sphereColorArray[2]=abs(z);
 
-	polar2Cartesian(M_PI,0,1.0,x,y,z);
+	polar2Cartesian(0,M_PI,1.0,x,y,z);
 	spherePositionArray[3*n2*(n1-1)+3]=x;
 	spherePositionArray[3*n2*(n1-1)+4]=y;
 	spherePositionArray[3*n2*(n1-1)+5]=z;
+	sphereColorArray[3*n2*(n1-1)+3]=abs(x);
+	sphereColorArray[3*n2*(n1-1)+4]=abs(y);
+	sphereColorArray[3*n2*(n1-1)+5]=abs(z);
 
 	for(int k1=1; k1<n1; k1++)
 	{
@@ -194,6 +207,9 @@ void init () {
 			spherePositionArray[3+3*n2*(k1-1)+3*k2]=x;
 			spherePositionArray[3+3*n2*(k1-1)+3*k2+1]=y;
 			spherePositionArray[3+3*n2*(k1-1)+3*k2+2]=z;
+			sphereColorArray[3+3*n2*(k1-1)+3*k2]=abs(x);
+			sphereColorArray[3+3*n2*(k1-1)+3*k2+1]=abs(y);
+			sphereColorArray[3+3*n2*(k1-1)+3*k2+2]=abs(z);
 		}
 	}
 
@@ -201,19 +217,19 @@ void init () {
 	{
 
 		sphereIndexArray[3*k2]=0;
-		sphereIndexArray[3*k2+1]=(k2+1+n2)%n2;
-		sphereIndexArray[3*k2+2]=(k2+2+n2)%n2;
+		sphereIndexArray[3*k2+1]=k2+1;
+		sphereIndexArray[3*k2+2]=(k2+1)%n2+1;
 	}
 
 	for(int k2=0; k2<n2; k2++)
 	{
 
-		sphereIndexArray[3*n2+6*n2*(n1-1)+3*k2]=1+n2*(n1-1)+k2;
-		sphereIndexArray[3*n2+6*n2*(n1-1)+3*k2+1]=n2*(n1-1)+1;
-		sphereIndexArray[3*n2+6*n2*(n1-1)+3*k2+2]=1+n2*(n1-1)+(k2+1+n2)%n2;
+		sphereIndexArray[3*n2+6*n2*(n1-2)+3*k2]=1+n2*(n1-2)+k2;
+		sphereIndexArray[3*n2+6*n2*(n1-2)+3*k2+1]=n2*(n1-1)+1;
+		sphereIndexArray[3*n2+6*n2*(n1-2)+3*k2+2]=1+n2*(n1-2)+(k2+1)%n2;
 	}
 
-	for(int k1=1; k1<n1; k1++)
+	for(int k1=1; k1<n1-1; k1++)
 	{
 
 		for(int k2=0; k2<n2; k2++)
@@ -221,13 +237,23 @@ void init () {
 
 			sphereIndexArray[3*n2+6*n2*(k1-1)+3*k2]=1+n2*(k1-1)+k2;
 			sphereIndexArray[3*n2+6*n2*(k1-1)+3*k2+1]=1+n2*k1+k2;
-			sphereIndexArray[3*n2+6*n2*(k1-1)+3*k2+2]=1+n2*k1+(k2+1+n2)%n2;
+			sphereIndexArray[3*n2+6*n2*(k1-1)+3*k2+2]=1+n2*k1+(k2+1)%n2;
+
+			std::cout<<"premier triangle : "<<1+n2*(k1-1)+k2<<" "<<1+n2*k1+k2<<" "<<1+n2*k1+(k2+1)%n2<<"\n";
 
 			sphereIndexArray[3*n2+6*n2*(k1-1)+3*k2+3]=1+n2*(k1-1)+k2;
-			sphereIndexArray[3*n2+6*n2*(k1-1)+3*k2+4]=1+n2*(k1-1)+(k2+1+n2)%n2;
-			sphereIndexArray[3*n2+6*n2*(k1-1)+3*k2+5]=1+n2*k1+(k2+1+n2)%n2;
+			sphereIndexArray[3*n2+6*n2*(k1-1)+3*k2+4]=1+n2*k1+(k2+1)%n2;
+			sphereIndexArray[3*n2+6*n2*(k1-1)+3*k2+5]=1+n2*(k1-1)+(k2+1)%n2;
+
+			std::cout<<"deuxième triangle : "<<1+n2*(k1-1)+k2<<" "<<1+n2*k1+(k2+1)%n2<<" "<<1+n2*(k1-1)+(k2+1)%n2<<"\n";
 		}
 	}
+
+	// Buffers initialization
+	glGenBuffers(1, &indexBufferId);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(sphereIndexArray), sphereIndexArray, GL_STATIC_DRAW);
+
 
 }
 
@@ -254,7 +280,10 @@ void reshape (int w, int h) {
 }
 
 void display () {
-    setupCamera ();
+	if(settingCameraUp){
+		setupCamera ();
+		settingCameraUp=false;
+	}
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Erase the color and z buffers.
 
 	glSphereV2(0.0,0.0,0.0,1.5);
@@ -283,10 +312,46 @@ void keyboard (unsigned char keyPressed, int x, int y) {
     glutPostRedisplay ();
 }
 
-void mouse (int button, int state, int x, int y) {
-}
 
+float currxf;
+float curryf;
+float oldxf;
+float oldyf;
+float modelview[16];
+
+void mouse (int button, int state, int x, int y) {
+
+	if(button==GLUT_LEFT_BUTTON)
+	{
+		if(state==GLUT_DOWN)
+		{
+			movingCamera=true;
+			oldxf=x;
+			currxf=x;
+			oldyf=y;
+			curryf=y;
+		}
+		else 
+		{
+			movingCamera=false;
+		}
+	}
+
+}
 void motion (int x, int y) {
+
+	if(movingCamera)
+	{
+		oldxf=currxf;
+		oldyf=curryf;
+		currxf=x;
+		curryf=y;
+		glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
+		glMatrixMode(GL_MODELVIEW); // Set the modelview matrix as current. All upcoming matrix manipulations will affect it.
+		glRotatef(currxf-oldxf, modelview[1], modelview[5] ,modelview[9]);
+		glRotatef(curryf-oldyf, modelview[0], modelview[4], modelview[8]);
+		glutPostRedisplay();
+	}
 }
 
 // This function is executed in an infinite loop. It updated the window title
@@ -299,13 +364,13 @@ int main (int argc, char ** argv) {
     glutInitDisplayMode (GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE); // Setup a RGBA framebuffer to display, with a depth buffer (z-buffer), in double buffer mode (fill a buffer then update the screen)
     glutInitWindowSize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT); // Set the window app size on screen
     window = glutCreateWindow (appTitle.c_str ()); // create the window
-    init (); // Your initialization code (OpenGL states, geometry, material, lights, etc)
+    init(); // Your initialization code (OpenGL states, geometry, material, lights, etc)
     glutReshapeFunc (reshape); // Callback function executed whenever glut need to setup the projection matrix
-		glutDisplayFunc (display); // Callback function executed when the window app need to be redrawn
+	glutDisplayFunc (display); // Callback function executed when the window app need to be redrawn
     glutKeyboardFunc (keyboard); // Callback function executed when the keyboard is used
     glutMouseFunc (mouse); // Callback function executed when a mouse button is clicked
-		glutMotionFunc (motion); // Callback function executed when the mouse move
-		glutIdleFunc (idle); // Callback function executed continuously when no other event happens (good for background procesing or animation for instance).
+	glutMotionFunc (motion); // Callback function executed when the mouse move
+	glutIdleFunc (idle); // Callback function executed continuously when no other event happens (good for background procesing or animation for instance).
     printUsage (); // By default, display the usage help of the program
     glutMainLoop ();
     return 0;
