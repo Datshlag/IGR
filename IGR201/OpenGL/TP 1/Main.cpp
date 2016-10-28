@@ -6,12 +6,16 @@
 // All rights reserved.
 // ----------------------------------------------
 
+#define GL_GLEXT_PROTOTYPES
+
 #include <iostream>
 #include <vector>
 #include <string>
 #include <cmath>
 #include <math.h>
-#include <glut.h>
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include "GL/glext.h"
 #include <vector>
 
 #ifndef M_PI
@@ -47,8 +51,8 @@ const int n1=30;
 const int n2=30;
 static GLfloat spherePositionArray[3*(n1-1)*n2+6];
 static GLfloat sphereColorArray[3*(n1-1)*n2+6];
-static GLint sphereIndexArray[6*(n1-1)*n2];
-static GLint indexBufferId;
+static GLuint sphereIndexArray[6*(n1-1)*n2];
+static GLuint indexBufferId;
 
 void polar2Cartesian (float phi, float theta, float r, float & x, float & y, float & z) {
 	x = r * sin (theta) * cos (phi);
@@ -158,10 +162,10 @@ void init () {
 	// Camera initialization
 	fovAngle = 45.f;
 	nearPlane = 0.01;
-	farPlane = 10.0;
+	farPlane = 100.0;
 	camPhi = 0;
 	camTheta = 0;
-	camDist2Target = 5.0;
+	camDist2Target = 15;
 	camTargetX = 0.0;
 	camTargetY = 0.0;
 	camTargetZ = 0.0;
@@ -286,7 +290,18 @@ void display () {
 	}
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Erase the color and z buffers.
 
-	glSphereV2(0.0,0.0,0.0,1.5);
+	for(int i=-10; i<10; i++)
+	{
+		for(int j=-10; j<10; j++)
+		{
+			for(int k=-10; k<10; k++)
+			{
+
+				glSphereV2(i/2,j/2,k/2,0.5);
+			}
+		}
+	}
+
 	glEnd();
 
     glFlush (); // Ensures any previous OpenGL call has been executed
