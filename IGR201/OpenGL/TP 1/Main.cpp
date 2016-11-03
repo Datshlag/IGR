@@ -6,6 +6,16 @@
 // All rights reserved.
 // ----------------------------------------------
 
+/*
+Aloïs Pourchot
+
+Questions traitées : toutes, sauf l'implémentation du bruit de Perlin. La fonctionnalité permettant en théorie de déplacer
+le modèle ne fonctionne pas correctement. La fonction permettant  d'ouvrir une texture au format ppm ne fonctionne pas dans 
+le cas où le fichier présente des commentaires. Deux textures de planètes sont présentes dans l'archive à titre purement visuel
+dans le cas où lesdites textures ne seraient pas présentes, un échiquier sera généré dans le méthode d'ouverture. La méthode genCheckerBoard
+fonctionne bien avec les paramètres fixés ci-dessous, mais il se pourrait qu'en changeant la quantification des sphères, elle ne rende plus vraiment
+un échiquier. Je n'ai malheureusement plus le temps d'y toucher.
+*/
 #define GL_GLEXT_PROTOTYPES
 
 #include <iostream>
@@ -107,7 +117,7 @@ void glSphereVBO(float xCoord, float yCoord, float zCoord, float radius){
 
 	glDrawElements(GL_TRIANGLES, 6*n1*n2, GL_UNSIGNED_INT, (GLvoid *) 0);
 
-	glPopMatrix (); // replace la matrice modèle vue courante original
+	glPopMatrix (); // remplace la matrice modèle vue courante original
 }
 
 void genCheckerBoard(unsigned int w, unsigned int h){
@@ -293,7 +303,8 @@ void loadImage(const char *filename)
 void printUsage () {
 	std::cerr << std::endl // send a line break to the standard error output
 		 << appTitle << std::endl
-         << "Author : Tamy Boubekeur, Aloïs Pourchot" << std::endl << std::endl
+         << "Author : Tamy Boubekeur" << std::endl << std::endl
+         << "Student : Aloïs Pourchot" << std::endl << std::endl
          << "Usage : ./main [<file.off>]" << std::endl
          << "Commandes clavier :" << std::endl
          << "------------------" << std::endl
@@ -302,8 +313,10 @@ void printUsage () {
 		 << " 9 : Toggle light mode" << std::endl
 		 << " 1-8 : Toggle light source" << std::endl
          << " <drag>+<left button>: rotate model" << std::endl
-         << " <drag>+<right button>: move model" << std::endl
+         << " <drag>+<right button>: move model (this feature is messy)" << std::endl
          << " <drag>+<middle button>: zoom" << std::endl
+         << " +: increase sphere acceleration"<< std::endl
+         << " -: decrease sphere acceleration"<<std::endl
          << " q, <esc>: Quit" << std::endl << std::endl;
 }
 
@@ -467,51 +480,51 @@ void init () {
 	// Lighting initialization
 	GLfloat light_position_0[4] = {100.0f, 100.0f, 100.0f, 1.0f};
 	GLfloat color_0[4] = {0.0f, 0.0f, 0.9f, 1.0f};
-	glLightfv (GL_LIGHT0, GL_POSITION, light_position_0); // On place la source N° 0 en (10,10,10)
-	glLightfv (GL_LIGHT0, GL_DIFFUSE, color_0); // On lui donne légèrement orangée
-	glLightfv (GL_LIGHT0, GL_SPECULAR, color_0); // Une hérésie, mais OpenGL est conçu comme cela
+	glLightfv (GL_LIGHT0, GL_POSITION, light_position_0);
+	glLightfv (GL_LIGHT0, GL_DIFFUSE, color_0);
+	glLightfv (GL_LIGHT0, GL_SPECULAR, color_0);
 
 	GLfloat light_position_1[4] = {-100.0f, -100.0f, -100.0f, 1.0f};
 	GLfloat color_1[4] = {0.0f, 0.9f, 0.0f, 1.0f};
-	glLightfv (GL_LIGHT1, GL_POSITION, light_position_1); // On place la source N° 0 en (10,10,10)
-	glLightfv (GL_LIGHT1, GL_DIFFUSE, color_1); // On lui donne légèrement orangée
-	glLightfv (GL_LIGHT1, GL_SPECULAR, color_1); // Une hérésie, mais OpenGL est conçu comme cela
+	glLightfv (GL_LIGHT1, GL_POSITION, light_position_1);
+	glLightfv (GL_LIGHT1, GL_DIFFUSE, color_1);
+	glLightfv (GL_LIGHT1, GL_SPECULAR, color_1);
 
 	GLfloat light_position_2[4] = {-100.0f, 100.0f, 100.0f, 1.0f};
 	GLfloat color_2[4] = {0.9f, 0.0f, 0.0f, 1.0f};
-	glLightfv (GL_LIGHT2, GL_POSITION, light_position_2); // On place la source N° 0 en (10,10,10)
-	glLightfv (GL_LIGHT2, GL_DIFFUSE, color_2); // On lui donne légèrement orangée
-	glLightfv (GL_LIGHT2, GL_SPECULAR, color_2); // Une hérésie, mais OpenGL est conçu comme cela
+	glLightfv (GL_LIGHT2, GL_POSITION, light_position_2);
+	glLightfv (GL_LIGHT2, GL_DIFFUSE, color_2);
+	glLightfv (GL_LIGHT2, GL_SPECULAR, color_2);
 
 	GLfloat light_position_3[4] = {100.0f, -100.0f, 100.0f, 1.0f};
 	GLfloat color_3[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-	glLightfv (GL_LIGHT3, GL_POSITION, light_position_3); // On place la source N° 0 en (10,10,10)
-	glLightfv (GL_LIGHT3, GL_DIFFUSE, color_3); // On lui donne légèrement orangée
-	glLightfv (GL_LIGHT3, GL_SPECULAR, color_3); // Une hérésie, mais OpenGL est conçu comme cela
+	glLightfv (GL_LIGHT3, GL_POSITION, light_position_3);
+	glLightfv (GL_LIGHT3, GL_DIFFUSE, color_3);
+	glLightfv (GL_LIGHT3, GL_SPECULAR, color_3);
 
 	GLfloat light_position_4[4] = {100.0f, 100.0f, -100.0f, 1.0f};
 	GLfloat color_4[4] = {0.5f, 0.5f, 0.5f, 1.0f};
-	glLightfv (GL_LIGHT4, GL_POSITION, light_position_4); // On place la source N° 0 en (10,10,10)
-	glLightfv (GL_LIGHT4, GL_DIFFUSE, color_4); // On lui donne légèrement orangée
-	glLightfv (GL_LIGHT4, GL_SPECULAR, color_4); // Une hérésie, mais OpenGL est conçu comme cela
+	glLightfv (GL_LIGHT4, GL_POSITION, light_position_4);
+	glLightfv (GL_LIGHT4, GL_DIFFUSE, color_4);
+	glLightfv (GL_LIGHT4, GL_SPECULAR, color_4);
 
 	GLfloat light_position_5[4] = {-100.0f, -100.0f, 100.0f, 1.0f};
 	GLfloat color_5[4] = {0.9f, 0.7f, 0.1f, 1.0f};
-	glLightfv (GL_LIGHT5, GL_POSITION, light_position_5); // On place la source N° 0 en (10,10,10)
-	glLightfv (GL_LIGHT5, GL_DIFFUSE, color_5); // On lui donne légèrement orangée
-	glLightfv (GL_LIGHT5, GL_SPECULAR, color_5); // Une hérésie, mais OpenGL est conçu comme cela
+	glLightfv (GL_LIGHT5, GL_POSITION, light_position_5);
+	glLightfv (GL_LIGHT5, GL_DIFFUSE, color_5);
+	glLightfv (GL_LIGHT5, GL_SPECULAR, color_5);
 
 	GLfloat light_position_6[4] = {100.0f, -100.0f, -100.0f, 1.0f};
 	GLfloat color_6[4] = {0.5f, 0.1f, 0.8f, 1.0f};
-	glLightfv (GL_LIGHT6, GL_POSITION, light_position_6); // On place la source N° 0 en (10,10,10)
-	glLightfv (GL_LIGHT6, GL_DIFFUSE, color_6); // On lui donne légèrement orangée
-	glLightfv (GL_LIGHT6, GL_SPECULAR, color_6); // Une hérésie, mais OpenGL est conçu comme cela
+	glLightfv (GL_LIGHT6, GL_POSITION, light_position_6);
+	glLightfv (GL_LIGHT6, GL_DIFFUSE, color_6);
+	glLightfv (GL_LIGHT6, GL_SPECULAR, color_6);
 
 	GLfloat light_position_7[4] = {-100.0f, 100.0f, -100.0f, 1.0f};
 	GLfloat color_7[4] = {0.5f, 0.2f, 0.6f, 1.0f};
-	glLightfv (GL_LIGHT7, GL_POSITION, light_position_7); // On place la source N° 0 en (10,10,10)
-	glLightfv (GL_LIGHT7, GL_DIFFUSE, color_7); // On lui donne légèrement orangée
-	glLightfv (GL_LIGHT7, GL_SPECULAR, color_7); // Une hérésie, mais OpenGL est conçu comme cela
+	glLightfv (GL_LIGHT7, GL_POSITION, light_position_7);
+	glLightfv (GL_LIGHT7, GL_DIFFUSE, color_7); 
+	glLightfv (GL_LIGHT7, GL_SPECULAR, color_7);
 
 	// Texture stuff initialization
 	glEnable(GL_TEXTURE_2D); 
@@ -520,19 +533,23 @@ void init () {
 	loadImage("textures/planetcenter.ppm");
 
 	glBindTexture (GL_TEXTURE_2D, textures[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
 	glTexImage2D (GL_TEXTURE_2D, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 
 	loadImage("textures/planetorbit.ppm");
+
 	glBindTexture (GL_TEXTURE_2D, textures[1]);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
 	glTexImage2D (GL_TEXTURE_2D, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 
 	delete(image);
@@ -654,14 +671,12 @@ void keyboard (unsigned char keyPressed, int x, int y) {
     			v0 = v0 + acceleration*(currentTime*0.001-t0);
     			t0 = currentTime*0.001;
     			acceleration+=0.1;
-    			std::cerr<<acceleration<<std::endl;;
     			break;
 			case '-':
 				x0 = acceleration/2*(currentTime*0.001-t0)*(currentTime*0.001-t0)+v0*(currentTime*0.001-t0)+x0;
     			v0 = v0 + acceleration*(currentTime*0.001-t0);
     			t0 = currentTime*0.001;
 				acceleration-=0.1;
-				std::cerr<<acceleration<<std::endl;
 				break;
 		    case 27:
 		        exit (0);
@@ -757,7 +772,6 @@ void motion (int x, int y) {
 		oldyf=curryf;
 		currxf=x;
 		curryf=y;
-		glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
 		glMatrixMode(GL_MODELVIEW);
 		glTranslatef(currxf-oldxf,curryf-oldyf,0);
 	}
@@ -769,10 +783,10 @@ void idle () {
 
 	glutPostRedisplay ();
 	currentTime = glutGet ((GLenum)GLUT_ELAPSED_TIME);
-
 }
 
 int main (int argc, char ** argv) {
+
     glutInit (&argc, argv); // Initialize a glut app
     glutInitDisplayMode (GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE); // Setup a RGBA framebuffer to display, with a depth buffer (z-buffer), in double buffer mode (fill a buffer then update the screen)
     glutInitWindowSize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT); // Set the window app size on screen
