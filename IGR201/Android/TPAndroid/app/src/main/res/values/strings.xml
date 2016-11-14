@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">TPAndroid</string>
+    <string name="usd_label">USD :</string>
+    <string name="destination">TO :</string>
+    <string name="value">3.2</string>
+    <string name="button_convert">Convert</string>
+    <string name="result">Result :</string>
+    <string name="Rate">Rate :</string>
+</resources>

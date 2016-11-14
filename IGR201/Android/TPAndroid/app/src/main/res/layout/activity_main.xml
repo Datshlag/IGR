@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="aloispourchot.tpandroid.MainActivity">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="6"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin">
+
+        <TextView
+            android:id="@+id/usd_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/usd_label"
+            android:textSize="40dp"
+        />
+
+        <EditText
+            android:id="@+id/edit_euros"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/usd_label"
+            android:layout_toLeftOf="@+id/dollar"
+            android:textSize="35dp"
+            android:textAlignment="textEnd"
+            android:inputType="numberDecimal"
+            android:hint="0"
+        />
+        <TextView
+            android:id="@+id/dollar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="$"
+            android:layout_marginLeft="5dp"
+            android:layout_centerVertical="true"
+            android:textSize="35dp"/>
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/SplitLine_hor1"
+        android:layout_width="match_parent"
+        android:layout_height= "2dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:background="@color/colorPrimaryDark" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="6"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin">
+
+
+        <TextView
+            android:id="@+id/destination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/destination"
+            android:textSize="40dp"
+            android:layout_centerVertical="true"/>
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_alignBottom="@id/destination"
+            android:layout_toRightOf="@id/destination"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:background="@color/colorPrimary">
+
+        <TextView
+            android:id="@+id/result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/result"
+            android:textSize="20dp"
+            android:textColor="#FFFFFFFF"
+            />
+
+        <TextView
+            android:id="@+id/rate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Rate"
+            android:textSize="20dp"
+            android:textColor="#FFFFFFFF"
+            android:layout_below="@id/result"/>
+
+        <EditText
+            android:id="@+id/result_value"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/result"
+            android:layout_alignBottom="@id/result"
+            android:text="0"
+            android:focusable="false"
+            android:background="#00000000"
+            android:textSize="20dp"
+            android:textAlignment="textEnd"
+            android:textColor="#FFFFFFFF"/>
+
+        <EditText
+            android:id="@+id/rate_value"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:layout_alignBottom="@id/rate"
+            android:layout_toRightOf="@id/rate"
+            android:textAlignment="textEnd"
+            android:focusable="false"
+            android:background="#00000000"
+            android:textSize="20dp"
+            android:textColor="#FFFFFFFF"/>
+    </RelativeLayout>
+
+</LinearLayout>
