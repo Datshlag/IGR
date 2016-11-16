@@ -1,0 +1,74 @@
+<html>
+  <head>
+  <title>Exo 1</title>
+  </head>
+  <body>
+  
+  <p>En utilisant canvas :</p>
+  <canvas id = "canvas" width="200" height="200"></canvas>
+
+  <p>En utilisant le format svg :</p>
+	<object data="../TP1/tp1_exo3.svg"></object>
+
+  </body>
+</html>
+
+<script>
+
+	window.onload = function(){
+		draw();
+		addListener();
+	}
+	
+	function draw(){
+
+		console.log("lul");
+		var c = document.getElementById("canvas");
+		var w = Number(c.getAttribute("width"));
+		var h = Number(c.getAttribute("height"));
+		var ctx=c.getContext("2d");
+
+		ctx.beginPath();
+		ctx.rect(0,0,w/2,h/2);
+		ctx.fillStyle = "blue";
+		ctx.fill();
+
+		ctx.beginPath();
+		ctx.rect(w/2,0,w/2,h/2);
+		ctx.fillStyle = "purple";
+		ctx.fill();
+
+		ctx.beginPath();
+		ctx.rect(0,h/2,w/2,h/2);
+		ctx.fillStyle = "cyan";
+		ctx.fill();
+
+		ctx.beginPath();
+		ctx.rect(w/2,h/2,w/2,h/2);
+		ctx.fillStyle = "pink";
+		ctx.fill();
+
+		ctx.fillStyle = "black";
+		ctx.font = ""+w/10+"px Georgia";
+		ctx.textAlign = "center"
+		ctx.fillText("Bouton 1",w/4,h/4);
+		ctx.fillText("Bouton 2",3/4*w,h/4);
+		ctx.fillText("Bouton 3",1/4*w,3/4*h);
+		ctx.fillText("Bouton 4",3/4*w,3/4*h);
+	}
+
+	function dismoiou(evt){
+
+	    var canvas = document.getElementById('canvas');
+		var x = evt.clientX;
+		var y = evt.clientY;
+		alert("x:" + x + " y:" + y);
+	}
+
+	function addListener(){
+
+		var canvas = document.getElementById('canvas');
+		canvas.addEventListener("mousedown", dismoiou,false);
+	}
+
+</script>

@@ -8,4 +8,6 @@ Attribut transform : The transform attribute defines a list of transform definit
 
 d'après https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform
 
-Les objets ont l'air d'être dessinés dans le même ordre que spécifié dans le html, donc lorsque plusieurs objets sont dessinés au même endroit, seul le plus récent est visible.
+Les objets ont l'air d'être dessinés dans le même ordre que spécifié dans le HTML, donc lorsque plusieurs objets sont dessinés au même endroit, seul le plus récent est visible.
+
+Exercice 2: la fonction alert('texte') de Javascript ouvre une pop-up contenant le texte indiqué (avec modifications suivant le navigateur)

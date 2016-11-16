@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+
+	<g transform="translate(0,0)">
+		<svg id="b1" onmouseup="setRandomColor(1);">
+			<rect id="r1" width="100" height="100" fill="blue" 
+			>
+				<animate begin="3s" dur="2s" repeatCount="1" attributeName="fill" from="blue" to="red" fill="freeze" />
+			</rect>
+			<text x="50" y="50" fill="black" text-anchor="middle">Bouton 1</text>
+		</svg>
+	</g> 
+
+	<g transform="translate(0,100)">
+		<svg id="b3" onmouseup="setRandomColor(2);">
+			<rect id="r2" width="100" height="100" fill="cyan"/>
+			<text x="50" y="50" fill="black" text-anchor="middle">Bouton 3</text>
+		</svg>
+	</g> 
+
+	<g transform="translate(100,0)">
+		<svg id="b2" onmouseup="setRandomColor(3);">
+			<rect id="r3" width="100" height="100" fill="purple"/>
+			<text x="50" y="50" fill="black" text-anchor="middle">Bouton 2</text>
+		</svg>
+	</g> 
+
+	<g transform="translate(100,100)">
+		<svg id="b4" onmouseup="setRandomColor(4);">
+			<rect id="r4" width="100" height="100" fill="pink"/>
+			<text x="50" y="50" fill="black" text-anchor="middle">Bouton 4</text>
+		</svg>
+	</g> 
+
+	<script>
+		function setWidth(w){
+			d = document.getElementById("b1");
+			d.setAttribute("width", w);
+		}
+
+		function setRandomColor(i){
+
+			d = document.getElementById("r"+i);
+			c = '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6);
+			d.setAttribute("fill", c);
+			
+		}
+
+	</script>
+</svg>

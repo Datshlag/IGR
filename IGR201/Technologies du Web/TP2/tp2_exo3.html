@@ -1,0 +1,90 @@
+<!-- This code will create a square that moves inside a bigger square. When clicking on the bigger square, the smaller will stop, clicking again will make it move again, with a different initial speed.  -->
+
+<html>
+  <head>
+  <title>Exo 3</title>
+  </head>
+  <body>
+
+	<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500"
+	onmouseup="stopSquare();">
+		
+		<rect width="500" height="500" style="stroke:black;stroke-width:10;fill-opacity:0;stroke-opacity:1" />
+		<rect id = "r" x="225", y="225" width="50" height="50" fill="red"/>
+	</svg>
+
+  </body>
+</html>
+
+<script>
+	var d = document.getElementById("r");
+	var stop = 0;
+	var firsttime = 1;
+	var angle;
+	var vx;
+	var vy;
+	var oldts;
+	var currts;
+
+	function move(ts){
+
+		console.log(firsttime)
+
+		if(firsttime == 1){
+
+			oldts = ts;
+			currts = ts;
+			firsttime = 0;
+			angle = Math.random()*Math.PI*2;
+			vx = Math.cos(angle);
+			vy = Math.sin(angle);
+			requestAnimationFrame(move);
+			console.log(vx);
+		}
+
+		else{
+
+			oldts = currts;
+			currts = ts;
+		    x = Number(d.getAttribute("x")) + vx*(currts-oldts);
+		    y = Number(d.getAttribute("y")) + vy*(currts-oldts);
+
+		    if(x<5||x>445){
+
+		    	vx *= -1;
+		    	x += 2*vx*(currts-oldts);
+
+		    }
+
+		    if(y<5||y>445){
+
+		    	vy *= -1;
+		    	y += 2*vy*(currts-oldts);
+		    }
+
+		    d.setAttribute("x", x);
+		    d.setAttribute("y", y);
+		}
+
+		if(stop == 0){
+
+    		requestAnimationFrame(move);
+    	}
+
+	 }
+
+	function stopSquare(){
+
+		if(stop == 0){
+			stop = 1;
+		}
+
+		else if(stop==1){
+			stop = 0;
+			firsttime = 1;
+			requestAnimationFrame(move);
+		}
+	}
+
+	window.requestAnimationFrame(move);
+</script>

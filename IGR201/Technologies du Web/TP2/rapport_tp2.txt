@@ -1,0 +1,7 @@
+Exercice 2:
+
+Comme vu en cours, utiliser des résolutions trop éloignées de la résolution de base du png altère grandement la qualité du rendu, ce qui n'est pas le cas pour une image décrite par un svg.
+
+Exercice 4:
+
+Rajouter l'attribut "style=float:right" fait en sorte que l'image soit alignée à droite de la page. Notons au passage qu'insérer notre svg avec la balise <img> semble avoir "désactivé" le code Javascript associé. Pour remédier à cela, on peut utiliser la balise <object>.

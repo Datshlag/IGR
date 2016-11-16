@@ -1,0 +1,19 @@
+Exercice 1:
+
+On observe en agrandissant l'élément Canvas des problèmes de résolutions, donc de déformations d'image, qui ne sont pas présentes pour le svg.
+
+Exercice 2 :
+
+Pour le svg on pouvait préciser une action par bouton, ce n'est pas le cas pour le canvas, où il nous faut a priori autant d'éléments canvas que de boutons.
+
+Exercice 3 :
+
+On observe le résultat attendu : lorsque l'on clique sur le canvas, on obtient les coordonnées de la souris. Connaissant les coordonnées des différents éléments de notre canvas, nous pouvons alors, en changeant la fonction de callback, exécuter du code spécifique pour chaque interraction. 
+
+Exercice 4 : 
+
+Pour modifier les couleurs ou la position des objets, il faudrait après avoir récupéré les coordonnées de la souris, changer la propriété du bouton voulu et rappeler une fonction redessinant le cas échéant l'object canvas. Ce que je n'ai pas eu le temps de faire.
+
+Exercice 5 :
+
+De ce que j'ai pu constater, le svg a l'avantage d'être plus malléable et moins contraignant que l'utilisation de la balise canvas, tout en fournissant une qualité de rendu excellente. Mais ce qui est gagné en facilité et apparence l'est un peu perdu en terme de performance. Même si je n'ai pas pu le tester moi-même, le canvas a lui l'avantage de laisser au développeur la gestion de la mise à jour du dessin, et donc éventuellement d'obtenir quelque chose de plus performant.

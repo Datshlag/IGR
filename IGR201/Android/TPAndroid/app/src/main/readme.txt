@@ -1,0 +1,3 @@
+Please only use the app with an active internet connection, otherwise might crash (didn't have time to fix this I am really late).
+To build the project you might need to add "compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'" in the graddle
+dependencies. I chose not to implement the httpclient myself because I didn't really have the time to do that, and I used the apache one.
