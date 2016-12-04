@@ -54,7 +54,7 @@ public:
 				                         const std::string & vertexShaderFilename,
                         				 const std::string & fragmentShaderFilename);
 
-protected:
+public:
   std::string infoLog ();
 
 private:

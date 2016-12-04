@@ -2,32 +2,40 @@
 
 #include "Vec3.h"
 
+void polar2Cartesian (float phi, float theta, float r, float & x, float & y, float & z) {
+  x = r * sin (theta) * cos (phi);
+  y = r * sin (theta) * sin (phi);
+  z = r * cos (theta);
+}
+
 class LightSource{
 
   public:
-    LightSource(Vec3<float> pos, Vec3<float> color, float intensity=1.0): pos(pos), color(color), intensity(intensity)
+    LightSource(Vec3f pos, Vec3<float> color, float intensity=1.0): pos(pos), color(color), intensity(intensity)
     {
 
     }
 
     Vec3<float> getPos(){
 
-      return pos;
+      float x,y,z;
+      polar2Cartesian(pos[1], pos[2], pos[0], x, y, z);
+      return Vec3f(x,y,z);
+     }
+
+    void addP(float toAddP){
+
+      pos[1] = std::fmod(pos[1] + toAddP,2*M_PI);
     }
 
-    void addX(float toAddX){
+    void addT(float toAddT){
 
-      pos[0]+=toAddX;
+      pos[2] = std::fmod(pos[2] + toAddT,2*M_PI);
     }
 
-    void addY(float toAddY){
+    void addR(float toAddR){
 
-      pos[1]+=toAddY;
-    }
-
-    void addZ(float toAddZ){
-
-      pos[2]+=toAddZ;
+      pos[0] = fmax(0.0, pos[0] + toAddR);
     }
 
     void addLum(float toAddLum){
