@@ -30,7 +30,7 @@ using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
-static const string DEFAULT_MESH_FILE ("models/bridge.off");
+static const string DEFAULT_MESH_FILE ("models/man.off");
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
@@ -41,10 +41,17 @@ static bool fullScreen = false;
 static Camera camera;
 static Mesh mesh;
 static std::vector<LightSource> lightSources;
+
 static int mode = 1;
 static float shininess = 1.5;
 static float alpha = 0.5;
 static float F0 = 0.1;
+
+GLint modeShader;
+GLint shininessShader;
+GLint alphaShader;
+GLint F0Shader;
+GLint lightPosShader;
 
 GLProgram * glProgram;
 
@@ -66,7 +73,7 @@ void printUsage () {
          << " t, g: increase, decrease shinisess" << std::endl
          << " y, h: increase, decrease alpha" << std::endl
          << " u, j: increase, decrease F0" << std::endl
-         << " 1: Lambert + Phong" << std::endl
+         << " 1: Lambert + Blinn-Phong" << std::endl
          << " 2: Cook-Torrance" << std::endl
          << " 3: GGX" << std::endl
          << " q, <esc>: Quit" << std::endl << std::endl;
@@ -84,7 +91,7 @@ void init (const char * modelFilename) {
     glEnableClientState (GL_COLOR_ARRAY);
     glEnable (GL_NORMALIZE);
   	glLineWidth (2.0); // Set the width of edges in GL_LINE polygon mode
-    glClearColor (0.0f, 0.0f, 0.0f, 1.0f); // Background color
+    glClearColor (0.1f, 0.1f, 0.1f, 1.0f); // Background color
 	mesh.loadOFF (modelFilename);  
     colorResponses.resize (mesh.positions ().size ());
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
@@ -101,6 +108,18 @@ void init (const char * modelFilename) {
     lightSources.push_back(LightSource(Vec3<float>(3,2,2),Vec3<float>(5.0,0.0,0.0)));
     //lightSources.push_back(LightSource(Vec3<float>(3,0,0),Vec3<float>(0.0,1.0,1.0)));
     //lightSources.push_back(LightSource(Vec3<float>(3,4,5),Vec3<float>(1.0,1.0,0.0)));
+
+    modeShader = glProgram->getUniformLocation("mode");
+    shininessShader = glProgram->getUniformLocation("shininess");
+    alphaShader = glProgram->getUniformLocation("alpha");
+    F0Shader = glProgram->getUniformLocation("F0");
+    lightPosShader = glProgram->getUniformLocation("lightPos");
+
+    glProgram->setUniform1i(modeShader, mode);
+    glProgram->setUniform1f(shininessShader, shininess);
+    glProgram->setUniform1f(alphaShader, alpha);
+    glProgram->setUniform1f(F0Shader, F0);
+    glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 }
 
 // EXERCISE : the following color response shall be replaced with a proper reflectance evaluation/shadow test/etc.
@@ -228,6 +247,7 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addT(0.1);
             }
+            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 's':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -235,6 +255,7 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addT(-0.1);
             }
+            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'q':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -242,6 +263,7 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addP(-0.1);
             }
+            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'd':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -249,6 +271,7 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addP(0.1);
             }
+            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'a':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -256,6 +279,7 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addR(0.1);
             }
+            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'e':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -263,41 +287,51 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addR(-0.1);
             }
+            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
         case 't':
             shininess += 0.1;
+            glProgram->setUniform1f(shininessShader, shininess);
             break;
         case 'g':
             shininess = fmax(0, shininess-0.1);
+            glProgram->setUniform1f(shininessShader, shininess);
             break;
         case 'y':
             alpha = fmin(1,alpha + 0.05);
+            glProgram->setUniform1f(alphaShader, alpha);
             break;
         case 'h':
             alpha = fmax(0, alpha-0.05);
+            glProgram->setUniform1f(alphaShader, alpha);
             break;
         case 'u':
             F0 += 0.1;
+            glProgram->setUniform1f(F0Shader, F0);
             break;
         case 'j':
             F0 = fmax(0, F0-0.1);
+            glProgram->setUniform1f(F0Shader, F0);
             break;
         case '1':
             mode = 1;
+            glProgram->setUniform1i(modeShader, mode);
             break;
         case '2':
             mode = 2;
+            glProgram->setUniform1i(modeShader, mode);
             break;
         case '3':
             mode = 3;
+            glProgram->setUniform1i(modeShader, mode);
             break;
 	    case 27:
 	        exit (0);
 	        break;
 	    case 'w':
 	        GLint mode[2];
-					glGetIntegerv (GL_POLYGON_MODE, mode);
-					glPolygonMode (GL_FRONT_AND_BACK, mode[1] ==  GL_FILL ? GL_LINE : GL_FILL);
+			glGetIntegerv (GL_POLYGON_MODE, mode);
+			glPolygonMode (GL_FRONT_AND_BACK, mode[1] ==  GL_FILL ? GL_LINE : GL_FILL);
 	        break;
 	    default:
 	        printUsage ();

@@ -12,16 +12,17 @@
 // At first used const values. 
 // Then, use uniform variables and set them from the CPU program.
 
-const vec3 lightPos = vec3 (1.0, 1.0, 1.0);
+uniform vec3 lightPos;
 const vec3 lightColor = vec3 (1.0, 0.0, 0.0);
 const vec3 matAlbedo = vec3 (0.6, 0.6, 0.6);
 
-const float shininess = 2.0;
-const float F0 = 0.5;
-const float alpha = 0.5;
+uniform float shininess;
+uniform float F0;
+uniform float alpha;
+uniform int mode;
 
-vec3 diffuse;
-vec3 spec;
+vec3 diffuse = vec3(1.0, 1.0, 1.0);
+vec3 spec = vec3(1.0, 1.0, 1.0);
 
 void blinnPhong(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n);
 void cookTorrance(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n);
@@ -47,9 +48,11 @@ void main (void) {
   	float d = distance(p,l);
     float attenuation = 1.0/(1.0+d+d*d);
 
-    cookTorrance(omegaI, omega0, omegaH, n);
+    if (mode == 1) blinnPhong(omegaI, omega0, omegaH, n);
+    else if (mode == 2) cookTorrance(omegaI, omega0, omegaH, n);
+    else if (mode == 3) GGX(omegaI, omega0, omegaH, n);
 
-    vec4 color = vec4(spec+diffuse, 1.0);
+    vec4 color = vec4(attenuation*(spec+diffuse), 1.0);
 
 // ----------------------------------------
     
@@ -69,15 +72,15 @@ void blinnPhong(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n) {
 void cookTorrance(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n) {
     
     float nDotOmega0 = max(0.0, dot(n, omega0));
-    float nDotOmegaI = max(0.0,dot(n, omegaI));
-    float nDotOmegaH = max(0.0,dot(n, omegaH));
+    float nDotOmegaI = max(0.0, dot(n, omegaI));
+    float nDotOmegaH = max(0.0, dot(n, omegaH));
     float omega0DotOmegaH = max(0.0, dot(omega0, omegaH));
     float omegaIDotOmegaH = max(0.0, dot(omegaH,omegaI));
 
     float F,D,G;
 
     D = exp((pow(nDotOmegaH,2.0)-1.0)/(pow(alpha*nDotOmegaH,2.0)))/(M_PI*pow(alpha,2.0)*pow(nDotOmegaH,4.0));
-    F = F0 + (1-F0)*pow(1.0-omegaIDotOmegaH,5.0);
+    F = F0 + (1.0-F0)*pow(1.0-omegaIDotOmegaH,5.0);
     G = min(1.0,min(2.0*nDotOmegaH*nDotOmegaI/omega0DotOmegaH,2.0*nDotOmega0*nDotOmegaH/omega0DotOmegaH));
 
     diffuse = lightColor*matAlbedo*nDotOmegaI;
@@ -95,7 +98,7 @@ void GGX(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n) {
     float F,D,G;
 
     D = pow(alpha,2.0)/(M_PI*pow(1.0+(pow(alpha,2.0)-1.0)*pow(nDotOmegaH,2.0),2.0));
-    F = F0 + (1-F0)*pow(1.0-omegaIDotOmegaH,5.0);
+    F = F0 + (1.0-F0)*pow(1.0-omegaIDotOmegaH,5.0);
     G = 2.0*nDotOmega0/(nDotOmega0 + pow(alpha*alpha+(1.0-alpha*alpha)*pow(nDotOmega0,2.0),0.5)) * 2.0*nDotOmegaI/(nDotOmegaI + pow(alpha*alpha+(1.0-alpha*alpha)*pow(nDotOmegaI,2.0),0.5));
 
     diffuse = lightColor*matAlbedo*nDotOmegaI;
