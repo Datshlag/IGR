@@ -9,6 +9,13 @@
 // All rights reserved.
 // --------------------------------------------------------------------------
 
+#ifndef BUFFER_OFFSET
+
+    #define BUFFER_OFFSET(offset) ((char*)NULL + (offset))
+
+#endif
+#define USING_VBO true
+
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <iostream>
@@ -30,7 +37,7 @@ using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
-static const string DEFAULT_MESH_FILE ("models/man.off");
+static const string DEFAULT_MESH_FILE ("models/bridge.off");
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
@@ -53,7 +60,17 @@ GLint alphaShader;
 GLint F0Shader;
 GLint lightPosShader;
 
+GLuint vbo[2];
+GLuint vao;
+GLuint ibo;
+
+unsigned int positionIndex;
+unsigned int normalIndex;
+
 GLProgram * glProgram;
+
+void loadVbo();
+void renderVbo();
 
 static std::vector<Vec3f> colorResponses; // Cached per-vertex color response, updated at each frame
 
@@ -82,27 +99,42 @@ void printUsage () {
 void init (const char * modelFilename) {
     glewExperimental = GL_TRUE;
     glewInit (); // init glew, which takes in charges the modern OpenGL calls (v>1.2, shaders, etc)
+    if (glewIsSupported("GL_VERSION_3_3"))
+        printf("Ready for OpenGL 3.3\n");
+    else {
+        printf("OpenGL 3.3 not supported\n");
+        exit(1);
+    }
     glCullFace (GL_BACK);     // Specifies the faces to cull (here the ones pointing away from the camera)
     glEnable (GL_CULL_FACE); // Enables face culling (based on the orientation defined by the CW/CCW enumeration).
     glDepthFunc (GL_LESS); // Specify the depth test for the z-buffer
     glEnable (GL_DEPTH_TEST); // Enable the z-buffer in the rasterization
-    glEnableClientState (GL_VERTEX_ARRAY);
-    glEnableClientState (GL_NORMAL_ARRAY);
-    glEnableClientState (GL_COLOR_ARRAY);
+
+    if(!USING_VBO) {
+
+        glEnableClientState (GL_VERTEX_ARRAY);
+        glEnableClientState (GL_NORMAL_ARRAY);
+        glEnableClientState (GL_COLOR_ARRAY);
+    }
+
     glEnable (GL_NORMALIZE);
   	glLineWidth (2.0); // Set the width of edges in GL_LINE polygon mode
     glClearColor (0.1f, 0.1f, 0.1f, 1.0f); // Background color
-	mesh.loadOFF (modelFilename);  
+	mesh.loadOFF (modelFilename); 
     colorResponses.resize (mesh.positions ().size ());
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
     try {
-        glProgram = GLProgram::genVFProgram ("Simple GL Program", "shader.vert", "shader.frag"); // Load and compile pair of shaders
+
+        if(USING_VBO) glProgram = GLProgram::genVFProgram ("Simple GL Program", "shaderVBO.vert", "shaderVBO.frag"); // Load and compile pair of shaders
+        else glProgram = GLProgram::genVFProgram ("Simple GL Program", "shader.vert", "shader.frag");
         glProgram->use (); // Activate the shader program
         std::cerr << glProgram->infoLog();
 
     } catch (Exception & e) {
         cerr << e.msg () << endl;
     }
+
+    if(USING_VBO) loadVbo();
 
     lightSources = std::vector<LightSource>();
     lightSources.push_back(LightSource(Vec3<float>(3,2,2),Vec3<float>(5.0,0.0,0.0)));
@@ -120,6 +152,36 @@ void init (const char * modelFilename) {
     glProgram->setUniform1f(alphaShader, alpha);
     glProgram->setUniform1f(F0Shader, F0);
     glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+}
+
+void loadVbo() {
+
+    positionIndex = glGetAttribLocation (glProgram->id(), "VertexPosition") ;
+    normalIndex = glGetAttribLocation (glProgram->id(), "VertexNormal") ;
+
+    glGenBuffers(1, &ibo);
+    glGenBuffers(2, vbo);
+    glGenVertexArrays(1, &vao);
+    
+    glBindVertexArray(vao); // Verrouillage du VAO
+        // Buffer d'indices  
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); // Verrouillage du IBO
+            // Allocation de la mémoire vidéo
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.triangles().size()*sizeof(Triangle), &(mesh.triangles())[0], GL_STATIC_DRAW);
+            
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
+            // Allocation de la mémoire vidéo
+            glBufferData(GL_ARRAY_BUFFER, mesh.positions().size()*sizeof(mesh.positions()[0]), &(mesh.positions()[0]), GL_STATIC_DRAW);
+            glEnableVertexAttribArray (positionIndex);
+            glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Verrouillage du VBO
+            // Allocation de la mémoire vidéo
+            glBufferData(GL_ARRAY_BUFFER, mesh.normals().size()*sizeof(mesh.normals()[0]), &(mesh.normals()[0]), GL_STATIC_DRAW);
+            glEnableVertexAttribArray (normalIndex) ;
+            glVertexAttribPointer(normalIndex, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
 }
 
 // EXERCISE : the following color response shall be replaced with a proper reflectance evaluation/shadow test/etc.
@@ -213,9 +275,15 @@ void updatePerVertexColorResponse () {
 void renderScene () {
     //updatePerVertexColorResponse ();
     glVertexPointer (3, GL_FLOAT, sizeof (Vec3f), (GLvoid*)(&(mesh.positions()[0])));
-    glNormalPointer (GL_FLOAT, 3*sizeof (float), (GLvoid*)&(mesh.normals()[0]));
+    glNormalPointer (GL_FLOAT, 3*sizeof (float), (GLvoid*)(&(mesh.normals()[0])));
     glColorPointer (3, GL_FLOAT, sizeof (Vec3f), (GLvoid*)(&(colorResponses[0])));
-    glDrawElements (GL_TRIANGLES, 3*mesh.triangles().size(), GL_UNSIGNED_INT, (GLvoid*)((&mesh.triangles()[0])));
+    glDrawElements (GL_TRIANGLES, 3*mesh.triangles().size(), GL_UNSIGNED_INT, (GLvoid*)(&(mesh.triangles()[0])));
+}
+
+void renderVbo() {
+
+    glBindVertexArray(vao);
+    glDrawElements(GL_TRIANGLES, 3*mesh.triangles().size(), GL_UNSIGNED_INT, NULL);
 }
 
 void reshape(int w, int h) {
@@ -225,7 +293,12 @@ void reshape(int w, int h) {
 void display () {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     camera.apply ();
-    renderScene ();
+    if(!USING_VBO) renderScene ();
+    else renderVbo();
+    for(GLenum err; (err = glGetError()) != GL_NO_ERROR;)
+    {
+      cerr << err << std::endl;
+    }
     glFlush ();
     glutSwapBuffers ();
 }

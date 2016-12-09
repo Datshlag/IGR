@@ -1,3 +1,5 @@
+#version 130
+
 #define M_PI 3.1415926535897932384626433832795
 
 // ----------------------------------------------
@@ -24,11 +26,13 @@ void blinnPhong(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n);
 void cookTorrance(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n);
 void GGX(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n);
 
-varying vec4 P; // fragment-wise position
-varying vec3 N; // fragment-wise normal
+in vec4 P; // fragment-wise position
+in vec3 N; // fragment-wise normal
+
+out vec4 colorOut;
 
 void main (void) {
-    gl_FragColor = vec4 (0.0, 0.0, 0.0, 1.0);
+    colorOut = vec4 (0.0, 0.0, 0.0, 1.0);
     
     vec3 p = vec3 (gl_ModelViewMatrix * P);
     vec3 l = vec3(gl_ModelViewMatrix * vec4(lightPos, 1.0));
@@ -47,7 +51,7 @@ void main (void) {
 
     vec4 color = vec4(attenuation*(spec+diffuse), 1.0);
     
-    gl_FragColor += color;
+    colorOut += color;
 }
 
 void blinnPhong(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n) {
