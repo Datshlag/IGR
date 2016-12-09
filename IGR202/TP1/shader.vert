@@ -8,9 +8,11 @@
 
 varying vec4 P;
 varying vec3 N;
+varying vec4 C;
 
 void main(void) {
     P = gl_Vertex;
     N = gl_Normal;
+    C = gl_Color;
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }

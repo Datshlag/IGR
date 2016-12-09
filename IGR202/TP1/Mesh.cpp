@@ -44,6 +44,7 @@ void Mesh::loadOFF (const std::string & filename) {
     in.close ();
     centerAndScaleToUnit ();
     recomputeNormals ();
+    addBottomPlane(50);
 }
 
 void Mesh::recomputeNormals () {
@@ -74,4 +75,31 @@ void Mesh::centerAndScaleToUnit () {
     }
     for  (unsigned int i = 0; i < m_positions.size (); i++)
         m_positions[i] = (m_positions[i] - c) / maxD;
+}
+
+void Mesh::addBottomPlane(unsigned int nbVertex) {
+
+    float pas = 1/nbVertex;
+
+    unsigned int prevVertexSize = m_positions.size();
+    unsigned int prevTriangleSize = m_triangles.size();
+
+    m_positions.resize(prevVertexSize + nbVertex*nbVertex);
+    m_normals.resize(prevVertexSize + nbVertex*nbVertex);
+    m_triangles.resize(prevTriangleSize + 2*(nbVertex-1)*(nbVertex-1));
+
+    for(unsigned int i = 0; i < nbVertex; i++){
+
+        for(unsigned int j = 0; j < nbVertex; j++){
+
+            m_positions[prevVertexSize + i*nbVertex + j] = Vec3f(i*pas, j*pas, -1.0);
+            m_normals[prevVertexSize + i*nbVertex + j] = normalize(Vec3f(0.0, 0.0, 1.0));
+        }
+    }
+
+    for(unsigned int i = 0; i < (nbVertex-1)*(nbVertex-1); i++) {
+
+        m_triangles[prevTriangleSize + 2 * i] = Triangle(prevVertexSize + nbVertex*(i+1) + i, prevVertexSize + i, prevVertexSize + i + 1);
+        m_triangles[prevTriangleSize + 2 * i + 1] = Triangle(prevVertexSize + nbVertex*(i+1) + i, prevVertexSize + i + 1, prevVertexSize + nbVertex*(i+1) + i + 1);
+    }
 }

@@ -16,7 +16,7 @@ class LightSource{
 
     }
 
-    Vec3<float> getPos(){
+    Vec3f getPos(){
 
       float x,y,z;
       polar2Cartesian(pos[1], pos[2], pos[0], x, y, z);

@@ -12,7 +12,7 @@
 
 uniform vec3 lightPos;
 const vec3 lightColor = vec3 (1.0, 1.0, 1.0);
-const vec3 matAlbedo = vec3 (0.8, 0.8, 0.8);
+vec3 matAlbedo;
 
 uniform float shininess;
 uniform float F0;
@@ -28,30 +28,37 @@ void GGX(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n);
 
 in vec4 P; // fragment-wise position
 in vec3 N; // fragment-wise normal
+in vec4 C; // fragment-wise albedo + shadow info
 
 out vec4 colorOut;
 
 void main (void) {
     colorOut = vec4 (0.0, 0.0, 0.0, 1.0);
     
-    vec3 p = vec3 (gl_ModelViewMatrix * P);
-    vec3 l = vec3(gl_ModelViewMatrix * vec4(lightPos, 1.0));
-    vec3 n = normalize (gl_NormalMatrix * N);
+    if(C.w > 0){
 
-    vec3 omegaI = normalize (l - p);
-    vec3 omega0 = normalize (-p);
-    vec3 omegaH = normalize(omega0 + omegaI);
+        matAlbedo = vec3(C);
 
-  	float d = distance(p,l);
-    float attenuation = 1.0/(1.0+d+d*d);
+        vec3 p = vec3 (gl_ModelViewMatrix * P);
+        vec3 l = vec3(gl_ModelViewMatrix * vec4(lightPos, 1.0));
+        vec3 n = normalize (gl_NormalMatrix * N);
 
-    if (mode == 1) blinnPhong(omegaI, omega0, omegaH, n);
-    else if (mode == 2) cookTorrance(omegaI, omega0, omegaH, n);
-    else if (mode == 3) GGX(omegaI, omega0, omegaH, n);
+        vec3 omegaI = normalize (l - p);
+        vec3 omega0 = normalize (-p);
+        vec3 omegaH = normalize(omega0 + omegaI);
 
-    vec4 color = vec4(attenuation*(spec+diffuse), 1.0);
-    
-    colorOut += color;
+        float d = distance(p,l);
+        float attenuation = 1.0/(1.0+d+d*d);
+
+        if (mode == 1) blinnPhong(omegaI, omega0, omegaH, n);
+        else if (mode == 2) cookTorrance(omegaI, omega0, omegaH, n);
+        else if (mode == 3) GGX(omegaI, omega0, omegaH, n);
+
+        vec4 color = vec4(attenuation*(spec+diffuse), 1.0);
+        
+        colorOut += color;
+    }
+
 }
 
 void blinnPhong(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n) {

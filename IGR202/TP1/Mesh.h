@@ -40,6 +40,9 @@ public:
     /// scale to the unit cube and center at original
     void centerAndScaleToUnit ();
 
+    /// Add a bottom plane consisting of 2 * nbVertex^2 triangles
+    void addBottomPlane(unsigned int nbVertex);
+
 private:
     std::vector<Vec3f> m_positions;
     std::vector<Vec3f> m_normals;

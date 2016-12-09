@@ -23,7 +23,7 @@ Mesh.o: Mesh.cpp Mesh.h Vec3.h
 GLError.o: GLError.cpp GLError.h Exception.h 
 GLShader.o: GLShader.cpp GLShader.h GLError.h
 GLProgram.o: GLProgram.cpp GLProgram.h GLShader.h GLError.h Exception.h
-Main.o: Main.cpp Vec3.h Camera.h Mesh.h GLProgram.h Exception.h LightSource.h
+Main.o: Main.cpp Vec3.h Camera.h Mesh.h GLProgram.h Exception.h LightSource.h LightRay.h
 
 
 
