@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Vec3.h"
+#include <iostream>
 
-#define FLT_EPSILON 1.19209e-07
+#define EPSILON 0.0000001
 
 class LightRay{
 
@@ -17,21 +18,23 @@ class LightRay{
 				Vec3f e0 = p1 - p0;
 				Vec3f e1 = p2 - p0;
 				Vec3f n = normalize(cross(e0, e1));
-				Vec3f q = cross(direction, e1);
-				float a = dot(e0, q);
-				if ((dot(n, direction) >= 0) || (abs(a) < FLT_EPSILON)) return false;
+				Vec3f h = cross(direction, e1);
+				float a = dot(e0, h);
+
+				if ( a > -EPSILON && a < EPSILON ) return false;
 
 				Vec3f s = 1/a*(origin - p0);
-				Vec3f r = cross(s, e0);
-				float b0 = dot(s, q);
-				float b1 = dot(r, direction);
-				float b2 = 1 - b0 - b1;
-				if( (b0 < 0) || (b1 < 0) || (b2 < 0)) return false;
+				Vec3f q = cross(s, e0);
+				float u = dot(s, h);
 
-				float t = dot(e1, r);
-				return (t > FLT_EPSILON);
+				if (u < 0.0 || u > 1.0) return false;
+
+				float v = dot(q, direction);
+
+				if (v < 0.0 || u + v > 1.0) return false;
+
+
+				float t = dot(e1, q);
+				return (t > EPSILON);
 		}
-
-
-		inline bool shareDirection(const Vec3f & v){ return (dot(direction, v) > 0); }
 };

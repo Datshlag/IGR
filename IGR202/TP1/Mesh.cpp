@@ -44,7 +44,7 @@ void Mesh::loadOFF (const std::string & filename) {
     in.close ();
     centerAndScaleToUnit ();
     recomputeNormals ();
-    addBottomPlane(50);
+    addBottomPlane(128, 1);
 }
 
 void Mesh::recomputeNormals () {
@@ -77,12 +77,15 @@ void Mesh::centerAndScaleToUnit () {
         m_positions[i] = (m_positions[i] - c) / maxD;
 }
 
-void Mesh::addBottomPlane(unsigned int nbVertex) {
+void Mesh::addBottomPlane(unsigned int nbVertex, float width) {
 
-    float pas = 1/nbVertex;
+    float pas = 2*width/((float)nbVertex);
 
     unsigned int prevVertexSize = m_positions.size();
     unsigned int prevTriangleSize = m_triangles.size();
+
+    std::cerr << "triangle size :" << prevTriangleSize << " " << prevTriangleSize + 2*(nbVertex-1)*(nbVertex-1) << std::endl;
+    std::cerr << "vertex size :" << prevVertexSize << " " << prevVertexSize + nbVertex*nbVertex <<  std::endl;
 
     m_positions.resize(prevVertexSize + nbVertex*nbVertex);
     m_normals.resize(prevVertexSize + nbVertex*nbVertex);
@@ -92,14 +95,19 @@ void Mesh::addBottomPlane(unsigned int nbVertex) {
 
         for(unsigned int j = 0; j < nbVertex; j++){
 
-            m_positions[prevVertexSize + i*nbVertex + j] = Vec3f(i*pas, j*pas, -1.0);
-            m_normals[prevVertexSize + i*nbVertex + j] = normalize(Vec3f(0.0, 0.0, 1.0));
+            m_positions[prevVertexSize + i*nbVertex + j] = Vec3f(-width + i*pas, -1.0, -width + j*pas);
+            m_normals[prevVertexSize + i*nbVertex + j] = normalize(Vec3f(0.0, 1.0, 0.0));
         }
     }
 
-    for(unsigned int i = 0; i < (nbVertex-1)*(nbVertex-1); i++) {
+    unsigned int l = 0;
 
-        m_triangles[prevTriangleSize + 2 * i] = Triangle(prevVertexSize + nbVertex*(i+1) + i, prevVertexSize + i, prevVertexSize + i + 1);
-        m_triangles[prevTriangleSize + 2 * i + 1] = Triangle(prevVertexSize + nbVertex*(i+1) + i, prevVertexSize + i + 1, prevVertexSize + nbVertex*(i+1) + i + 1);
-    }
+    for(unsigned int i = 0; i < nbVertex - 1; i++) {
+
+        for(unsigned int j = 0; j < nbVertex - 1; j++) {
+
+            m_triangles[prevTriangleSize + l++] = Triangle(prevVertexSize + j + nbVertex*i, prevVertexSize + j + 1 + nbVertex*i, prevVertexSize + nbVertex*(i+1) + j + 1);
+            m_triangles[prevTriangleSize + l++] = Triangle(prevVertexSize + j + nbVertex*i, prevVertexSize + j + 1 + nbVertex*(i+1), prevVertexSize + nbVertex*(i+1) + j);
+        }   
+    }        
 }

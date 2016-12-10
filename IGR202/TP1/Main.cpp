@@ -14,7 +14,7 @@
     #define BUFFER_OFFSET(offset) ((char*)NULL + (offset))
 
 #endif
-#define USING_VBO false
+#define USING_VBO true
 
 #include <GL/glew.h>
 #include <GL/glut.h>
@@ -38,7 +38,7 @@ using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
-static const string DEFAULT_MESH_FILE ("models/monkey.off");
+static const string DEFAULT_MESH_FILE ("models/man.off");
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
@@ -212,18 +212,16 @@ void computePerVertexShadow () {
     while(l < 4*nbVertex)
     {
 
-        colorResponses[++l] = matAlbedo[0];
-        colorResponses[++l] = matAlbedo[1];
-        colorResponses[++l] = matAlbedo[2];
+        colorResponses[l++] = matAlbedo[0];
+        colorResponses[l++] = matAlbedo[1];
+        colorResponses[l++] = matAlbedo[2];
 
         i=l/4;
-
-        if(i%1000==0) std::cerr << i <<" / " << nbVertex << std::endl;
 
         ray = LightRay(positions[i], normalize(lightPos-positions[i]));
         intersects = false;
 
-        for(unsigned int j=0; j < nbTriangle; j++)
+        for(unsigned int j = 0; j < nbTriangle; j++)
         {
             Triangle currTri = triangles[j];
 
@@ -231,8 +229,8 @@ void computePerVertexShadow () {
             if(intersects) break;
         }
 
-        if(intersects) colorResponses[++l] = -1;
-        else colorResponses[++l] = 1;
+        if(intersects) colorResponses[l++] = -1;
+        else colorResponses[l++] = 1;
     }
 
     if(USING_VBO){
@@ -242,7 +240,6 @@ void computePerVertexShadow () {
             glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
     }
 
-    std::cerr << "terminé" << std::endl;
 }
 
 void initiliazeColor() {

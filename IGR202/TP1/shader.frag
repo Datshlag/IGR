@@ -29,7 +29,7 @@ varying vec3 N; // fragment-wise normal
 varying vec4 C; // fragment-wise albedo + shadow information
 
 void main (void) {
-    gl_FragColor = vec4 (0.0, 0.0, 0.0, 1.0);
+    gl_FragColor = vec4 (0.0, 0.0, 0.0, 0.0);
 
     if (C.w > 0) {
 
@@ -44,13 +44,13 @@ void main (void) {
         vec3 omegaH = normalize(omega0 + omegaI);
 
         float d = distance(p,l);
-        float attenuation = 1.0/(1.0+d+d*d);
+        float invAttenuation = 10.0/(1.0+d+d*d);
 
         if (mode == 1) blinnPhong(omegaI, omega0, omegaH, n);
         else if (mode == 2) cookTorrance(omegaI, omega0, omegaH, n);
         else if (mode == 3) GGX(omegaI, omega0, omegaH, n);
 
-        vec4 color = vec4(attenuation*(spec+diffuse), 1.0);
+        vec4 color = vec4(invAttenuation*(spec+diffuse), 1.0);
         
         gl_FragColor += color;
     }
