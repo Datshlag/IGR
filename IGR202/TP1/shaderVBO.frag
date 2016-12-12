@@ -35,7 +35,7 @@ out vec4 colorOut;
 void main (void) {
     colorOut = vec4 (0.0, 0.0, 0.0, 1.0);
     
-    if(C.w > 0){
+    if(C.w >= 0){
 
         matAlbedo = vec3(C);
 
@@ -54,7 +54,7 @@ void main (void) {
         else if (mode == 2) cookTorrance(omegaI, omega0, omegaH, n);
         else if (mode == 3) GGX(omegaI, omega0, omegaH, n);
 
-        vec4 color = vec4(invAttenuation*(spec+diffuse), 1.0);
+        vec4 color = vec4(invAttenuation * (spec+diffuse), 1.0);
         
         colorOut = color;
     }

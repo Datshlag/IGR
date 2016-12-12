@@ -8,11 +8,14 @@
 class LightRay{
 
 	public:
-		Vec3f origin;
-		Vec3f direction;
-
 		inline LightRay() {}
 		inline LightRay(const Vec3f & origin, const Vec3f & direction): origin(origin), direction(direction){}
+
+		inline void setOrigin(const Vec3f & _origin) { origin = _origin; }
+		inline void setDirection(const Vec3f & _direction) { direction = _direction; }
+
+		inline Vec3f getDirection() { return direction; }
+		inline Vec3f getOrigin() { return origin; }
 
 		inline bool intersects(const Vec3f & p0, const Vec3f & p1, const Vec3f & p2) {
 				Vec3f e0 = p1 - p0;
@@ -37,4 +40,8 @@ class LightRay{
 				float t = dot(e1, q);
 				return (t > EPSILON);
 		}
+
+	private:
+		Vec3f origin;
+		Vec3f direction;
 };

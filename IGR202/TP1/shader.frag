@@ -33,7 +33,7 @@ void main (void) {
 
     if (C.w > 0) {
 
-        matAlbedo = C.xyz;
+        matAlbedo = vec3(C.w, C.w, C.w);
 
         vec3 p = vec3 (gl_ModelViewMatrix * P);
         vec3 l = vec3(gl_ModelViewMatrix * vec4(lightPos, 1.0));

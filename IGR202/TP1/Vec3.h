@@ -328,9 +328,20 @@ inline Vec3<T> operator * (const T &s, const Vec3<T> &P) {
   return (P * s);
 }
 
+//produit par une matrice à gauche
+template <class T>
+inline Vec3<T> operator* (const T m[3][3], const Vec3<T> &V) {
+
+  Vec3<T> res;
+  res[0] = m[0][0] * V[0] + m[0][1] * V[1] + m[0][2] * V[2];
+  res[1] = m[1][0] * V[0] + m[1][1] * V[1] + m[1][2] * V[2];
+  res[2] = m[2][0] * V[0] + m[2][1] * V[1] + m[2][2] * V[2];
+  return (res);
+}
+
 template <class T>
 std::ostream & operator<< (std::ostream & output, const Vec3<T> & v) {
-  output << v[0] << " " << v[1] << " " << v[2];
+  output << "(" << v[0] << ", " << v[1] << ", " << v[2] << ")";
   return output;
 }
 
