@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1097</width>
+    <height>645</height>
+   </rect>
+  </property>
+  <property name="mouseTracking">
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <property name="mouseTracking">
+    <bool>true</bool>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="6,1">
+      <item>
+       <widget class="DrawZone" name="widget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>800</width>
+          <height>600</height>
+         </size>
+        </property>
+        <property name="mouseTracking">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
+         <string>Pen attributes</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_2" stretch="4,4,0,0">
+           <item>
+            <widget class="QGroupBox" name="groupBox_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title">
+              <string>Pen</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_3">
+              <item row="0" column="0">
+               <layout class="QFormLayout" name="formLayout">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="penSizeLabel">
+                  <property name="text">
+                   <string>Pen Size :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="capStyleLabel">
+                  <property name="text">
+                   <string>Pen Cap Style :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QSpinBox" name="penSizeSpinBox"/>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="capStyleComboBox">
+                  <item>
+                   <property name="text">
+                    <string>Square Cap</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Flat Cap</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Round Cap</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QComboBox" name="joinStyleComboBox">
+                  <item>
+                   <property name="text">
+                    <string>Bevel Join</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Miter Join</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Round Join</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="joinStyleLabel">
+                  <property name="text">
+                   <string>Pen Join Style :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="colorSelectionLabel">
+                  <property name="text">
+                   <string>Pen color :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="DrawZone" name="widget_2" native="true"/>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QCheckBox" name="AACheckBox">
+                  <property name="text">
+                   <string>Antialiasing</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QWidget" name="widget_3" native="true"/>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title">
+              <string>Shape</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="0" column="0">
+               <layout class="QFormLayout" name="formLayout_2">
+                <item row="1" column="0">
+                 <widget class="QCheckBox" name="fillCheckBox">
+                  <property name="text">
+                   <string>Fill Shape</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="fillRuleComboBox">
+                  <item>
+                   <property name="text">
+                    <string>Odd Even Fill</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Winding Fill</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>Type :</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="shapeTypeComboBox">
+                  <item>
+                   <property name="text">
+                    <string>Line</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>PolyLine</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Polygon</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Ellipse</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Rectangle</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Free Draw</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_4">
+             <property name="title">
+              <string>Mode</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_6">
+              <item row="0" column="0" colspan="2">
+               <layout class="QFormLayout" name="formLayout_5">
+                <item row="0" column="0">
+                 <widget class="QRadioButton" name="drawRadioButton">
+                  <property name="text">
+                   <string>Draw</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QRadioButton" name="selectRadioButton">
+                  <property name="text">
+                   <string>Select</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1097</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFichier">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+   </widget>
+   <widget class="QMenu" name="menuStylo">
+    <property name="title">
+     <string>Pen</string>
+    </property>
+    <widget class="QMenu" name="menuPen_join_style">
+     <property name="title">
+      <string>Pen cap style...</string>
+     </property>
+     <addaction name="actionSquare_cap"/>
+     <addaction name="actionFlat_cap"/>
+     <addaction name="actionRound_cap"/>
+    </widget>
+    <widget class="QMenu" name="menuPen_join_style_2">
+     <property name="title">
+      <string>Pen Join Style...</string>
+     </property>
+     <addaction name="actionBevel_join"/>
+     <addaction name="actionMiter_join"/>
+     <addaction name="actionRound_join"/>
+    </widget>
+    <addaction name="actionPen_color"/>
+    <addaction name="actionPen_size"/>
+    <addaction name="separator"/>
+    <addaction name="menuPen_join_style"/>
+    <addaction name="menuPen_join_style_2"/>
+    <addaction name="separator"/>
+    <addaction name="actionAntialiasing"/>
+   </widget>
+   <widget class="QMenu" name="menuShapes">
+    <property name="title">
+     <string>Shape</string>
+    </property>
+    <addaction name="actionLine"/>
+    <addaction name="actionPolyline"/>
+    <addaction name="actionPolygon"/>
+    <addaction name="separator"/>
+    <addaction name="actionEllipse"/>
+    <addaction name="actionRectangle"/>
+    <addaction name="separator"/>
+    <addaction name="actionFree_draw"/>
+   </widget>
+   <widget class="QMenu" name="menuEdition">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionAnnuler"/>
+    <addaction name="actionClear"/>
+    <addaction name="separator"/>
+    <addaction name="actionDelete"/>
+    <addaction name="separator"/>
+    <addaction name="actionDraw"/>
+    <addaction name="actionSelect"/>
+   </widget>
+   <addaction name="menuFichier"/>
+   <addaction name="menuEdition"/>
+   <addaction name="menuStylo"/>
+   <addaction name="menuShapes"/>
+  </widget>
+  <action name="actionPen_color">
+   <property name="text">
+    <string>Pen Color</string>
+   </property>
+  </action>
+  <action name="actionPen_size">
+   <property name="text">
+    <string>Pen Size</string>
+   </property>
+  </action>
+  <action name="actionSquare_cap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Square Cap</string>
+   </property>
+  </action>
+  <action name="actionFlat_cap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Flat Cap</string>
+   </property>
+  </action>
+  <action name="actionRound_cap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Round Cap</string>
+   </property>
+  </action>
+  <action name="actionBevel_join">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Bevel Join</string>
+   </property>
+  </action>
+  <action name="actionMiter_join">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Miter Join</string>
+   </property>
+  </action>
+  <action name="actionRound_join">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Round Join</string>
+   </property>
+  </action>
+  <action name="actionEllipse">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Ellipse</string>
+   </property>
+  </action>
+  <action name="actionLine">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Line</string>
+   </property>
+  </action>
+  <action name="actionRectangle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Rectangle</string>
+   </property>
+  </action>
+  <action name="actionPolygon">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Polygon</string>
+   </property>
+  </action>
+  <action name="actionFree_draw">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Free Draw</string>
+   </property>
+  </action>
+  <action name="actionDraw">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Draw</string>
+   </property>
+  </action>
+  <action name="actionSelect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Select</string>
+   </property>
+  </action>
+  <action name="actionAnnuler">
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+  </action>
+  <action name="actionClear">
+   <property name="text">
+    <string>Clear</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionPolyline">
+   <property name="text">
+    <string>Polyline</string>
+   </property>
+  </action>
+  <action name="actionAntialiasing">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Antialiasing</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>DrawZone</class>
+   <extends>QWidget</extends>
+   <header>drawzone.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

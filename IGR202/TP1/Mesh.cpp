@@ -1,12 +1,12 @@
 // --------------------------------------------------------------------------
 // Copyright(C) 2009-2016
 // Tamy Boubekeur
-// 
-// Permission granted to use this code only for teaching projects and 
+//
+// Permission granted to use this code only for teaching projects and
 // private practice.
 //
-// Do not distribute this code outside the teaching assignements.                                                                           
-// All rights reserved.                                                       
+// Do not distribute this code outside the teaching assignements.
+// All rights reserved.
 // --------------------------------------------------------------------------
 
 #include "Mesh.h"
@@ -26,7 +26,7 @@ void Mesh::clear () {
 void Mesh::loadOFF (const std::string & filename) {
     clear ();
 	ifstream in (filename.c_str ());
-    if (!in) 
+    if (!in)
         exit (1);
 	string offString;
     unsigned int sizeV, sizeT, tmp;
@@ -38,13 +38,13 @@ void Mesh::loadOFF (const std::string & filename) {
     int s;
     for (unsigned int i = 0; i < sizeT; i++) {
         in >> s;
-        for (unsigned int j = 0; j < 3; j++) 
+        for (unsigned int j = 0; j < 3; j++)
             in >> m_triangles[i][j];
     }
     in.close ();
     centerAndScaleToUnit ();
     recomputeNormals ();
-    //addBottomPlane(32, 1);
+    addBottomPlane(32, 1);
 }
 
 void Mesh::recomputeNormals () {
@@ -108,6 +108,6 @@ void Mesh::addBottomPlane(unsigned int nbVertex, float width) {
 
             m_triangles[prevTriangleSize + l++] = Triangle(prevVertexSize + j + nbVertex*i, prevVertexSize + j + 1 + nbVertex*i, prevVertexSize + nbVertex*(i+1) + j + 1);
             m_triangles[prevTriangleSize + l++] = Triangle(prevVertexSize + j + nbVertex*i, prevVertexSize + j + 1 + nbVertex*(i+1), prevVertexSize + nbVertex*(i+1) + j);
-        }   
-    }        
+        }
+    }
 }

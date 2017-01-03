@@ -1,0 +1,2 @@
+MultimediaObject.o: MultimediaObject.cpp MultimediaObject.h
+Main.o: Main.cpp MultimediaObject.h Video.h Picture.h

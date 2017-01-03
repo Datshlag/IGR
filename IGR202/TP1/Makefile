@@ -1,6 +1,6 @@
 CIBLE = main
 SRCS =  Main.cpp Camera.cpp Mesh.cpp GLProgram.cpp GLShader.cpp GLError.cpp
-OPENGL_PATH = /usr/lib/nvidia-358 # change this for your own environment
+OPENGL_PATH = /usr/lib/nvidia-367 # change this for your own environment
 LIBS = -L$(OPENGL_PATH) -lglut -lGLU -lGL -lGLEW -lm -lpthread
 
 CC = g++
