@@ -34,7 +34,7 @@ out vec4 colorOut;
 
 void main (void) {
     colorOut = vec4 (0.0, 0.0, 0.0, 1.0);
-    
+
     if(C.w >= 0){
 
         matAlbedo = vec3(C);
@@ -48,14 +48,14 @@ void main (void) {
         vec3 omegaH = normalize(omega0 + omegaI);
 
         float d = distance(p,l);
-        float invAttenuation = 5.0/(1.0+d+d*d);
+        float invAttenuation = 5.0/(1.0+d+d*d) * 1/(C.w+1);
 
         if (mode == 1) blinnPhong(omegaI, omega0, omegaH, n);
         else if (mode == 2) cookTorrance(omegaI, omega0, omegaH, n);
         else if (mode == 3) GGX(omegaI, omega0, omegaH, n);
 
         vec4 color = vec4(invAttenuation * (spec+diffuse), 1.0);
-        
+
         colorOut = color;
     }
 
@@ -72,7 +72,7 @@ void blinnPhong(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n) {
 }
 
 void cookTorrance(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n) {
-    
+
     float nDotOmega0 = max(0.0, dot(n, omega0));
     float nDotOmegaI = max(0.0, dot(n, omegaI));
     float nDotOmegaH = max(0.0, dot(n, omegaH));
@@ -90,7 +90,7 @@ void cookTorrance(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n) {
 }
 
 void GGX(vec3 omegaI, vec3 omega0, vec3 omegaH, vec3 n) {
-    
+
     float nDotOmega0 = max(0.0, dot(n, omega0));
     float nDotOmegaI = max(0.0,dot(n, omegaI));
     float nDotOmegaH = max(0.0,dot(n, omegaH));

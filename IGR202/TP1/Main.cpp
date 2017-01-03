@@ -38,7 +38,7 @@ using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
-static const string DEFAULT_MESH_FILE ("models/camel_mc.off");
+static const string DEFAULT_MESH_FILE ("models/monkey.off");
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
@@ -120,7 +120,7 @@ void init (const char * modelFilename) {
         glEnableClientState (GL_COLOR_ARRAY);
     }
 
-	mesh.loadOFF (modelFilename); 
+	mesh.loadOFF (modelFilename);
 
     colorResponses.resize (4*mesh.positions().size());
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
@@ -166,13 +166,13 @@ void loadVbo() {
     glGenBuffers(1, &ibo);
     glGenBuffers(3, vbo);
     glGenVertexArrays(1, &vao);
-    
+
     glBindVertexArray(vao); // Verrouillage du VAO
-        // Buffer d'indices  
+        // Buffer d'indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); // Verrouillage du IBO
             // Allocation de la mémoire vidéo
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.triangles().size()*sizeof(Triangle), &(mesh.triangles())[0], GL_STATIC_DRAW);
-            
+
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
             // Allocation de la mémoire vidéo
             glBufferData(GL_ARRAY_BUFFER, mesh.positions().size()*sizeof(mesh.positions()[0]), &(mesh.positions()[0]), GL_STATIC_DRAW);
@@ -331,8 +331,9 @@ void computePerVertexAO (unsigned int numOfSamples, float radius, float Vmax) {
 
             sum += intersects[i] * dot(n, lightRays[i].getDirection());
         }
+        std::cerr<<sum<<std::endl;
         sum *= Vmax/numOfSamples;
-        colorResponses[4*l] *= sum;
+        colorResponses[4*l+3] *= sum;
         //std::cerr << " vertex : " << l << " reponse : " << colorResponses[4*l+0] << std::endl;
 
         l--;
@@ -380,9 +381,9 @@ void initiliazeColor() {
 // EXERCISE : the following color response shall be replaced with a proper reflectance evaluation/shadow test/etc.
 void updatePerVertexColorResponse () {
 
-    
+
     //BRDF using Lambert's model for the diffusion term and Blinn-Phong's model for the specular term
-    
+
     if(mode==1)
     {
         for (unsigned int i = 0; i < colorResponses.size (); i++)
