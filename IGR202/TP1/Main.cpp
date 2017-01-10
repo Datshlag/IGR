@@ -39,7 +39,7 @@ using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
-static const string DEFAULT_MESH_FILE ("models/man.off");
+static const string DEFAULT_MESH_FILE ("models/monkey.off");
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
@@ -122,8 +122,8 @@ void init (const char * modelFilename) {
         glEnableClientState (GL_COLOR_ARRAY);
     }
 
-	mesh.loadOFF (modelFilename); 
-    bvh = BVH(mesh);//Build BVH tree with the mesh
+  	mesh.loadOFF (modelFilename);
+    //bvh = BVH(mesh);//Build BVH tree with the mesh
 
     colorResponses.resize (4*mesh.positions().size());
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
@@ -169,13 +169,13 @@ void loadVbo() {
     glGenBuffers(1, &ibo);
     glGenBuffers(3, vbo);
     glGenVertexArrays(1, &vao);
-    
+
     glBindVertexArray(vao); // Verrouillage du VAO
-        // Buffer d'indices  
+        // Buffer d'indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); // Verrouillage du IBO
             // Allocation de la mémoire vidéo
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.triangles().size()*sizeof(Triangle), &(mesh.triangles())[0], GL_STATIC_DRAW);
-            
+
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
             // Allocation de la mémoire vidéo
             glBufferData(GL_ARRAY_BUFFER, mesh.positions().size()*sizeof(mesh.positions()[0]), &(mesh.positions()[0]), GL_STATIC_DRAW);
@@ -368,9 +368,9 @@ void initiliazeColor() {
 // EXERCISE : the following color response shall be replaced with a proper reflectance evaluation/shadow test/etc.
 void updatePerVertexColorResponse () {
 
-    
+
     //BRDF using Lambert's model for the diffusion term and Blinn-Phong's model for the specular term
-    
+
     if(mode==1)
     {
         for (unsigned int i = 0; i < colorResponses.size (); i++)
@@ -455,7 +455,7 @@ void updatePerVertexColorResponse () {
 
 int test = 0;
 void renderScene () {
-    
+
     glVertexPointer (3, GL_FLOAT, sizeof (Vec3f), (GLvoid*)(&(mesh.positions()[0])));
     glNormalPointer (GL_FLOAT, 3*sizeof (float), (GLvoid*)(&(mesh.normals()[0])));
     glColorPointer (4, GL_FLOAT, 4*sizeof(float), (GLvoid*)(&(colorResponses[0])));
@@ -552,7 +552,7 @@ void key (unsigned char keyPressed, int x, int y) {
         case 'g':
             /*shininess = fmax(0, shininess-0.1);
             glProgram->setUniform1f(shininessShader, shininess);*/
-            computePerVertexAO (32, 0.5, 0.1); 
+            computePerVertexAO (32, 0.5, 0.1);
             break;
         case 'y':
             alpha = fmin(1,alpha + 0.05);

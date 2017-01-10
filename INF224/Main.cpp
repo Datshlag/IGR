@@ -1,9 +1,11 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 #include "MultimediaObject.h"
 #include "Video.h"
 #include "Picture.h"
+#include "Film.h"
 
 int main (int argc, char ** argv) {
 

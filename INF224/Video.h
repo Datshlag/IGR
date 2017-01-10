@@ -1,3 +1,4 @@
+#pragma once
 #include "MultimediaObject.h"
 
 class Video : public MultimediaObject {
@@ -9,10 +10,11 @@ class Video : public MultimediaObject {
       virtual ~Video() { }
 
       Video(): MultimediaObject(), length(0) { }
-      Video(std::string name, std::string pathname, int _length): MultimediaObject(name, pathname), length(_length) { }
+      Video(std::string name, std::string pathname, int _length):
+          MultimediaObject(name, pathname), length(_length) { }
 
       const int getLength() { return length; }
       void setLength(const int &_length) { length = _length; }
 
-      void const play() { system(("mpv" + getPath() + "&").c_str()); }
+      const void play() { system(("mpv" + getPath() + "&").c_str()); }
 };

@@ -18,5 +18,5 @@ class Picture : public MultimediaObject {
       void setLength(const double &_latitude) { latitude = _latitude; }
       void setLongitude(const double &_longitude) { longitude = _longitude; }
 
-      void const play() { system(("imagej" + getPath() + "&").c_str()); }
+      const void play() { system(("imagej" + getPath() + "&").c_str()); }
 };
