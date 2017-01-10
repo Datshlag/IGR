@@ -33,12 +33,13 @@
 #include "Exception.h"
 #include "LightSource.h"
 #include "LightRay.h"
+#include "BVH.h"
 
 using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
-static const string DEFAULT_MESH_FILE ("models/monkey.off");
+static const string DEFAULT_MESH_FILE ("models/man.off");
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
@@ -49,12 +50,13 @@ static bool fullScreen = false;
 static Camera camera;
 static Mesh mesh;
 static std::vector<LightSource> lightSources;
+static BVH bvh;
 
 static int mode = 1;
 static float shininess = 1.5;
 static float alpha = 0.5;
 static float F0 = 0.1;
-static Vec3f matAlbedo = Vec3f(0.8, 0.8, 0.8);
+static Vec3f matAlbedo = Vec3f(0.8, 0.2, 0.2);
 
 GLint modeShader;
 GLint shininessShader;
@@ -75,7 +77,7 @@ GLProgram * glProgram;
 void loadVbo();
 void renderVbo();
 void initiliazeColor();
-void buildRotMatrix(Vec3f dir, float alpha, float matrix[3][3]);
+const inline void buildRotMatrix(const Vec3f & dir, const float  & alpha, float matrix[3][3]);
 
 static std::vector<float> colorResponses; // Cached per-vertex color response, updated at each frame
 
@@ -120,7 +122,8 @@ void init (const char * modelFilename) {
         glEnableClientState (GL_COLOR_ARRAY);
     }
 
-	mesh.loadOFF (modelFilename);
+	mesh.loadOFF (modelFilename); 
+    bvh = BVH(mesh);//Build BVH tree with the mesh
 
     colorResponses.resize (4*mesh.positions().size());
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
@@ -140,7 +143,7 @@ void init (const char * modelFilename) {
     initiliazeColor();
 
     lightSources = std::vector<LightSource>();
-    lightSources.push_back(LightSource(Vec3<float>(3,2,2),Vec3<float>(5.0,0.0,0.0)));
+    lightSources.push_back(LightSource(Vec3<float>(4,4,1),Vec3<float>(5.0,0.0,0.0)));
     //lightSources.push_back(LightSource(Vec3<float>(3,0,0),Vec3<float>(0.0,1.0,1.0)));
     //lightSources.push_back(LightSource(Vec3<float>(3,4,5),Vec3<float>(1.0,1.0,0.0)));
 
@@ -166,13 +169,13 @@ void loadVbo() {
     glGenBuffers(1, &ibo);
     glGenBuffers(3, vbo);
     glGenVertexArrays(1, &vao);
-
+    
     glBindVertexArray(vao); // Verrouillage du VAO
-        // Buffer d'indices
+        // Buffer d'indices  
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); // Verrouillage du IBO
             // Allocation de la mémoire vidéo
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.triangles().size()*sizeof(Triangle), &(mesh.triangles())[0], GL_STATIC_DRAW);
-
+            
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
             // Allocation de la mémoire vidéo
             glBufferData(GL_ARRAY_BUFFER, mesh.positions().size()*sizeof(mesh.positions()[0]), &(mesh.positions()[0]), GL_STATIC_DRAW);
@@ -202,19 +205,14 @@ void computePerVertexShadow () {
     bool intersects;
 
     Vec3f lightPos = lightSources[0].getPos();
-
     std::vector<Vec3f> positions = mesh.positions();
     std::vector<Triangle> triangles = mesh.triangles();
-
     unsigned int nbVertex = positions.size();
     unsigned int nbTriangle = triangles.size();
 
-
     unsigned int l = 0;
     int i;
-
-    while(l < 4*nbVertex)
-    {
+    while(l < 4*nbVertex) {
 
         // On donne au vertex ses valeurs d'Albedo
         colorResponses[l++] = matAlbedo[0];
@@ -228,8 +226,7 @@ void computePerVertexShadow () {
         intersects = false;
 
         // On cherche si le rayon est bloqué par un triangle
-        for(unsigned int j = nbTriangle; j--; )
-        {
+        for(unsigned int j = nbTriangle; j--; ) {
             Triangle currTri = triangles[j];
 
             intersects = ray.intersects(positions[currTri[0]], positions[currTri[1]], positions[currTri[2]]);
@@ -237,13 +234,13 @@ void computePerVertexShadow () {
         }
 
         // On change le signe de la 4ème coordonnée en fonction de s'il y a eu intersection
-        if(intersects) colorResponses[l++] = -1;
-        else colorResponses[l++] = 1;
+        if(intersects) colorResponses[l++] = -1.0;
+        else colorResponses[l++] = 1.0;
     }
 
 
     // Envoi des données au buffer sur le GPU
-    if(USING_VBO){
+    if(USING_VBO) {
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
             // Remplacement du contenu en VRAM
@@ -252,40 +249,33 @@ void computePerVertexShadow () {
 
 }
 
-void computePerVertexAO (unsigned int numOfSamples, float radius, float Vmax) {
+void computePerVertexAO (unsigned int numOfSamples, float radius, float Vamb) {
+
+    srand((unsigned)time(NULL));
 
     std::vector<Vec3f> positions = mesh.positions();
     std::vector<Vec3f> normals = mesh.normals();
     std::vector<Triangle> triangles = mesh.triangles();
-
     unsigned int nbVertex = positions.size();
     unsigned int nbTriangle = triangles.size();
-
-    Triangle currTri;
-    Vec3f currPos;
 
     LightRay lightRays[numOfSamples];
     bool intersects[numOfSamples];
 
     float  d, sum;
 
-    unsigned int l = nbVertex;
-
+    Triangle currTri;
+    Vec3f currPos;
     Vec3f n;
-    Vec3f nPol;
     Vec3f randVec;
-    Vec3f rotVec;
-    Vec3f c;
 
     float M[3][3];
 
-    srand((unsigned)time(NULL));
-
+    unsigned int l = nbVertex;
     while(l != 0) {
-        currPos = positions[l];
 
+        currPos = positions[l];
         n = normalize(normals[l]);
-        nPol = cartesianToPolar(n);
 
         // Calcul de la distribution initiale des rayons émis
         for(int i = numOfSamples; i--;) {
@@ -294,9 +284,7 @@ void computePerVertexAO (unsigned int numOfSamples, float radius, float Vmax) {
             randVec = Vec3f(1, ((float)rand() *  M_PI/2) / (float)RAND_MAX, ((float)rand() *  2 * M_PI) / (float)RAND_MAX);
             randVec = polarToCartesian(randVec);
 
-            rotVec = cross(Vec3f(0,0,1), n);
-            rotVec.normalize();
-            buildRotMatrix(rotVec, nPol[1], M);
+            buildRotMatrix(normalize(cross(Vec3f(0,0,1), n)), cartesianToPolar(n)[1], M);
             randVec = M * randVec;
 
             lightRays[i].setDirection(randVec);
@@ -308,8 +296,7 @@ void computePerVertexAO (unsigned int numOfSamples, float radius, float Vmax) {
         for(unsigned int i = nbTriangle; i--;) {
 
             currTri = triangles[i];
-            c = (float) 1/3  * (positions[currTri[0]] + positions[currTri[1]] + positions[currTri[2]]);
-            d =  length(currPos - c);
+            d =  length(currPos - (float) 1/3 * (positions[currTri[0]] + positions[currTri[1]] + positions[currTri[2]]));
 
             // Si le triangle est trop loin pas la peine de continuer
             if(d < radius) {
@@ -326,15 +313,15 @@ void computePerVertexAO (unsigned int numOfSamples, float radius, float Vmax) {
         }
 
         // Calcul du coefficient d'AO
-        sum = 0;
+        sum = 0.0;
         for(int i = numOfSamples; i--;) {
 
             sum += intersects[i] * dot(n, lightRays[i].getDirection());
         }
-        std::cerr<<sum<<std::endl;
-        sum *= Vmax/numOfSamples;
+        sum *= 1.0/numOfSamples;
+        sum = 1.0 - sum;
         colorResponses[4*l+3] *= sum;
-        //std::cerr << " vertex : " << l << " reponse : " << colorResponses[4*l+0] << std::endl;
+        //std::cerr << " vertex : " << l << " reponse : " << colorResponses[4*l+3] << std::endl;
 
         l--;
     }
@@ -365,7 +352,7 @@ void initiliazeColor() {
         colorResponses[l++] = matAlbedo[0];
         colorResponses[l++] = matAlbedo[1];
         colorResponses[l++] = matAlbedo[2];
-        colorResponses[l++] = 1;
+        colorResponses[l++] = 1.0;
     }
 
     if(USING_VBO){
@@ -381,9 +368,9 @@ void initiliazeColor() {
 // EXERCISE : the following color response shall be replaced with a proper reflectance evaluation/shadow test/etc.
 void updatePerVertexColorResponse () {
 
-
+    
     //BRDF using Lambert's model for the diffusion term and Blinn-Phong's model for the specular term
-
+    
     if(mode==1)
     {
         for (unsigned int i = 0; i < colorResponses.size (); i++)
@@ -468,8 +455,7 @@ void updatePerVertexColorResponse () {
 
 int test = 0;
 void renderScene () {
-    //updatePerVertexColorResponse ();
-    //if(test++ == 0)computePerVertexShadow();
+    
     glVertexPointer (3, GL_FLOAT, sizeof (Vec3f), (GLvoid*)(&(mesh.positions()[0])));
     glNormalPointer (GL_FLOAT, 3*sizeof (float), (GLvoid*)(&(mesh.normals()[0])));
     glColorPointer (4, GL_FLOAT, 4*sizeof(float), (GLvoid*)(&(colorResponses[0])));
@@ -566,15 +552,22 @@ void key (unsigned char keyPressed, int x, int y) {
         case 'g':
             /*shininess = fmax(0, shininess-0.1);
             glProgram->setUniform1f(shininessShader, shininess);*/
-            computePerVertexAO (32, 0.5, 10);
+            computePerVertexAO (32, 0.5, 0.1); 
             break;
         case 'y':
             alpha = fmin(1,alpha + 0.05);
             glProgram->setUniform1f(alphaShader, alpha);
             break;
         case 'h':
-            alpha = fmax(0, alpha-0.05);
-            glProgram->setUniform1f(alphaShader, alpha);
+            bvh.drawBVH(mesh, colorResponses);
+            if(USING_VBO){
+
+                glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
+                    // Remplacement du contenu en VRAM
+                    glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
+            }
+            /*alpha = fmax(0, alpha-0.05);
+            glProgram->setUniform1f(alphaShader, alpha);*/
             break;
         case 'u':
             F0 += 0.1;
@@ -657,7 +650,7 @@ int main (int argc, char ** argv) {
     return 0;
 }
 
-void buildRotMatrix(Vec3f dir, float alpha, float matrix[3][3]) {
+inline const void buildRotMatrix(const Vec3f & dir, const float & alpha, float matrix[3][3]) {
 
     float cos = std::cos(alpha);
     float sin = std::sin(alpha);
