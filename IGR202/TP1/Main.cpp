@@ -34,6 +34,7 @@
 #include "LightSource.h"
 #include "LightRay.h"
 #include "BVH.h"
+#include <time.h>
 
 using namespace std;
 
@@ -123,7 +124,9 @@ void init (const char * modelFilename) {
     }
 
   	mesh.loadOFF (modelFilename);
-    //bvh = BVH(mesh);//Build BVH tree with the mesh
+    bvh = BVH(mesh);//Build BVH tree with the mesh
+
+    std::cerr << "nb of nodes : " << bvh.getNbNodes() << std::endl;
 
     colorResponses.resize (4*mesh.positions().size());
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
@@ -225,11 +228,13 @@ void computePerVertexShadow () {
         ray = LightRay(positions[i], normalize(lightPos-positions[i]));
         intersects = false;
 
+        //std::cerr << i << std::endl;
+
         // On cherche si le rayon est bloqué par un triangle
         for(unsigned int j = nbTriangle; j--; ) {
-            Triangle currTri = triangles[j];
 
-            intersects = ray.intersects(positions[currTri[0]], positions[currTri[1]], positions[currTri[2]]);
+            Triangle currTri = triangles[j];
+            intersects = ray.intersectsTriangle(positions[currTri[0]], positions[currTri[1]], positions[currTri[2]]);
             if(intersects) break;
         }
 
@@ -247,6 +252,47 @@ void computePerVertexShadow () {
             glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
     }
 
+}
+
+void computePerVertexShadowV2 () {
+
+    LightRay ray;
+    bool intersects;
+
+    Vec3f lightPos = lightSources[0].getPos();
+    std::vector<Vec3f> positions = mesh.positions();
+    std::vector<Triangle> triangles = mesh.triangles();
+    unsigned int nbVertex = positions.size();
+
+    unsigned int l = 0;
+    int i;
+    while(l < 4*nbVertex) {
+
+        // On donne au vertex ses valeurs d'Albedo
+        colorResponses[l++] = matAlbedo[0];
+        colorResponses[l++] = matAlbedo[1];
+        colorResponses[l++] = matAlbedo[2];
+
+        i=l/4;
+
+        // Rayon partant du vertex en direction de la source de lumière
+        ray = LightRay(positions[i], normalize(lightPos-positions[i]));
+        intersects = ray.intersectionBVH(bvh);
+        //std::cerr << i << std::endl;
+
+        // On change le signe de la 4ème coordonnée en fonction de s'il y a eu intersection
+        if(intersects) colorResponses[l++] = -1.0;
+        else colorResponses[l++] = 1.0;
+    }
+
+
+    // Envoi des données au buffer sur le GPU
+    if(USING_VBO) {
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
+            // Remplacement du contenu en VRAM
+            glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
+    }
 }
 
 void computePerVertexAO (unsigned int numOfSamples, float radius, float Vamb) {
@@ -306,7 +352,7 @@ void computePerVertexAO (unsigned int numOfSamples, float radius, float Vamb) {
                     // Si le rayon a déjà rencontré un triangle pas la peine de continuer
                     if(!intersects[i]) {
 
-                        intersects[i] = lightRays[i].intersects(positions[currTri[0]], positions[currTri[1]], positions[currTri[2]]);
+                        intersects[i] = lightRays[i].intersectsTriangle(positions[currTri[0]], positions[currTri[1]], positions[currTri[2]]);
                     }
                 }
             }
@@ -547,12 +593,30 @@ void key (unsigned char keyPressed, int x, int y) {
         case 't':
             /*shininess += 0.1;
             glProgram->setUniform1f(shininessShader, shininess);*/
-            computePerVertexShadow();
+            {
+                clock_t t1, t2;
+                t1 = clock();
+                computePerVertexShadow();
+                t2 = clock();
+                float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
+                std::cerr << diff <<endl;
+            }
+            break;
+        case 'r':
+            initiliazeColor();
             break;
         case 'g':
             /*shininess = fmax(0, shininess-0.1);
             glProgram->setUniform1f(shininessShader, shininess);*/
-            computePerVertexAO (32, 0.5, 0.1);
+            {
+                clock_t t1, t2;
+                t1 = clock();
+                computePerVertexShadowV2();
+                t2 = clock();
+                float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
+                std::cerr << diff <<endl;
+            }
+            //computePerVertexAO (32, 0.5, 0.1);
             break;
         case 'y':
             alpha = fmin(1,alpha + 0.05);

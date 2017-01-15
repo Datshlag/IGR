@@ -3,6 +3,7 @@
 #include "Vec3.h"
 #include "Bbox.h"
 #include "Mesh.h"
+#include "Bbox.h"
 #include <iostream>
 
 class BVH {
@@ -13,9 +14,10 @@ class BVH {
 		BVH* rightChild;
 		static int max_density;
 		static int max_node;
+		static int nb_node;
 		
 	public: 
-		BVH() { }
+		BVH(): leftChild(NULL), rightChild(NULL) { }
 		BVH(const Mesh &mesh) {
 
 			std::vector<int> v(mesh.triangles().size());
@@ -24,20 +26,21 @@ class BVH {
 				v[i]=i;
 			}
 
-			bbox = Bbox(mesh, v);
+			bbox = Bbox(&mesh, v);
 
-			std::vector<Bbox> childBbox = bbox.split(mesh);
+			std::vector<Bbox> childBbox = bbox.split();
 			leftChild = new BVH(mesh, childBbox[0]);
 			rightChild = new BVH(mesh, childBbox[1]);
-			max_node--;
+			//max_node--;
 		}
 		BVH(const Mesh &mesh, const Bbox &_bbox): bbox(_bbox), leftChild(NULL), rightChild(NULL) {
 
 			if(bbox.getDensity() > max_density) {
 
-				std::vector<Bbox> childBbox = bbox.split(mesh);
+				std::vector<Bbox> childBbox = bbox.split();
 				leftChild = new BVH(mesh, childBbox[0]);
 				rightChild = new BVH(mesh, childBbox[1]);
+				nb_node++;
 			}
 
 			/*if(!bbox.isEmpty() && max_node > 0) {
@@ -49,18 +52,27 @@ class BVH {
 			}*/
 		}
 
-		const Vec3f getMeanPos() { return bbox.getMeanPos(); }
-		const Vec3f getMeanNormal() { return bbox.getMeanNormal(); }
-		const void drawBVH(const Mesh &mesh, std::vector<float> &colors) {
+		Vec3f getMeanPos() const { return bbox.getMeanPos(); }
+		Vec3f getMeanNormal() const { return bbox.getMeanNormal(); }
+
+		const BVH* getLeftChild() const { return leftChild; }
+		const BVH* getRightChild() const { return rightChild; }
+
+		const Bbox getBbox() const { return bbox; }
+
+		int getNbNodes() const { return nb_node; }
+
+		void drawBVH(const Mesh &mesh, std::vector<float> &colors) const {
 
 			if(leftChild != NULL) leftChild->drawBVH(mesh, colors);
 			if(rightChild != NULL) rightChild->drawBVH(mesh, colors);
 			if(leftChild == NULL && rightChild == NULL) {
 
-				bbox.drawBbox(mesh, colors);
+				bbox.drawBbox(colors);
 			}
 		}
 };
 
 int BVH::max_density = 100;
 int BVH::max_node = 100;
+int BVH::nb_node = 0;

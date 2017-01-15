@@ -16,7 +16,7 @@ class LightSource{
 
     }
 
-    Vec3f getPos(){
+    Vec3f getPos() const {
 
       float x,y,z;
       polar2Cartesian(pos[1], pos[2], pos[0], x, y, z);
@@ -43,12 +43,12 @@ class LightSource{
       intensity+=toAddLum;
     }
 
-    float getIntensity(){
+    float getIntensity() const {
 
       return intensity;
     }
 
-    Vec3<float> getColor(){
+    Vec3<float> getColor() const {
 
       return color;
     }
