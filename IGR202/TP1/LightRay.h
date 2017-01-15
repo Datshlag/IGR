@@ -1,16 +1,21 @@
 #pragma once
 
+#include <iostream>
+#include <cfloat>
+
 #include "Vec3.h"
 #include "BVH.h"
 #include "Bbox.h"
 #include "Mesh.h"
-#include <iostream>
 
 #define EPSILON 0.0000001
 
 class LightRay {
 
 	public:
+		static int count;
+		float rayTime = 0.0;
+		int countLocal = 0;
 		inline LightRay() { }
 		inline LightRay(const Vec3f & origin, const Vec3f & direction): origin(origin), direction(direction) { 
 
@@ -47,104 +52,116 @@ class LightRay {
 			float t = dot(e1, q);
 			return (t > EPSILON);
 		}
-
-
-		inline bool intersectsBox(const Bbox &box) const {
-
-			Vec3f min = box.getMinCorner();
-			Vec3f max = box.getMaxCorner();
-
 			
-
-		//bad implementation
-		inline bool intersectsBoxObsolete(const Bbox &bbox) const {
+		//ray bbox intersection test implementaiton based on the "slabs" method : https://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
+		inline bool intersectsBox(const Bbox &bbox) const {
 
 			Vec3f minCorner = bbox.getMinCorner();
 			Vec3f maxCorner = bbox.getMaxCorner();
 
-			float xMin, yMin, zMin, xMax, yMax, zMax;
+			float tNear, tFar, tMin, tMax;
+			tNear = -INFINITY;
+			tFar = INFINITY;
 
-			xMin = minCorner[0];
-			yMin = minCorner[1];
-			zMin = minCorner[2];
-			xMax = maxCorner[0];
-			yMax = maxCorner[1];
-			zMax = maxCorner[2];
+			//X axis plane
+			if(origin[0] < EPSILON) {
 
-			Vec3f aCorner, bCorner, cCorner, dCorner, eCorner, fCorner, gCorner, hCorner;
+				if((origin[0] < minCorner[0] - EPSILON) || (origin[0] > maxCorner[0] + EPSILON)) return false; 
+			}
 
-			aCorner = minCorner;
-			bCorner = Vec3f(xMin, yMax, zMin);
-			cCorner = Vec3f(xMax, yMin, zMin);
-			dCorner = Vec3f(xMin, yMin, zMax);
-			eCorner = Vec3f(xMin, yMax, zMax);
-			fCorner = Vec3f(xMax, yMax, zMin);
-			gCorner = Vec3f(xMax, yMin, zMax);
-			hCorner = maxCorner;
+			tMin = (minCorner[0] - origin[0]) * inv_direction[0];
+			tMax = (maxCorner[0] - origin[0]) * inv_direction[0];
 
-			bool intersects = false;
+			if(tMin > tMax) std::swap(tMin, tMax);
+			if(tMin > tNear) tNear = tMin;
+			if(tMax < tFar) tFar = tMax;
 
-			intersects = intersects || intersectsTriangle(aCorner, dCorner, bCorner);
-			intersects = intersects || intersectsTriangle(bCorner, dCorner, eCorner);
+			//missed box
+			if(tNear > tFar) return false;
+			//box behind
+			if(tFar < 0) return false;
 
-			intersects = intersects || intersectsTriangle(bCorner, cCorner, aCorner);
-			intersects = intersects || intersectsTriangle(fCorner, cCorner, bCorner);
+			//Y axis plane
+			if(origin[1] < EPSILON) {
 
-			intersects = intersects || intersectsTriangle(bCorner, eCorner, hCorner);
-			intersects = intersects || intersectsTriangle(bCorner, hCorner, fCorner);
+				if((origin[1] < minCorner[1] - EPSILON) || (origin[1] > maxCorner[1] + EPSILON)) return false; 
+			}
 
-			intersects = intersects || intersectsTriangle(hCorner, gCorner, cCorner);
-			intersects = intersects || intersectsTriangle(hCorner, cCorner, fCorner);
+			tMin = (minCorner[1] - origin[1]) * inv_direction[1];
+			tMax = (maxCorner[1] - origin[1]) * inv_direction[1];
 
-			intersects = intersects || intersectsTriangle(cCorner, gCorner, dCorner);
-			intersects = intersects || intersectsTriangle(cCorner, dCorner, aCorner);
+			if(tMin > tMax) std::swap(tMin, tMax);
+			if(tMin > tNear) tNear = tMin;
+			if(tMax < tFar) tFar = tMax;
 
-			intersects = intersects || intersectsTriangle(eCorner, dCorner, gCorner);
-			intersects = intersects || intersectsTriangle(eCorner, gCorner, hCorner);
+			if(tNear > tFar) return false;
+			if(tFar < 0) return false;
 
-			return intersects;
+			//Z axis plane
+			if(origin[2] < EPSILON) {
+
+				if((origin[2] < minCorner[2] - EPSILON) || (origin[2] > maxCorner[2] + EPSILON)) return false; 
+			}
+
+			tMin = (minCorner[2] - origin[2]) * inv_direction[2];
+			tMax = (maxCorner[2] - origin[2]) * inv_direction[2];
+
+			if(tMin > tMax) std::swap(tMin, tMax);
+			if(tMin > tNear) tNear = tMin;
+			if(tMax < tFar) tFar = tMax;
+
+			if(tNear > tFar) return false;
+			if(tFar < 0) return false;
+
+			return true;
 		}
 
 		inline bool intersectsBoxContent(const Bbox &bbox) {
+
+			clock_t t1, t2;
+            t1 = clock();
 
 			std::vector<int> indexes = bbox.getTrianglesIndexes();
 			const Mesh *mesh = bbox.getMesh();
 
 			bool intersects;
 
-			/*std::vector<Vec3f> positions = mesh->positions();
+			std::vector<Vec3f> positions = mesh->positions();
     		std::vector<Triangle> triangles = mesh->triangles();
+
+    		Triangle currTri;
 
 			for(unsigned int j = 0; j < indexes.size(); j++) {
 
-	            Triangle currTri = triangles[indexes[j]];
+				countLocal++;
+	            currTri = triangles[indexes[j]];
 	            intersects = intersectsTriangle(positions[currTri[0]], positions[currTri[1]], positions[currTri[2]]);
 	            if(intersects) break;
-	        }*/
+	        }
 
-	        //std::cerr << "got to bottom : " << intersects << std::endl;*/
+            t2 = clock();
+            float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
+
+            rayTime += diff;
 
 	        return intersects;
 		}
 
-		inline bool intersectionBVH(const BVH &bvh) {
+		inline bool intersectionBVH(const BVH *bvh) {
 
-			const Bbox bbox = bvh.getBbox();
-
-			if(intersectsBox(bbox) != intersectsBoxObsolete(bbox)) std::cerr << intersectsBox(bbox) << " " << intersectsBoxObsolete(bbox) << std::endl;
+			const Bbox bbox = bvh->getBbox();
 
 			if(intersectsBox(bbox)) {
 
-				const BVH * leftChild = bvh.getLeftChild();
-				const BVH * rightChild = bvh.getRightChild();
+				const BVH * leftChild = bvh->getLeftChild();
+				const BVH * rightChild = bvh->getRightChild();
 
-				bool leftIntersect = false;
-				bool rightIntersect = false;
+				if(leftChild != NULL && rightChild != NULL){
+					bool left = intersectionBVH(leftChild);
+					return(left || intersectionBVH(rightChild));
+				}
 
-				if(leftChild != NULL) leftIntersect = intersectionBVH(*leftChild);
-				if(rightChild != NULL) rightIntersect = intersectionBVH(*rightChild);
-				if((rightChild == NULL) && (leftChild == NULL)) return intersectsBoxContent(bbox);
-				else return leftIntersect||rightIntersect;
+				else return intersectsBoxContent(bbox);
 			}
 
 			return false;
@@ -154,5 +171,6 @@ class LightRay {
 		Vec3f origin;
 		Vec3f direction;
 		Vec3f inv_direction;
-		int sign[3];
 };	
+
+int LightRay::count = 0;

@@ -11,7 +11,6 @@ class Bbox {
 		//Corners of the bounding box
 		Vec3f minCorner;
 		Vec3f maxCorner;
-		Vec3f bounds[2];
 
 		//Indexes of the triangles in the bbox
 		std::vector<int> trianglesIndexes;
@@ -44,44 +43,68 @@ class Bbox {
 			Triangle currTriangle;
 			Vec3f currNormal;
 
+			int i;
+			float posX, posY, posZ;
+
+			//We compute the min and max bounds
 			for(unsigned int j = 0; j < trianglesIndexes.size(); j++) {
 
-				int i = trianglesIndexes[j];
+				i = trianglesIndexes[j];
 
 				currTriangle = triangles[i];
 
 				currPos = positions[currTriangle[0]];
 				currNormal = normals[currTriangle[0]];
-				if(currPos[0] < minX) minX = currPos[0];
-				if(currPos[1] < minY) minY = currPos[1];
-				if(currPos[2] < minZ) minZ = currPos[2];
-				if(currPos[0] > maxX) maxX = currPos[0];
-				if(currPos[1] > maxY) maxY = currPos[1];
-				if(currPos[2] > maxZ) maxZ = currPos[2];
+
+				posX = currPos[0];
+				posY = currPos[1];
+				posZ = currPos[2];
+
+				if(posX < minX) minX = posX;
+				if(posY < minY) minY = posY;
+				if(posZ < minZ) minZ = posZ;
+				if(posX > maxX) maxX = posX;
+				if(posY > maxY) maxY = posY;
+				if(posZ > maxZ) maxZ = posZ;
+
 				meanPos += currPos * (float)1.0/3.0;
 				meanNormal += currNormal * (float)1.0/3.0;
 
 				currPos = positions[currTriangle[1]];
 				currNormal = normals[currTriangle[1]];
-				if(currPos[0] < minX) minX = currPos[0];
-				if(currPos[1] < minY) minY = currPos[1];
-				if(currPos[2] < minZ) minZ = currPos[2];
-				if(currPos[0] > maxX) maxX = currPos[0];
-				if(currPos[1] > maxY) maxY = currPos[1];
-				if(currPos[2] > maxZ) maxZ = currPos[2];
+
+				posX = currPos[0];
+				posY = currPos[1];
+				posZ = currPos[2];
+
+				if(posX < minX) minX = posX;
+				if(posY < minY) minY = posY;
+				if(posZ < minZ) minZ = posZ;
+				if(posX > maxX) maxX = posX;
+				if(posY > maxY) maxY = posY;
+				if(posZ > maxZ) maxZ = posZ;
+
 				meanPos += currPos * (float)1.0/3.0;
 				meanNormal += currNormal * (float)1.0/3.0;
 
+
 				currPos = positions[currTriangle[2]];
 				currNormal = normals[currTriangle[2]];
-				if(currPos[0] < minX) minX = currPos[0];
-				if(currPos[1] < minY) minY = currPos[1];
-				if(currPos[2] < minZ) minZ = currPos[2];
-				if(currPos[0] > maxX) maxX = currPos[0];
-				if(currPos[1] > maxY) maxY = currPos[1];
-				if(currPos[2] > maxZ) maxZ = currPos[2];
+
+				posX = currPos[0];
+				posY = currPos[1];
+				posZ = currPos[2];
+
+				if(posX < minX) minX = posX;
+				if(posY < minY) minY = posY;
+				if(posZ < minZ) minZ = posZ;
+				if(posX > maxX) maxX = posX;
+				if(posY > maxY) maxY = posY;
+				if(posZ > maxZ) maxZ = posZ;
+
 				meanPos += currPos * (float)1.0/3.0;
 				meanNormal += currNormal * (float)1.0/3.0;
+
 
 			}
 
@@ -95,7 +118,8 @@ class Bbox {
 
 		std::vector<Bbox> split() const {
 
-			int i = getLargestDim();
+			int i, j;
+			i = getLargestDim();
 
 			std::vector<Triangle> triangles = mesh->triangles();
 			std::vector<Vec3f> positions = mesh->positions();
@@ -108,12 +132,11 @@ class Bbox {
 			Vec3f bar;
 			bool splitOk = false;
 
-
 			while(!splitOk) {
 
 				for(unsigned int k = 0; k < trianglesIndexes.size(); k++) {
 
-					int j = trianglesIndexes[k];
+					j = trianglesIndexes[k];
 					currTriangle = triangles[j];
 					bar = (positions[currTriangle[0]]+positions[currTriangle[1]]+positions[currTriangle[2]]) * (float)1.0/3.0;
 

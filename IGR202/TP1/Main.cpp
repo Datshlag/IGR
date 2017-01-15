@@ -40,7 +40,7 @@ using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
-static const string DEFAULT_MESH_FILE ("models/monkey.off");
+static const string DEFAULT_MESH_FILE ("models/man.off");
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
@@ -51,7 +51,7 @@ static bool fullScreen = false;
 static Camera camera;
 static Mesh mesh;
 static std::vector<LightSource> lightSources;
-static BVH bvh;
+static BVH* bvh;
 
 static int mode = 1;
 static float shininess = 1.5;
@@ -124,9 +124,10 @@ void init (const char * modelFilename) {
     }
 
   	mesh.loadOFF (modelFilename);
-    bvh = BVH(mesh);//Build BVH tree with the mesh
+    bvh = new BVH(mesh);//Build BVH tree with the mesh
 
-    std::cerr << "nb of nodes : " << bvh.getNbNodes() << std::endl;
+    std::cerr << "nb of nodes : " << bvh->getNbNodes() << std::endl;
+    std::cerr << "nb of leaves : " << bvh->getNbLeaves() << std::endl;
 
     colorResponses.resize (4*mesh.positions().size());
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
@@ -215,7 +216,13 @@ void computePerVertexShadow () {
 
     unsigned int l = 0;
     int i;
+
+    float rayTime;
+    int nbIntersect;
     while(l < 4*nbVertex) {
+
+        rayTime = 0.0;
+        nbIntersect = 0;
 
         // On donne au vertex ses valeurs d'Albedo
         colorResponses[l++] = matAlbedo[0];
@@ -231,12 +238,23 @@ void computePerVertexShadow () {
         //std::cerr << i << std::endl;
 
         // On cherche si le rayon est bloqué par un triangle
-        for(unsigned int j = nbTriangle; j--; ) {
+        for(unsigned int j = nbTriangle; (j--)&&(!intersects); ) {
+
+            clock_t t1, t2;
+            t1 = clock();
 
             Triangle currTri = triangles[j];
             intersects = ray.intersectsTriangle(positions[currTri[0]], positions[currTri[1]], positions[currTri[2]]);
-            if(intersects) break;
+
+            t2 = clock();
+            float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
+
+            rayTime += diff;
+
+            nbIntersect++;
         }
+
+        std::cerr << " Rayon : " << i << " tests intersections : " << nbIntersect << " total time : " << rayTime << std::endl;
 
         // On change le signe de la 4ème coordonnée en fonction de s'il y a eu intersection
         if(intersects) colorResponses[l++] = -1.0;
@@ -278,7 +296,8 @@ void computePerVertexShadowV2 () {
         // Rayon partant du vertex en direction de la source de lumière
         ray = LightRay(positions[i], normalize(lightPos-positions[i]));
         intersects = ray.intersectionBVH(bvh);
-        //std::cerr << i << std::endl;
+        std::cerr << " Rayon : " << i << " tests intersections : " << ray.countLocal << " total time : " << ray.rayTime << std::endl;
+
 
         // On change le signe de la 4ème coordonnée en fonction de s'il y a eu intersection
         if(intersects) colorResponses[l++] = -1.0;
@@ -623,7 +642,7 @@ void key (unsigned char keyPressed, int x, int y) {
             glProgram->setUniform1f(alphaShader, alpha);
             break;
         case 'h':
-            bvh.drawBVH(mesh, colorResponses);
+            bvh->drawBVH(mesh, colorResponses);
             if(USING_VBO){
 
                 glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
