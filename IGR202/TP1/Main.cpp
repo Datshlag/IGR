@@ -346,7 +346,9 @@ void computePerVertexAO (unsigned int numOfSamples, float radius, float Vamb) {
         for(int i = numOfSamples; i--;) {
 
             lightRays[i].setOrigin(currPos);
-            randVec = Vec3f(1, ((float)rand() *  M_PI/2) / (float)RAND_MAX, ((float)rand() *  2 * M_PI) / (float)RAND_MAX);
+            
+	/* SI T'ÉTAIS VENU EN TP T'AURAIS SU QU'IL NE FAUT PAS FAIRE COMME ÇA !!!!!!!!!! */
+        	randVec = Vec3f(1, ((float)rand() *  M_PI/2) / (float)RAND_MAX, ((float)rand() *  2 * M_PI) / (float)RAND_MAX);
             randVec = polarToCartesian(randVec);
 
             buildRotMatrix(normalize(cross(Vec3f(0,0,1), n)), cartesianToPolar(n)[1], M);
