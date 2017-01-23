@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <cmath>
+#include <time.h>
 
 #include "Vec3.h"
 #include "Camera.h"
@@ -34,7 +35,6 @@
 #include "LightSource.h"
 #include "LightRay.h"
 #include "BVH.h"
-#include <time.h>
 
 using namespace std;
 
@@ -125,6 +125,7 @@ void init (const char * modelFilename) {
 
   	mesh.loadOFF (modelFilename);
     bvh = new BVH(mesh);//Build BVH tree with the mesh
+
 
     std::cerr << "nb of nodes : " << bvh->getNbNodes() << std::endl;
     std::cerr << "nb of leaves : " << bvh->getNbLeaves() << std::endl;
@@ -295,7 +296,7 @@ void computePerVertexShadowV2 () {
 
         // Rayon partant du vertex en direction de la source de lumière
         ray = LightRay(positions[i], normalize(lightPos-positions[i]));
-        intersects = ray.intersectionBVH(bvh);
+        intersects = ray.intersectsBVH(bvh);
         std::cerr << " Rayon : " << i << " tests intersections : " << ray.countLocal << " total time : " << ray.rayTime << std::endl;
 
 
@@ -642,7 +643,7 @@ void key (unsigned char keyPressed, int x, int y) {
             glProgram->setUniform1f(alphaShader, alpha);
             break;
         case 'h':
-            bvh->drawBVH(mesh, colorResponses);
+            //bvh->drawBVH(mesh, colorResponses);
             if(USING_VBO){
 
                 glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO

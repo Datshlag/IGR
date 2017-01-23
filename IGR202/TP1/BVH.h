@@ -3,70 +3,53 @@
 #include "Vec3.h"
 #include "Bbox.h"
 #include "Mesh.h"
-#include "Bbox.h"
 #include <iostream>
 
 class BVH {
 
-	private : 
+	private :
 		Bbox bbox;
 		BVH* leftChild;
 		BVH* rightChild;
+
+		std::vector<int> indexes;
+		Vec3f meanPos;
+
 		static int max_density;
 		static int nb_node;
 		static int nb_leaves;
-		
-	public: 
-		BVH(): leftChild(NULL), rightChild(NULL) { }
-		BVH(const Mesh &mesh) {
 
-			nb_node++;
-			std::vector<int> v(mesh.triangles().size());
-			for(unsigned int i = 0; i < v.size(); i++) {
+		void split (const std::vector<int> &subIndexes1,
+				  	const std::vector<int> &subIndexes2,
+				  	const Bbox &subBbox1,
+				  	const Bbox &subBbox2) const;
 
-				v[i]=i;
-			}
 
-			bbox = Bbox(&mesh, v);
+    const Mesh* mesh;
 
-			std::vector<Bbox> childBbox = bbox.split();
-			leftChild = new BVH(mesh, childBbox[0]);
-			rightChild = new BVH(mesh, childBbox[1]);
-		}
-		BVH(const Mesh &mesh, const Bbox &_bbox): bbox(_bbox), leftChild(NULL), rightChild(NULL) {
+	public:
+		~BVH();
+		BVH();
+		BVH(const Mesh &mesh);
+		BVH(const Mesh &mesh, const std::vector<int> &indexes, const Bbox &_bbox);
 
-			nb_node++;
-			if(bbox.getDensity() > max_density) {
-
-				std::vector<Bbox> childBbox = bbox.split();
-				leftChild = new BVH(mesh, childBbox[0]);
-				rightChild = new BVH(mesh, childBbox[1]);
-			}
-			else nb_leaves++;
-		}
-
-		Vec3f getMeanPos() const { return bbox.getMeanPos(); }
-		Vec3f getMeanNormal() const { return bbox.getMeanNormal(); }
+		void split (std::vector<int> &subIndexes1, 
+            std::vector<int> &subIndexes2,
+            Bbox &subBbox1,
+            Bbox &subBbox2) const;
 
 		const BVH* getLeftChild() const { return leftChild; }
 		const BVH* getRightChild() const { return rightChild; }
-
 		const Bbox getBbox() const { return bbox; }
+		const std::vector<int> getIndexes() const { return indexes; }
+		const Mesh* getMesh() const { return mesh; }
 
 		int getNbNodes() const { return nb_node; }
 		int getNbLeaves() const { return nb_leaves; }
 
-		void drawBVH(const Mesh &mesh, std::vector<float> &colors) const {
-
-			if(leftChild != NULL) leftChild->drawBVH(mesh, colors);
-			if(rightChild != NULL) rightChild->drawBVH(mesh, colors);
-			if(leftChild == NULL && rightChild == NULL) {
-
-				bbox.drawBbox(colors);
-			}
-		}
+		//void drawBVH(const Mesh &mesh, std::vector<float> &colors) const { }
 };
 
-int BVH::max_density = 10000;
+int BVH::max_density = 100;
 int BVH::nb_node = 0;
 int BVH::nb_leaves = 0;

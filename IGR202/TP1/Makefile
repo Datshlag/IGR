@@ -1,29 +1,31 @@
+.PHONY: clean
 CIBLE = main
-SRCS =  Main.cpp Camera.cpp Mesh.cpp GLProgram.cpp GLShader.cpp GLError.cpp
+SRCS =  Main.cpp Camera.cpp Mesh.cpp GLProgram.cpp GLShader.cpp GLError.cpp BVH.cpp LightRay.cpp
 OPENGL_PATH = /usr/lib/nvidia-358 # change this for your own environment
 LIBS = -L$(OPENGL_PATH) -lglut -lGLU -lGL -lGLEW -lm -lpthread
 
-CC = g++
-CPP = g++
+CC = gcc
+CXX = g++
 
-FLAGS = -Wall -g -pthread
+FLAGS = -g -Wall  -O3 -pthread -std=c++11
 
 CFLAGS = $(FLAGS)
 CXXFLAGS = $(FLAGS)
 
-OBJS = $(SRCS:.cpp=.o)   
+OBJS = $(SRCS:.cpp=.o)
 
 $(CIBLE): $(OBJS)
-	g++ $(LDFLAGS) -o $(CIBLE) $(OBJS) $(LIBS) -O2
+	$(CXX) $(LIBS) $^ -o $@
+
+-include $(subst .cpp,.d,$(SRCS))
+
+%.d : %.cpp
+	 $(CXX) -std=c++11 -MM -MF $@\
+		  -MP $<
+
 clean:
-	rm -f  *~  $(CIBLE) $(OBJS)
-
-Camera.o: Camera.cpp Camera.h Vec3.h
-Mesh.o: Mesh.cpp Mesh.h Vec3.h
-GLError.o: GLError.cpp GLError.h Exception.h 
-GLShader.o: GLShader.cpp GLShader.h GLError.h
-GLProgram.o: GLProgram.cpp GLProgram.h GLShader.h GLError.h Exception.h
-Main.o: Main.cpp Vec3.h Camera.h Mesh.h GLProgram.h Exception.h LightSource.h LightRay.h BVH.h Bbox.h
-
-
-
+	rm -f $(CIBLE)
+	rm -f *.o
+	rm -f *.d
+run:
+	./$(CIBLE)
