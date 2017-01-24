@@ -4,7 +4,7 @@ SRCS =  Main.cpp Camera.cpp Mesh.cpp GLProgram.cpp GLShader.cpp GLError.cpp BVH.
 OPENGL_PATH = /usr/lib/nvidia-358 # change this for your own environment
 LIBS = -L$(OPENGL_PATH) -lglut -lGLU -lGL -lGLEW -lm -lpthread
 
-CC = gcc
+CC = g++
 CXX = g++
 
 FLAGS = -g -Wall  -O3 -pthread -std=c++11
@@ -15,7 +15,7 @@ CXXFLAGS = $(FLAGS)
 OBJS = $(SRCS:.cpp=.o)
 
 $(CIBLE): $(OBJS)
-	$(CXX) $(LIBS) $^ -o $@
+	$(CXX) $^ -o $@ $(LIBS) 
 
 -include $(subst .cpp,.d,$(SRCS))
 

@@ -12,20 +12,18 @@ class BVH {
 		BVH* leftChild;
 		BVH* rightChild;
 
-		std::vector<int> indexes;
-		Vec3f meanPos;
+		const Mesh* mesh;
 
-		static int max_density;
-		static int nb_node;
-		static int nb_leaves;
+		std::vector<int> indexes;
+
+		static unsigned int max_density;
+		static unsigned int nb_node;
+		static unsigned int nb_leaves;
 
 		void split (const std::vector<int> &subIndexes1,
 				  	const std::vector<int> &subIndexes2,
 				  	const Bbox &subBbox1,
 				  	const Bbox &subBbox2) const;
-
-
-    const Mesh* mesh;
 
 	public:
 		~BVH();
@@ -49,7 +47,3 @@ class BVH {
 
 		//void drawBVH(const Mesh &mesh, std::vector<float> &colors) const { }
 };
-
-int BVH::max_density = 100;
-int BVH::nb_node = 0;
-int BVH::nb_leaves = 0;

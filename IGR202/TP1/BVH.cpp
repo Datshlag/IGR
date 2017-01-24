@@ -1,6 +1,10 @@
 #include "BVH.h"
 #include <cfloat>
 
+unsigned int BVH::max_density = 100;
+unsigned int BVH::nb_node = 0;
+unsigned int BVH::nb_leaves = 0;
+
 BVH::BVH(): mesh(NULL) { }
 BVH::BVH(const Mesh &_mesh): mesh(&_mesh) {
 
@@ -22,6 +26,7 @@ BVH::BVH(const Mesh &_mesh): mesh(&_mesh) {
     maxX = maxY = maxZ = FLT_MIN;
 
     Vec3f currPos;
+    Vec3f meanPos = Vec3f(0, 0, 0);
     float posX, posY, posZ;
 
     for(unsigned int i = 0; i < positions.size(); i++) {
@@ -41,8 +46,9 @@ BVH::BVH(const Mesh &_mesh): mesh(&_mesh) {
         meanPos += currPos;
     }
 
-    bbox = Bbox(Vec3f(minX, minY, minZ), Vec3f(maxX, maxY, maxZ), meanPos);
     meanPos *= (float) 1.0/positions.size();
+
+    bbox = Bbox(Vec3f(minX, minY, minZ), Vec3f(maxX, maxY, maxZ), meanPos);
 
     std::vector<int> subIndexes1 = std::vector<int>();
     std::vector<int> subIndexes2 = std::vector<int>();
@@ -56,8 +62,7 @@ BVH::BVH(const Mesh &_mesh): mesh(&_mesh) {
     rightChild = new BVH(_mesh, subIndexes2, subBbox2);
 }
 
-BVH::BVH(const Mesh &_mesh, const std::vector<int> &_indexes, const Bbox &_bbox): mesh(&_mesh), indexes(_indexes), bbox(_bbox) {
-
+BVH::BVH(const Mesh &_mesh, const std::vector<int> &_indexes, const Bbox &_bbox): mesh(&_mesh), indexes(_indexes), bbox(_bbox), leftChild(NULL), rightChild(NULL) {
 
     if (indexes.size() > max_density) {
 
@@ -67,6 +72,8 @@ BVH::BVH(const Mesh &_mesh, const std::vector<int> &_indexes, const Bbox &_bbox)
         Bbox subBbox2;
 
         split(subIndexes1, subIndexes2, subBbox1, subBbox2);
+
+        //std::cout<< "Father : " << indexes.size() << " 1st son : " << subIndexes1.size() << std::endl;
 
         leftChild = new BVH(_mesh, subIndexes1, subBbox1);
         rightChild = new BVH(_mesh, subIndexes2, subBbox2);
@@ -93,12 +100,12 @@ void BVH::split (std::vector<int> &subIndexes1,
     float minX1, minY1, minZ1;
     minX1 = minY1 = minZ1 = FLT_MAX;
     float maxX1, maxY1, maxZ1;
-    maxX1 = maxY1 = maxZ1 = FLT_MIN;
+    maxX1 = maxY1 = maxZ1 = - FLT_MAX;
 
     float minX2, minY2, minZ2;
     minX2 = minY2 = minZ2 = FLT_MAX;
     float maxX2, maxY2, maxZ2;
-    maxX2 = maxY2 = maxZ2 = FLT_MIN;
+    maxX2 = maxY2 = maxZ2 = - FLT_MAX;
 
     Vec3f meanPos1, meanPos2;
     meanPos1 = meanPos2 = Vec3f(0, 0, 0);
@@ -110,7 +117,9 @@ void BVH::split (std::vector<int> &subIndexes1,
     Vec3f V0, V1, V2, bar;
     float posX, posY, posZ;
 
-    for (int i = 0; i < indexes.size(); i++) {
+    Vec3f meanPos = bbox.meanPos;
+
+    for (unsigned int i = 0; i < indexes.size(); i++) {
 
         currTri = triangles[indexes[i]];
         V0 = positions[currTri[0]];
@@ -118,7 +127,7 @@ void BVH::split (std::vector<int> &subIndexes1,
         V2 = positions[currTri[2]];
         bar = (V0 + V1 + V2) * (float)1.0/3.0;
 
-        if (bar[split] > meanPos[split]) {
+        if (bar[split] >= meanPos[split]) {
 
             //Adding to the subset index list
             subIndexes1.push_back(indexes[i]);
@@ -205,7 +214,15 @@ void BVH::split (std::vector<int> &subIndexes1,
             if(posY > maxY2) maxY2 = posY;
             if(posZ > maxZ2) maxZ2 = posZ;
         }
+
+        if(indexes.size() == 1008) {
+
+            std::cout <<Vec3f(minX1, minY1, minZ1) << " " << Vec3f(maxX1, maxY1, maxZ1) << std::endl;
+        }
     }
+
+    meanPos1 *= (float)1.0/subIndexes1.size();
+    meanPos2 *= (float)1.0/subIndexes2.size();
 
     subBbox1 = Bbox(Vec3f(minX1, minY1, minZ1), Vec3f(maxX1, maxY1, maxZ1), meanPos1);
     subBbox2 = Bbox(Vec3f(minX2, minY2, minZ2), Vec3f(maxX2, maxY2, maxZ2), meanPos2);

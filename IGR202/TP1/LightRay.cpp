@@ -1,6 +1,8 @@
 #include "LightRay.h"
 #define EPSILON 0.000000001
 
+int LightRay::count = 0;
+
 bool LightRay::intersectsTriangle(const Vec3f & p0, const Vec3f & p1, const Vec3f & p2) const {
 
 	Vec3f e0 = p1 - p0;
@@ -90,7 +92,7 @@ bool LightRay::intersectsBox(const Bbox &bbox) const {
 
 bool LightRay::intersectsBVH(const BVH *bvh) const{
 
-	const Bbox bbox = bvh->getBbox();
+	Bbox bbox = bvh->getBbox();
 
 	if(intersectsBox(bbox)) {
 

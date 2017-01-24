@@ -40,7 +40,7 @@ using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
-static const string DEFAULT_MESH_FILE ("models/man.off");
+static const string DEFAULT_MESH_FILE ("models/monkey.off");
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
@@ -297,7 +297,7 @@ void computePerVertexShadowV2 () {
         // Rayon partant du vertex en direction de la source de lumière
         ray = LightRay(positions[i], normalize(lightPos-positions[i]));
         intersects = ray.intersectsBVH(bvh);
-        std::cerr << " Rayon : " << i << " tests intersections : " << ray.countLocal << " total time : " << ray.rayTime << std::endl;
+        //std::cerr << " Rayon : " << i << " tests intersections : " << ray.countLocal << " total time : " << ray.rayTime << std::endl;
 
 
         // On change le signe de la 4ème coordonnée en fonction de s'il y a eu intersection
@@ -613,14 +613,12 @@ void key (unsigned char keyPressed, int x, int y) {
         case 't':
             /*shininess += 0.1;
             glProgram->setUniform1f(shininessShader, shininess);*/
-            {
-                clock_t t1, t2;
-                t1 = clock();
-                computePerVertexShadow();
-                t2 = clock();
-                float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
-                std::cerr << diff <<endl;
-            }
+            clock_t t1, t2;
+            t1 = clock();
+            computePerVertexShadow();
+            t2 = clock();
+            float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
+            std::cerr << diff <<endl;
             break;
         case 'r':
             initiliazeColor();
@@ -628,14 +626,12 @@ void key (unsigned char keyPressed, int x, int y) {
         case 'g':
             /*shininess = fmax(0, shininess-0.1);
             glProgram->setUniform1f(shininessShader, shininess);*/
-            {
-                clock_t t1, t2;
-                t1 = clock();
-                computePerVertexShadowV2();
-                t2 = clock();
-                float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
-                std::cerr << diff <<endl;
-            }
+            clock_t t1, t2;
+            t1 = clock();
+            computePerVertexShadowV2();
+            t2 = clock();
+            float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
+            std::cerr << diff <<endl;
             //computePerVertexAO (32, 0.5, 0.1);
             break;
         case 'y':

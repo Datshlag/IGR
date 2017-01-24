@@ -36,5 +36,3 @@ class LightRay {
 		Vec3f direction;
 		Vec3f inv_direction;
 };	
-
-int LightRay::count = 0;
