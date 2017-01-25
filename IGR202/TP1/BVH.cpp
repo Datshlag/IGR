@@ -1,7 +1,7 @@
 #include "BVH.h"
 #include <cfloat>
 
-unsigned int BVH::max_density = 100;
+unsigned int BVH::max_density = 5000;
 unsigned int BVH::nb_node = 0;
 unsigned int BVH::nb_leaves = 0;
 

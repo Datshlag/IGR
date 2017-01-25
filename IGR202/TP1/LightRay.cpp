@@ -1,5 +1,5 @@
 #include "LightRay.h"
-#define EPSILON 0.000000001
+#define EPSILON 0.0001f
 
 int LightRay::count = 0;
 
@@ -26,11 +26,13 @@ bool LightRay::intersectsTriangle(const Vec3f & p0, const Vec3f & p1, const Vec3
 
 	float t = dot(e1, q);
 	return (t > EPSILON);
+
+
 }
 			
 bool LightRay::intersectsBox(const Bbox &bbox) const {
 
-	Vec3f minCorner = bbox.minCorner;
+	/*Vec3f minCorner = bbox.minCorner;
 	Vec3f maxCorner = bbox.maxCorner;
 
 	float tNear, tFar, tMin, tMax;
@@ -87,7 +89,23 @@ bool LightRay::intersectsBox(const Bbox &bbox) const {
 	if(tNear > tFar) return false;
 	if(tFar < 0) return false;
 
-	return true;
+	return true;*/
+
+	Vec3f minCorner = bbox.minCorner;
+	Vec3f maxCorner = bbox.maxCorner;
+
+    float t1 = (minCorner[0] - origin[0]) * inv_direction[0]; 
+    float t2 = (maxCorner[0] - origin[0]) * inv_direction[0]; 
+    float t3 = (minCorner[1] - origin[1]) * inv_direction[1]; 
+    float t4 = (maxCorner[1] - origin[1]) * inv_direction[1]; 
+    float t5 = (minCorner[2] - origin[2]) * inv_direction[2]; 
+    float t6 = (maxCorner[2] - origin[2]) * inv_direction[2]; 
+
+    float tmin = std::max(std::max(std::min(t1, t2), std::min(t3, t4)), std::min(t5, t6));
+    float tmax = std::min(std::min(std::max(t1, t2), std::max(t3, t4)), std::max(t5, t6));
+
+    if (!(tmax > 0 && tmax > tmin)) return false;
+    else return true;
 }
 
 bool LightRay::intersectsBVH(const BVH *bvh) const{
