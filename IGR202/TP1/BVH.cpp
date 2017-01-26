@@ -1,7 +1,7 @@
 #include "BVH.h"
 #include <cfloat>
 
-unsigned int BVH::max_density = 5000;
+unsigned int BVH::max_density = 500;
 unsigned int BVH::nb_node = 0;
 unsigned int BVH::nb_leaves = 0;
 
@@ -72,8 +72,6 @@ BVH::BVH(const Mesh &_mesh, const std::vector<int> &_indexes, const Bbox &_bbox)
         Bbox subBbox2;
 
         split(subIndexes1, subIndexes2, subBbox1, subBbox2);
-
-        //std::cout<< "Father : " << indexes.size() << " 1st son : " << subIndexes1.size() << std::endl;
 
         leftChild = new BVH(_mesh, subIndexes1, subBbox1);
         rightChild = new BVH(_mesh, subIndexes2, subBbox2);
@@ -213,11 +211,6 @@ void BVH::split (std::vector<int> &subIndexes1,
             if(posX > maxX2) maxX2 = posX;
             if(posY > maxY2) maxY2 = posY;
             if(posZ > maxZ2) maxZ2 = posZ;
-        }
-
-        if(indexes.size() == 1008) {
-
-            std::cout <<Vec3f(minX1, minY1, minZ1) << " " << Vec3f(maxX1, maxY1, maxZ1) << std::endl;
         }
     }
 

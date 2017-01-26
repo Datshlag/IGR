@@ -23,6 +23,7 @@ public:
   GLProgram (const std::string & name);
   virtual ~GLProgram ();
 
+  std::vector<GLShader*> getShaders() { return _shaders; }
   inline GLuint id () const { return _id; }
   std::string name () const { return _name; }
   void attach (GLShader * shader);

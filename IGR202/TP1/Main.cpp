@@ -14,7 +14,6 @@
     #define BUFFER_OFFSET(offset) ((char*)NULL + (offset))
 
 #endif
-#define USING_VBO true
 
 #include <GL/glew.h>
 #include <GL/glut.h>
@@ -47,6 +46,7 @@ static const string myName ("Aloïs Pourchot");
 static GLint window;
 static unsigned int FPS = 0;
 static bool fullScreen = false;
+bool toonShader = false;
 
 static Camera camera;
 static Mesh mesh;
@@ -76,9 +76,9 @@ unsigned int colorIndex;
 GLProgram * glProgram;
 
 void loadVbo();
+void loadShaders(const std::string &vertexShader, const std::string &fragmentShader);
 void renderVbo();
 void initiliazeColor();
-const inline void buildRotMatrix(const Vec3f & dir, const float  & alpha, float matrix[3][3]);
 
 static std::vector<float> colorResponses; // Cached per-vertex color response, updated at each frame
 
@@ -116,41 +116,22 @@ void init (const char * modelFilename) {
     glLineWidth (2.0); // Set the width of edges in GL_LINE polygon mode
     glClearColor (0.1f, 0.1f, 0.1f, 1.0f); // Background color
 
-    if(!USING_VBO) {
-
-        glEnableClientState (GL_VERTEX_ARRAY);
-        glEnableClientState (GL_NORMAL_ARRAY);
-        glEnableClientState (GL_COLOR_ARRAY);
-    }
-
   	mesh.loadOFF (modelFilename);
     bvh = new BVH(mesh);//Build BVH tree with the mesh
-
 
     std::cerr << "nb of nodes : " << bvh->getNbNodes() << std::endl;
     std::cerr << "nb of leaves : " << bvh->getNbLeaves() << std::endl;
 
     colorResponses.resize (4*mesh.positions().size());
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
-    try {
 
-        if(USING_VBO) glProgram = GLProgram::genVFProgram ("Simple GL Program", "shaderVBO.vert", "shaderVBO.frag"); // Load and compile pair of shaders
-        else glProgram = GLProgram::genVFProgram ("Simple GL Program", "shader.vert", "shader.frag");
-        glProgram->use (); // Activate the shader program
-        std::cerr << glProgram->infoLog();
-
-    } catch (Exception & e) {
-        cerr << e.msg () << endl;
-    }
-
-    if(USING_VBO) loadVbo();
-
+    loadShaders("shaderVBO.vert", "shaderVBO.frag");
+    loadVbo();
     initiliazeColor();
 
+    //Add light sources here (PS: pls don't)
     lightSources = std::vector<LightSource>();
     lightSources.push_back(LightSource(Vec3<float>(4,4,1),Vec3<float>(5.0,0.0,0.0)));
-    //lightSources.push_back(LightSource(Vec3<float>(3,0,0),Vec3<float>(0.0,1.0,1.0)));
-    //lightSources.push_back(LightSource(Vec3<float>(3,4,5),Vec3<float>(1.0,1.0,0.0)));
 
     modeShader = glProgram->getUniformLocation("mode");
     shininessShader = glProgram->getUniformLocation("shininess");
@@ -163,6 +144,19 @@ void init (const char * modelFilename) {
     glProgram->setUniform1f(alphaShader, alpha);
     glProgram->setUniform1f(F0Shader, F0);
     glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+}
+
+void loadShaders(const std::string &vertexShader, const std::string &fragmentShader) {
+
+    try {
+
+        glProgram = GLProgram::genVFProgram ("Simple GL Program", vertexShader, fragmentShader);
+        glProgram->use (); // Activate the shader program
+        std::cerr << glProgram->infoLog();
+
+    } catch (Exception & e) {
+        cerr << e.msg () << endl;
+    }
 }
 
 void loadVbo() {
@@ -199,67 +193,92 @@ void loadVbo() {
             glBufferData(GL_ARRAY_BUFFER, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]), GL_DYNAMIC_DRAW);
             glEnableVertexAttribArray (colorIndex) ;
             glVertexAttribPointer(colorIndex, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-
 }
 
 
-// Calcul sur le CPU des ombres portées, implémentation très lente
-void computePerVertexShadow () {
-
-    LightRay ray;
-    bool intersects;
-
-    Vec3f lightPos = lightSources[0].getPos();
-    std::vector<Vec3f> positions = mesh.positions();
-    std::vector<Triangle> triangles = mesh.triangles();
-    unsigned int nbVertex = positions.size();
-    unsigned int nbTriangle = triangles.size();
+void initiliazeColor() {
 
     unsigned int l = 0;
-    int i;
 
-    float rayTime;
-    int nbIntersect;
-    while(l < 4*nbVertex) {
+    std::vector<Vec3f> positions = mesh.positions();
+    std::vector<Triangle> triangles = mesh.triangles();
 
-        rayTime = 0.0;
-        nbIntersect = 0;
+    unsigned int nbVertex = positions.size();
 
-        // On donne au vertex ses valeurs d'Albedo
+    // On met tous les vertex à la même valeur d'Albedo
+    while(l < 4*nbVertex)
+    {
+
         colorResponses[l++] = matAlbedo[0];
         colorResponses[l++] = matAlbedo[1];
         colorResponses[l++] = matAlbedo[2];
-
-        i=l/4;
-
-        // Rayon partant du vertex en direction de la source de lumière
-        ray = LightRay(positions[i], normalize(lightPos-positions[i]));
-        intersects = false;
-
-        // On cherche si le rayon est bloqué par un triangle
-        for(unsigned int j = nbTriangle; (j--)&&(!intersects); ) {
-
-            Triangle currTri = triangles[j];
-            intersects = ray.intersectsTriangle(positions[currTri[0]], positions[currTri[1]], positions[currTri[2]]);
-        }
-
-        // On change le signe de la 4ème coordonnée en fonction de s'il y a eu intersection
-        if(intersects) colorResponses[l++] = -1.0;
-        else colorResponses[l++] = 1.0;
+        colorResponses[l++] = 1.0;
     }
 
-
-    // Envoi des données au buffer sur le GPU
-    if(USING_VBO) {
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
-            // Remplacement du contenu en VRAM
-            glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
-    }
-
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
+        // Remplacement du contenu en VRAM
+        glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
 }
 
-void computePerVertexShadowV2 () {
+void toggleToonShader() {
+
+    auto _shaders = glProgram->getShaders();
+    if(!toonShader){
+
+        try {
+
+            GLShader * fs = new GLShader ("Toon Fragment Shader", GL_FRAGMENT_SHADER);
+            fs->loadFromFile ("toonVBO.frag");
+            fs->compile ();
+            glProgram->detach(_shaders[1]);
+            glProgram->attach(fs);
+            glProgram->link();
+            glProgram->use();
+
+            lightPosShader = glProgram->getUniformLocation("lightPos");
+
+            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+
+            toonShader = true;
+
+        } catch (Exception & e) {
+            cerr << e.msg () << endl;
+        }
+    }
+    else {
+
+        try {
+
+            GLShader * fs = new GLShader ("Photorealist Fragment Shader", GL_FRAGMENT_SHADER);
+            fs->loadFromFile ("shaderVBO.frag");
+            fs->compile ();
+            glProgram->detach(_shaders[1]);
+            glProgram->attach(fs);
+            glProgram->link();
+            glProgram->use();   
+
+            modeShader = glProgram->getUniformLocation("mode");
+            shininessShader = glProgram->getUniformLocation("shininess");
+            alphaShader = glProgram->getUniformLocation("alpha");
+            F0Shader = glProgram->getUniformLocation("F0");
+            lightPosShader = glProgram->getUniformLocation("lightPos");
+
+            glProgram->setUniform1i(modeShader, mode);
+            glProgram->setUniform1f(shininessShader, shininess);
+            glProgram->setUniform1f(alphaShader, alpha);
+            glProgram->setUniform1f(F0Shader, F0);
+            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+
+            toonShader = false;
+
+        } catch (Exception & e) {
+            cerr << e.msg () << endl;
+        }
+
+    }
+}
+
+void computePerVertexShadow () {
 
     LightRay ray;
     bool intersects;
@@ -290,220 +309,81 @@ void computePerVertexShadowV2 () {
     }
 
 
-    // Envoi des données au buffer sur le GPU
-    if(USING_VBO) {
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
-            // Remplacement du contenu en VRAM
-            glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
-    }
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
+        // Remplacement du contenu en VRAM
+        glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
 }
 
-void computePerVertexAO (unsigned int numOfSamples, float radius, float Vamb) {
+void computePerVertexAO (unsigned int numOfSamples) {
 
-    srand((unsigned)time(NULL));
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_real_distribution<float> range(-1.f,1.f);
 
     std::vector<Vec3f> positions = mesh.positions();
     std::vector<Vec3f> normals = mesh.normals();
     std::vector<Triangle> triangles = mesh.triangles();
+
     unsigned int nbVertex = positions.size();
-    unsigned int nbTriangle = triangles.size();
 
-    LightRay lightRays[numOfSamples];
-    bool intersects[numOfSamples];
+    LightRay lightRay;
 
-    float  d, sum;
+    float  sum = 0.0;
 
     Triangle currTri;
     Vec3f currPos;
     Vec3f n;
-    Vec3f randVec;
+    Vec3f u, v;
 
-    float M[3][3];
+    Vec3f XVector = {1.f, 0.f, 0.f};
+    Vec3f YVector = {0.f, 1.f, 0.f};
 
     unsigned int l = nbVertex;
+
     while(l != 0) {
+
+        sum = 0.0;
 
         currPos = positions[l];
         n = normalize(normals[l]);
 
-        // Calcul de la distribution initiale des rayons émis
         for(int i = numOfSamples; i--;) {
 
-            lightRays[i].setOrigin(currPos);
-            randVec = Vec3f(1, ((float)rand() *  M_PI/2) / (float)RAND_MAX, ((float)rand() *  2 * M_PI) / (float)RAND_MAX);
-            randVec = polarToCartesian(randVec);
+            if (dot(normals[i], XVector) < 0.80f)
+                u = cross(normals[i], XVector);
+            else
+                u = cross(normals[i], YVector);
 
-            buildRotMatrix(normalize(cross(Vec3f(0,0,1), n)), cartesianToPolar(n)[1], M);
-            randVec = M * randVec;
+            u.normalize();
+            v = cross(normals[i], u);
+            v.normalize();
 
-            lightRays[i].setDirection(randVec);
+            float n1 = range(generator);
+            float n2 = range(generator);
 
-            intersects[i] = false;
+            Vec3f direction = normals[i] + n1*u + n2*v;
+
+            lightRay = LightRay(currPos, direction);
+            direction.normalize();
+
+            if(lightRay.intersectsBVH(bvh)) sum += dot(n, direction);
         }
 
-        // Recherche des directions bloquantes
-        for(unsigned int i = nbTriangle; i--;) {
-
-            currTri = triangles[i];
-            d =  length(currPos - (float) 1/3 * (positions[currTri[0]] + positions[currTri[1]] + positions[currTri[2]]));
-
-            // Si le triangle est trop loin pas la peine de continuer
-            if(d < radius) {
-
-                for(int i = numOfSamples; i--;) {
-
-                    // Si le rayon a déjà rencontré un triangle pas la peine de continuer
-                    if(!intersects[i]) {
-
-                        intersects[i] = lightRays[i].intersectsTriangle(positions[currTri[0]], positions[currTri[1]], positions[currTri[2]]);
-                    }
-                }
-            }
-        }
-
-        // Calcul du coefficient d'AO
-        sum = 0.0;
-        for(int i = numOfSamples; i--;) {
-
-            sum += intersects[i] * dot(n, lightRays[i].getDirection());
-        }
         sum *= 1.0/numOfSamples;
         sum = 1.0 - sum;
         colorResponses[4*l+3] *= sum;
+
         //std::cerr << " vertex : " << l << " reponse : " << colorResponses[4*l+3] << std::endl;
 
         l--;
     }
 
     // Envoi des données au buffer sur le GPU
-    if(USING_VBO){
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
-            // Remplacement du contenu en VRAM
-            glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
-    }
-
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
+        // Remplacement du contenu en VRAM
+        glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
 }
 
-void initiliazeColor() {
-
-    unsigned int l = 0;
-
-    std::vector<Vec3f> positions = mesh.positions();
-    std::vector<Triangle> triangles = mesh.triangles();
-
-    unsigned int nbVertex = positions.size();
-
-    // On met tous les vertex à la même valeur d'Albedo
-    while(l < 4*nbVertex)
-    {
-
-        colorResponses[l++] = matAlbedo[0];
-        colorResponses[l++] = matAlbedo[1];
-        colorResponses[l++] = matAlbedo[2];
-        colorResponses[l++] = 1.0;
-    }
-
-    if(USING_VBO){
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
-            // Remplacement du contenu en VRAM
-            glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
-    }
-
-}
-
-/*
-// EXERCISE : the following color response shall be replaced with a proper reflectance evaluation/shadow test/etc.
-void updatePerVertexColorResponse () {
-
-
-    //BRDF using Lambert's model for the diffusion term and Blinn-Phong's model for the specular term
-
-    if(mode==1)
-    {
-        for (unsigned int i = 0; i < colorResponses.size (); i++)
-        {
-            colorResponses[i] = Vec3f(0,0,0);
-
-            for(unsigned int j=0; j < lightSources.size(); j++)
-            {
-
-                LightSource lightSource = lightSources[j];
-
-                float d = dist(mesh.positions()[i],lightSource.getPos());
-                float attenuation = 1/(1+d+d*d);
-
-                Vec3f omegaI = normalize(lightSource.getPos() - mesh.positions()[i]);
-                float scProduct = fmax(0,dot(omegaI, mesh.normals()[i]));
-                Vec3f diffusion = attenuation*lightSource.getColor()*scProduct;
-
-                float x,y,z;
-                camera.getPos(x,y,z);
-                Vec3f omega0 = normalize(Vec3f(x,y,z) - mesh.positions()[i]);
-                Vec3f omegaH = normalize(omega0 + omegaI);
-                float nDotOmegaH = fmax(0, dot(omegaH, mesh.normals()[i]));
-                float phong = pow(nDotOmegaH,shininess);
-                Vec3f brillance = attenuation*lightSource.getColor()*phong*scProduct;
-
-                colorResponses[i] += brillance + diffusion;
-            }
-    	}
-    }
-
-    else
-    {
-
-        for(unsigned int i = 0; i <colorResponses.size(); i++)
-        {
-
-            colorResponses[i] = Vec3f(0,0,0);
-
-            for(unsigned int j=0; j<lightSources.size(); j++)
-            {
-
-                LightSource lightSource = lightSources[j];
-
-                float x,y,z;
-                camera.getPos(x,y,z);
-
-                float d = dist(mesh.positions()[i],lightSource.getPos());
-                float attenuation = 1/(1+d+d*d);
-
-                Vec3f omegaI = normalize(lightSource.getPos() - mesh.positions()[i]);
-                Vec3f omega0 = normalize((Vec3f(x,y,z) - mesh.positions()[i]));
-                Vec3f omegaH = normalize((omega0 + omegaI));
-                Vec3f n = mesh.normals()[i];
-
-                float nDotOmega0 = fmax(0,dot(n, omega0));
-                float nDotOmegaI = dot(n, omegaI);
-                float nDotOmegaH = dot(n, omegaH);
-                float omega0DotOmegaH = dot(omega0, omegaH);
-                float omegaIDotOmegaH = dot(omegaH,omegaI);
-
-                float F,D,G;
-
-                if(mode == 2) D = std::exp((pow(nDotOmegaH,2)-1)/(pow(alpha*nDotOmegaH,2)))/(M_PI*pow(alpha,2)*pow(nDotOmegaH,4));
-                else if(mode == 3) D = pow(alpha,2)/(M_PI*pow(1+(pow(alpha,2)-1)*pow(nDotOmegaH,2),2));
-                F = F0 + (1-F0)*pow(1-fmax(0,omegaIDotOmegaH),5);
-
-                if(mode == 2) G = fmin(1,fmin(2*nDotOmegaH*nDotOmegaI/omega0DotOmegaH,2*nDotOmega0*nDotOmegaH/omega0DotOmegaH));
-                else if(mode == 3) G = 2*nDotOmega0/(nDotOmega0 + pow(alpha*alpha+(1-alpha*alpha)*pow(nDotOmega0,2),1/2)) * 2*nDotOmegaI/(nDotOmegaI + pow(alpha*alpha+(1-alpha*alpha)*pow(nDotOmegaI,2),1/2));
-
-                float scProduct = fmax(0,dot(omegaI, mesh.normals()[i]));
-                Vec3f diffusion = attenuation*lightSource.getColor()*scProduct;
-
-                Vec3f brillance = attenuation*lightSource.getColor()*D*F*G/(4*nDotOmegaI*nDotOmega0)*scProduct;
-
-                colorResponses[i] += brillance + diffusion;
-            }
-
-        }
-    }
-}*/
-
-int test = 0;
 void renderScene () {
 
     glVertexPointer (3, GL_FLOAT, sizeof (Vec3f), (GLvoid*)(&(mesh.positions()[0])));
@@ -525,8 +405,7 @@ void reshape(int w, int h) {
 void display () {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     camera.apply ();
-    if(!USING_VBO) renderScene ();
-    else renderVbo();
+    renderVbo();
     for(GLenum err; (err = glGetError()) != GL_NO_ERROR;)
     {
       cerr << err << std::endl;
@@ -595,26 +474,13 @@ void key (unsigned char keyPressed, int x, int y) {
             glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
         case 't':
-            /*shininess += 0.1;
-            glProgram->setUniform1f(shininessShader, shininess);*/
-            //clock_t t1 = clock();
             computePerVertexShadow();
-            //clock_t t2 = clock();
-            //float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
-            //std::cerr << diff <<endl;
             break;
         case 'r':
             initiliazeColor();
             break;
         case 'g':
-            /*shininess = fmax(0, shininess-0.1);
-            glProgram->setUniform1f(shininessShader, shininess);*/
-            //clock_t t1 = clock();
-            computePerVertexShadowV2();
-            //clock_t t2 = clock();
-            //float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
-            //std::cerr << diff <<endl;
-            //computePerVertexAO (32, 0.5, 0.1);
+            computePerVertexAO(32);
             break;
         case 'y':
             alpha = fmin(1,alpha + 0.05);
@@ -622,12 +488,6 @@ void key (unsigned char keyPressed, int x, int y) {
             break;
         case 'h':
             //bvh->drawBVH(mesh, colorResponses);
-            if(USING_VBO){
-
-                glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
-                    // Remplacement du contenu en VRAM
-                    glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
-            }
             /*alpha = fmax(0, alpha-0.05);
             glProgram->setUniform1f(alphaShader, alpha);*/
             break;
@@ -638,6 +498,9 @@ void key (unsigned char keyPressed, int x, int y) {
         case 'j':
             F0 = fmax(0, F0-0.1);
             glProgram->setUniform1f(F0Shader, F0);
+            break;
+        case '0':
+            toggleToonShader();
             break;
         case '1':
             mode = 1;
@@ -710,22 +573,4 @@ int main (int argc, char ** argv) {
     printUsage ();
     glutMainLoop ();
     return 0;
-}
-
-inline const void buildRotMatrix(const Vec3f & dir, const float & alpha, float matrix[3][3]) {
-
-    float cos = std::cos(alpha);
-    float sin = std::sin(alpha);
-
-    matrix[0][0] = dir[0] * dir[0] * (1 - cos) + cos;
-    matrix[0][1] = dir[0] * dir[1] *(1 - cos) - dir[2] * sin;
-    matrix[0][2] = dir[0] * dir[2] * (1 - cos) + dir[1] * sin;
-
-    matrix[1][0] = dir[0] * dir[1] * (1 - cos) + dir[2] * sin;
-    matrix[1][1] = dir[1] * dir[1] * (1 - cos) + cos;
-    matrix[1][2] = dir[1] * dir[2] * (1 - cos) - dir[0] * sin;
-
-    matrix[2][0] = dir[0] * dir[2] * (1 - cos) - dir[1] * sin;
-    matrix[2][1] = dir[1] * dir[2] * (1 - cos) + dir[0] * sin;
-    matrix[2][2] = dir[2] * dir[2] * (1 - cos) + cos;
 }

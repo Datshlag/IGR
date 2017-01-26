@@ -30,8 +30,10 @@ void GLProgram::attach (GLShader * shader) {
 
 void GLProgram::detach (GLShader * shader) {
     for (unsigned int i = 0; i < _shaders.size (); i++)
-        if (_shaders[i]->id () == shader->id ())
+        if (_shaders[i]->id () == shader->id ()) {
             glDetachShader (_id, shader->id());
+            _shaders.erase(_shaders.begin() + i);
+        }
 }
 
 void GLProgram::link () {
@@ -195,7 +197,7 @@ GLProgram * GLProgram::genVFProgram (const std::string & name,
                                      const std::string & fragmentShaderFilename) {
     GLProgram * p = new GLProgram (name);
     GLShader * vs = new GLShader (name + " Vertex Shader", GL_VERTEX_SHADER);
-    GLShader * fs = new GLShader (name + " Fragment Shader",GL_FRAGMENT_SHADER);
+    GLShader * fs = new GLShader (name + " Fragment Shader", GL_FRAGMENT_SHADER);
     vs->loadFromFile (vertexShaderFilename);
     vs->compile ();
     p->attach(vs);

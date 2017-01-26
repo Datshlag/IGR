@@ -44,7 +44,7 @@ void Mesh::loadOFF (const std::string & filename) {
     in.close ();
     centerAndScaleToUnit ();
     recomputeNormals ();
-    addBottomPlane(64, 1);
+    //addBottomPlane(64, 1);
 }
 
 void Mesh::recomputeNormals () {

@@ -32,65 +32,6 @@ bool LightRay::intersectsTriangle(const Vec3f & p0, const Vec3f & p1, const Vec3
 			
 bool LightRay::intersectsBox(const Bbox &bbox) const {
 
-	/*Vec3f minCorner = bbox.minCorner;
-	Vec3f maxCorner = bbox.maxCorner;
-
-	float tNear, tFar, tMin, tMax;
-	tNear = -INFINITY;
-	tFar = INFINITY;
-
-	//X axis plane
-	if(origin[0] < EPSILON) {
-
-		if((origin[0] < minCorner[0] - EPSILON) || (origin[0] > maxCorner[0] + EPSILON)) return false; 
-	}
-
-	tMin = (minCorner[0] - origin[0]) * inv_direction[0];
-	tMax = (maxCorner[0] - origin[0]) * inv_direction[0];
-
-	if(tMin > tMax) std::swap(tMin, tMax);
-	if(tMin > tNear) tNear = tMin;
-	if(tMax < tFar) tFar = tMax;
-
-	//missed box
-	if(tNear > tFar) return false;
-	//box behind
-	if(tFar < 0) return false;
-
-	//Y axis plane
-	if(origin[1] < EPSILON) {
-
-		if((origin[1] < minCorner[1] - EPSILON) || (origin[1] > maxCorner[1] + EPSILON)) return false; 
-	}
-
-	tMin = (minCorner[1] - origin[1]) * inv_direction[1];
-	tMax = (maxCorner[1] - origin[1]) * inv_direction[1];
-
-	if(tMin > tMax) std::swap(tMin, tMax);
-	if(tMin > tNear) tNear = tMin;
-	if(tMax < tFar) tFar = tMax;
-
-	if(tNear > tFar) return false;
-	if(tFar < 0) return false;
-
-	//Z axis plane
-	if(origin[2] < EPSILON) {
-
-		if((origin[2] < minCorner[2] - EPSILON) || (origin[2] > maxCorner[2] + EPSILON)) return false; 
-	}
-
-	tMin = (minCorner[2] - origin[2]) * inv_direction[2];
-	tMax = (maxCorner[2] - origin[2]) * inv_direction[2];
-
-	if(tMin > tMax) std::swap(tMin, tMax);
-	if(tMin > tNear) tNear = tMin;
-	if(tMax < tFar) tFar = tMax;
-
-	if(tNear > tFar) return false;
-	if(tFar < 0) return false;
-
-	return true;*/
-
 	Vec3f minCorner = bbox.minCorner;
 	Vec3f maxCorner = bbox.maxCorner;
 
