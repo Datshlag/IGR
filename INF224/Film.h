@@ -22,10 +22,12 @@ class Film : public Video {
 
       const int getNumberOfChapters() { return numberOfChapters; }
       const int* getChapters() {
-
-          int * result = new int[numberOfChapters];
-          std::copy_n(chapters, numberOfChapters, result);
-          return result;
+        // C'est assez sale ce que tu as fait. D'abord tout ce que tu crées avec new tu dois normalement le détruire avec delete, 
+        // l'os le fera pour toi si tu oublies mais c'est sale. La quand t'appelles la méthode depuis l'extérieur tu dois faire 
+        // const int* chapters = obj.getChapters(); puis quand t'as fini d'utiliser l'objet tu dois faire delete chapters depuis l'extérieur
+        // C'est moche...
+        // Donc tu peux ajouter un paramètre : getChapters(const int* chapters); puis éventuellement faire une copie
+         
       }
 
       const void displayChapters(std::ostream& os) {
