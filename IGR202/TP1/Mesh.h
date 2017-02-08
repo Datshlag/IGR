@@ -40,6 +40,12 @@ public:
     /// scale to the unit cube and center at original
     void centerAndScaleToUnit ();
 
+    /// Apply laPlacian filter to mesh
+    void laplacianFilter();
+
+    /// simplify mesh with OCS
+    void simplify(unsigned int resolution);
+
     /// Add a bottom plane consisting of 2 * nbVertex^2 triangles
     void addBottomPlane(unsigned int nbVertex, float width);
 

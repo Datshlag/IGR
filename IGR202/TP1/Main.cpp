@@ -39,7 +39,7 @@ using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
-static const string DEFAULT_MESH_FILE ("models/man.off");
+static const string DEFAULT_MESH_FILE ("models/max_50K.off");
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
@@ -49,7 +49,7 @@ static bool fullScreen = false;
 bool toonShader = false;
 
 static Camera camera;
-static Mesh mesh;
+static Mesh* mesh;
 static std::vector<LightSource> lightSources;
 static BVH* bvh;
 
@@ -116,13 +116,14 @@ void init (const char * modelFilename) {
     glLineWidth (2.0); // Set the width of edges in GL_LINE polygon mode
     glClearColor (0.1f, 0.1f, 0.1f, 1.0f); // Background color
 
-  	mesh.loadOFF (modelFilename);
+    mesh = new Mesh();
+  	mesh->loadOFF (modelFilename);
     bvh = new BVH(mesh);//Build BVH tree with the mesh
 
-    std::cerr << "nb of nodes : " << bvh->getNbNodes() << std::endl;
-    std::cerr << "nb of leaves : " << bvh->getNbLeaves() << std::endl;
+    //std::cerr << "nb of nodes : " << bvh->getNbNodes() << std::endl;
+    //std::cerr << "nb of leaves : " << bvh->getNbLeaves() << std::endl;
 
-    colorResponses.resize (4*mesh.positions().size());
+    colorResponses.resize (4*mesh->positions().size());
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
 
     loadShaders("shaderVBO.vert", "shaderVBO.frag");
@@ -173,18 +174,18 @@ void loadVbo() {
         // Buffer d'indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); // Verrouillage du IBO
             // Allocation de la mémoire vidéo
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.triangles().size()*sizeof(Triangle), &(mesh.triangles())[0], GL_STATIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->triangles().size()*sizeof(Triangle), &(mesh->triangles())[0], GL_STATIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
             // Allocation de la mémoire vidéo
-            glBufferData(GL_ARRAY_BUFFER, mesh.positions().size()*sizeof(mesh.positions()[0]), &(mesh.positions()[0]), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
             glEnableVertexAttribArray (positionIndex);
             glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Verrouillage du VBO
             // Allocation de la mémoire vidéo
-            glBufferData(GL_ARRAY_BUFFER, mesh.normals().size()*sizeof(mesh.normals()[0]), &(mesh.normals()[0]), GL_STATIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, mesh->normals().size()*sizeof(mesh->normals()[0]), &(mesh->normals()[0]), GL_STATIC_DRAW);
             glEnableVertexAttribArray (normalIndex) ;
             glVertexAttribPointer(normalIndex, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
@@ -200,8 +201,8 @@ void initiliazeColor() {
 
     unsigned int l = 0;
 
-    std::vector<Vec3f> positions = mesh.positions();
-    std::vector<Triangle> triangles = mesh.triangles();
+    std::vector<Vec3f> positions = mesh->positions();
+    std::vector<Triangle> triangles = mesh->triangles();
 
     unsigned int nbVertex = positions.size();
 
@@ -284,8 +285,8 @@ void computePerVertexShadow () {
     bool intersects;
 
     Vec3f lightPos = lightSources[0].getPos();
-    std::vector<Vec3f> positions = mesh.positions();
-    std::vector<Triangle> triangles = mesh.triangles();
+    std::vector<Vec3f> positions = mesh->positions();
+    std::vector<Triangle> triangles = mesh->triangles();
     unsigned int nbVertex = positions.size();
 
     unsigned int l = 0;
@@ -300,7 +301,7 @@ void computePerVertexShadow () {
         i=l/4;
 
         // Rayon partant du vertex en direction de la source de lumière
-        ray = LightRay(positions[i], normalize(lightPos-positions[i]));
+        ray = LightRay(positions.at(i), normalize(lightPos-positions.at(i)));
         intersects = ray.intersectsBVH(bvh);
 
         // On change le signe de la 4ème coordonnée en fonction de s'il y a eu intersection
@@ -320,9 +321,9 @@ void computePerVertexAO (unsigned int numOfSamples) {
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<float> range(-1.f,1.f);
 
-    std::vector<Vec3f> positions = mesh.positions();
-    std::vector<Vec3f> normals = mesh.normals();
-    std::vector<Triangle> triangles = mesh.triangles();
+    std::vector<Vec3f> positions = mesh->positions();
+    std::vector<Vec3f> normals = mesh->normals();
+    std::vector<Triangle> triangles = mesh->triangles();
 
     unsigned int nbVertex = positions.size();
 
@@ -338,21 +339,21 @@ void computePerVertexAO (unsigned int numOfSamples) {
     Vec3f XVector = {1.f, 0.f, 0.f};
     Vec3f YVector = {0.f, 1.f, 0.f};
 
-    unsigned int l = nbVertex;
+    unsigned int l = nbVertex - 1;
 
     while(l != 0) {
 
         sum = 0.0;
 
-        currPos = positions[l];
-        n = normalize(normals[l]);
+        currPos = positions.at(l);
+        n = normalize(normals.at(l));
 
         for(int i = numOfSamples; i--;) {
 
             if (dot(normals[i], XVector) < 0.80f)
-                u = cross(normals[i], XVector);
+                u = cross(normals.at(i), XVector);
             else
-                u = cross(normals[i], YVector);
+                u = cross(normals.at(i), YVector);
 
             u.normalize();
             v = cross(normals[i], u);
@@ -369,11 +370,9 @@ void computePerVertexAO (unsigned int numOfSamples) {
             if(lightRay.intersectsBVH(bvh)) sum += dot(n, direction);
         }
 
-        sum *= 1.0/numOfSamples;
-        sum = 1.0 - sum;
+        sum *= 1.0f/numOfSamples;
+        sum = 1.0f - sum;
         colorResponses[4*l+3] *= sum;
-
-        //std::cerr << " vertex : " << l << " reponse : " << colorResponses[4*l+3] << std::endl;
 
         l--;
     }
@@ -384,18 +383,10 @@ void computePerVertexAO (unsigned int numOfSamples) {
         glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
 }
 
-void renderScene () {
-
-    glVertexPointer (3, GL_FLOAT, sizeof (Vec3f), (GLvoid*)(&(mesh.positions()[0])));
-    glNormalPointer (GL_FLOAT, 3*sizeof (float), (GLvoid*)(&(mesh.normals()[0])));
-    glColorPointer (4, GL_FLOAT, 4*sizeof(float), (GLvoid*)(&(colorResponses[0])));
-    glDrawElements (GL_TRIANGLES, 3*mesh.triangles().size(), GL_UNSIGNED_INT, (GLvoid*)(&(mesh.triangles()[0])));
-}
-
 void renderVbo() {
 
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, 3*mesh.triangles().size(), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+    glDrawElements(GL_TRIANGLES, 3*mesh->triangles().size(), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
 
 void reshape(int w, int h) {
@@ -491,6 +482,24 @@ void key (unsigned char keyPressed, int x, int y) {
             /*alpha = fmax(0, alpha-0.05);
             glProgram->setUniform1f(alphaShader, alpha);*/
             break;
+        case 'x':
+            mesh->loadOFF(DEFAULT_MESH_FILE);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
+            // Allocation de la mémoire vidéo
+                glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
+            break;
+        case 'v':
+            mesh->simplify(64);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
+            // Allocation de la mémoire vidéo
+                glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
+            break;
+        case 'c':
+            mesh->laplacianFilter();
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
+            // Allocation de la mémoire vidéo
+                glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
+            break;
         case 'u':
             F0 += 0.1;
             glProgram->setUniform1f(F0Shader, F0);
@@ -545,7 +554,7 @@ void idle () {
         FPS = counter;
         counter = 0;
         static char winTitle [128];
-        unsigned int numOfTriangles = mesh.triangles ().size ();
+        unsigned int numOfTriangles = mesh->triangles ().size ();
         sprintf (winTitle, "Number Of Triangles: %d - FPS: %d", numOfTriangles, FPS);
         string title = appTitle + " - By " + myName  + " - " + winTitle;
         glutSetWindowTitle (title.c_str ());

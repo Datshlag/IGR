@@ -1,12 +1,12 @@
 #include "BVH.h"
 #include <cfloat>
 
-unsigned int BVH::max_density = 500;
+unsigned int BVH::max_density = 1000;
 unsigned int BVH::nb_node = 0;
 unsigned int BVH::nb_leaves = 0;
 
 BVH::BVH(): mesh(NULL) { }
-BVH::BVH(const Mesh &_mesh): mesh(&_mesh) {
+BVH::BVH(const Mesh* _mesh): mesh(_mesh) {
 
     nb_node++;
     std::vector<Vec3f> positions = mesh->positions();
@@ -31,7 +31,7 @@ BVH::BVH(const Mesh &_mesh): mesh(&_mesh) {
 
     for(unsigned int i = 0; i < positions.size(); i++) {
 
-        currPos = positions[i];
+        currPos = positions.at(i);
         posX = currPos[0];
         posY = currPos[1];
         posZ = currPos[2];
@@ -62,7 +62,7 @@ BVH::BVH(const Mesh &_mesh): mesh(&_mesh) {
     rightChild = new BVH(_mesh, subIndexes2, subBbox2);
 }
 
-BVH::BVH(const Mesh &_mesh, const std::vector<int> &_indexes, const Bbox &_bbox): mesh(&_mesh), indexes(_indexes), bbox(_bbox), leftChild(NULL), rightChild(NULL) {
+BVH::BVH(const Mesh* _mesh, const std::vector<int> &_indexes, const Bbox &_bbox): mesh(_mesh), indexes(_indexes), bbox(_bbox), leftChild(NULL), rightChild(NULL) {
 
     if (indexes.size() > max_density) {
 
@@ -120,9 +120,9 @@ void BVH::split (std::vector<int> &subIndexes1,
     for (unsigned int i = 0; i < indexes.size(); i++) {
 
         currTri = triangles[indexes[i]];
-        V0 = positions[currTri[0]];
-        V1 = positions[currTri[1]];
-        V2 = positions[currTri[2]];
+        V0 = positions.at(currTri[0]);
+        V1 = positions.at(currTri[1]);
+        V2 = positions.at(currTri[2]);
         bar = (V0 + V1 + V2) * (float)1.0/3.0;
 
         if (bar[split] >= meanPos[split]) {

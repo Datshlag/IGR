@@ -28,8 +28,8 @@ class BVH {
 	public:
 		~BVH();
 		BVH();
-		BVH(const Mesh &mesh);
-		BVH(const Mesh &mesh, const std::vector<int> &indexes, const Bbox &_bbox);
+		BVH(const Mesh* _mesh);
+		BVH(const Mesh* _mesh, const std::vector<int> &_indexes, const Bbox &_bbox);
 
 		void split (std::vector<int> &subIndexes1, 
             std::vector<int> &subIndexes2,
