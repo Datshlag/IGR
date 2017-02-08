@@ -1,17 +1,19 @@
 #include "MultimediaObject.h"
 
-MultimediaObject::~MultimediaObject() { }
+typedef MultimediaObject mo;
 
-MultimediaObject::MultimediaObject(): name(nullptr), pathname(nullptr) { }
-MultimediaObject::MultimediaObject(const std::string name, const std::string pathname): name(name), pathname(pathname) { }
+mo::~MultimediaObject () { };
 
-void MultimediaObject::setName(const std::string _name) { name = _name; }
-void MultimediaObject::setPath(const std::string _pathname) { pathname = _pathname; }
+mo::MultimediaObject(): name(""), pathname("") { }
+mo::MultimediaObject(const std::string &name, const std::string &pathname): name(name), pathname(pathname) { }
 
-const std::string MultimediaObject::getName() { return name; }
-const std::string MultimediaObject::getPath() { return pathname; }
+void mo::setName(const std::string &_name) { name = _name; }
+void mo::setPath(const std::string &_pathname) { pathname = _pathname; }
 
-const void MultimediaObject::display(std::ostream& os) {
+std::string mo::getName() const { return name; }
+std::string mo::getPath() const { return pathname; }
+
+void mo::display(std::ostream &os) const {
 
     os << " name : " << name << std::endl
        << " path : " << pathname << std::endl;

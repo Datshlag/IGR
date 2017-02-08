@@ -14,7 +14,7 @@ PROG = tp_inf224
 #
 # Fichiers sources (NE PAS METTRE les .h ni les .o seulement les .cpp)
 #
-SOURCES = MultimediaObject.cpp Main.cpp
+SOURCES = MultimediaObject.cpp Main.cpp Video.cpp Picture.cpp
 
 #
 # Fichiers objets (ne pas modifier sauf si l'extension n'est pas .cpp)

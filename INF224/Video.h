@@ -3,18 +3,17 @@
 
 class Video : public MultimediaObject {
 
-  private:
-      int length;
+    private:
+        int length;
 
-  public:
-      virtual ~Video() { }
+    public:
+        virtual ~Video();
 
-      Video(): MultimediaObject(), length(0) { }
-      Video(std::string name, std::string pathname, int _length):
-          MultimediaObject(name, pathname), length(_length) { }
+        Video();
+        Video(const std::string &name, const std::string &pathname, const int &_length);
 
-      const int getLength() { return length; }
-      void setLength(const int &_length) { length = _length; }
+        int getLength() const;
+        void setLength(const int &_length);
 
-      const void play() { system(("mpv" + getPath() + "&").c_str()); }
+        void play() const override;
 };

@@ -5,23 +5,23 @@
 
 class MultimediaObject {
 
-private:
-    std::string name;
-    std::string pathname;
+    private:
+        std::string name;
+        std::string pathname;
 
-public:
-    virtual ~MultimediaObject ();
+    public:
+        virtual ~MultimediaObject ();
 
-    MultimediaObject();
-    MultimediaObject(const std::string name, const std::string pathname);
+        MultimediaObject();
+        MultimediaObject(const std::string &name, const std::string &pathname);
 
-    const std::string getName();
-    const std::string getPath();
+        std::string getName() const;
+        std::string getPath() const;
 
-    void setName(const std::string _name);
-    void setPath(const std::string _pathname);
+        void setName(const std::string &_name);
+        void setPath(const std::string &_pathname);
 
-    const void display(std::ostream& os);
+        void display(std::ostream &os) const;
 
-    virtual const void play() {};
+        virtual void play() const = 0;
 };
