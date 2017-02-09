@@ -36,6 +36,9 @@ class BVH {
             Bbox &subBbox1,
             Bbox &subBbox2) const;
 
+		std::vector<float> getPosBuffer();
+		void computePosBuffer (std::vector<float> &linePos, unsigned int depth);
+
 		const BVH* getLeftChild() const { return leftChild; }
 		const BVH* getRightChild() const { return rightChild; }
 		const Bbox getBbox() const { return bbox; }

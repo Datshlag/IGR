@@ -40,8 +40,11 @@ public:
     /// scale to the unit cube and center at original
     void centerAndScaleToUnit ();
 
-    /// Apply laPlacian filter to mesh
+    /// Apply laplacian filter to mesh
     void laplacianFilter();
+
+    /// Apply topological laplacian filter
+    void geometricalLaplacian();
 
     /// simplify mesh with OCS
     void simplify(unsigned int resolution);

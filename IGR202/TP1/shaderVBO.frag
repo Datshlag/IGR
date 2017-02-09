@@ -52,7 +52,7 @@ void main (void) {
     else if (mode == 2) cookTorrance(omegaI, omega0, omegaH, n);
     else if (mode == 3) GGX(omegaI, omega0, omegaH, n);
 
-    if(C.w <= 0.0) invAttenuation *= -0.1 * C.w;
+    if(C.w <= 0.0) invAttenuation *= -0.15 * C.w;
     else if(C.w > 0.0) invAttenuation *= C.w;
 
     vec4 color = vec4(invAttenuation * (spec + diffuse), 1.0);

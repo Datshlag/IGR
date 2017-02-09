@@ -1,7 +1,7 @@
 #include "BVH.h"
 #include <cfloat>
 
-unsigned int BVH::max_density = 1000;
+unsigned int BVH::max_density = 100;
 unsigned int BVH::nb_node = 0;
 unsigned int BVH::nb_leaves = 0;
 
@@ -219,4 +219,140 @@ void BVH::split (std::vector<int> &subIndexes1,
 
     subBbox1 = Bbox(Vec3f(minX1, minY1, minZ1), Vec3f(maxX1, maxY1, maxZ1), meanPos1);
     subBbox2 = Bbox(Vec3f(minX2, minY2, minZ2), Vec3f(maxX2, maxY2, maxZ2), meanPos2);
+}
+
+std::vector<float> BVH::getPosBuffer() {
+
+    std::vector<float> linePos = std::vector<float> ();
+    computePosBuffer(linePos, 20);
+    return linePos;
+}
+
+void BVH::computePosBuffer (std::vector<float> &linePos, unsigned int depth) {
+
+    if(depth == 0)
+        return;
+    // 4 segments for x coord
+    // First
+
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+    // Second
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+    // Third
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+    // Fourth
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+
+
+    // 4 segments for y coord
+    // First
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+
+    // Second
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+
+    // Third
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+
+    // Fourth
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+
+
+    // 4 segments for z coord
+    // First
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+    // Second
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.minCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+    // Third
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+    linePos.push_back(bbox.minCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+    // Fourth
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.minCorner[2]);
+
+    linePos.push_back(bbox.maxCorner[0]);
+    linePos.push_back(bbox.maxCorner[1]);
+    linePos.push_back(bbox.maxCorner[2]);
+
+
+    // Call recursively for the children
+    if(leftChild) leftChild->computePosBuffer(linePos, depth-1);
+    if(rightChild) rightChild->computePosBuffer(linePos, depth-1);
 }

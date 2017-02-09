@@ -54,6 +54,7 @@ void Mesh::recomputeNormals () {
     m_normals.resize (m_positions.size (), Vec3f (0.f, 0.f, 0.f));
 
     for (unsigned int i = 0; i < m_triangles.size (); i++) {
+
         Vec3f e01 = m_positions[m_triangles[i][1]] -  m_positions[m_triangles[i][0]];
         Vec3f e02 = m_positions[m_triangles[i][2]] -  m_positions[m_triangles[i][0]];
         Vec3f e12 = m_positions[m_triangles[i][2]] -  m_positions[m_triangles[i][1]];
@@ -128,6 +129,7 @@ void Mesh::addBottomPlane(unsigned int nbVertex, float width) {
 void Mesh::laplacianFilter(){
 
     std::vector<std::vector<int> > neighbours (m_positions.size(), std::vector<int>());
+    std::vector<Vec3f> new_positions (m_positions.size(), Vec3f(0, 0, 0));
 
     for(unsigned int j = 0; j < m_triangles.size(); j++) {
 
@@ -159,9 +161,71 @@ void Mesh::laplacianFilter(){
                 neighbors_bar += m_positions.at(curr_neighbours[l]);
             }
             neighbors_bar *= 1.0f/curr_neighbours.size();
-            m_positions[i] = neighbors_bar;
+            new_positions[i] = neighbors_bar;
         }
     }
+
+    m_positions = new_positions;
+    recomputeNormals();
+}
+
+void Mesh::geometricalLaplacian() {
+
+    std::vector<std::vector<Triangle> > neighbours (m_positions.size(), std::vector<Triangle>());
+    std::vector<Vec3f> new_positions = m_positions;
+
+    for(unsigned int j = 0; j < m_triangles.size(); j++) {
+
+        auto curr_tri = m_triangles.at(j);
+
+        int v0 = curr_tri[0];
+        int v1 = curr_tri[1];
+        int v2 = curr_tri[2];
+
+        neighbours[v0].push_back(curr_tri);
+        neighbours[v1].push_back(curr_tri);
+        neighbours[v2].push_back(curr_tri);
+    }
+
+    for(unsigned int i = 0; i < m_positions.size(); i++) {
+
+        auto curr_neighbours = neighbours[i];
+        Vec3f curr_pos = m_positions[i];
+
+        Vec3f laplacian = Vec3f(0, 0, 0);
+        float v = 0.0;
+
+        for(unsigned int j = 0; j < curr_neighbours.size(); j++) {
+
+            Triangle curr_tri = curr_neighbours[j];
+            int pos;
+
+            if(curr_tri[0] == i) pos = 0;
+            if(curr_tri[1] == i) pos = 1;
+            if(curr_tri[2] == i) pos = 2;
+
+            Vec3f e01 = normalize(m_positions[curr_tri[(pos + 1)%3]] - m_positions[curr_tri[pos]]);
+            Vec3f e02 = normalize(m_positions[curr_tri[(pos + 2)%3]] - m_positions[curr_tri[pos]]);
+            Vec3f e12 = normalize(m_positions[curr_tri[(pos + 2)%3]] - m_positions[curr_tri[(pos + 1)%3]]);
+
+            Vec3f e0 = normalize(m_positions[curr_tri[pos]]);
+            Vec3f e1 = normalize(m_positions[curr_tri[(pos + 1)%3]]);
+            Vec3f e2 = normalize(m_positions[curr_tri[(pos + 2)%3]]);
+
+            float alpha01 =  dot(-e01, e12) / cross(e01, e12).length() ;
+            float alpha02 =  dot(-e02, -e12) / cross(e02, e12).length() ;
+
+            laplacian += m_positions[curr_tri[(pos + 1)%3]] * alpha02 / 2.f;
+            laplacian += m_positions[curr_tri[(pos + 2)%3]] * alpha01 / 2.f;            
+            v += alpha01;
+            v += alpha02;
+        }
+
+        new_positions[i] = laplacian * 2.f/v;
+    }
+
+    m_positions = new_positions;
+    recomputeNormals();
 }
 
 void Mesh::simplify(unsigned int resolution) {
@@ -230,7 +294,7 @@ void Mesh::simplify(unsigned int resolution) {
             for(unsigned int k = 0; k < resolution; k++) {
 
                 grille_3D[i][j][k] *= 1.0f/grille_3D_count[i][j][k];
-                std::cerr << grille_3D[i][j][k]<< std::endl;
+                std::cerr << grille_3D[i][j][k] << std::endl;
                 new_positions.push_back(grille_3D[i][j][k]);
             }
         }

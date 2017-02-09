@@ -47,6 +47,7 @@ static GLint window;
 static unsigned int FPS = 0;
 static bool fullScreen = false;
 bool toonShader = false;
+bool drawBVH = false;
 
 static Camera camera;
 static Mesh* mesh;
@@ -69,18 +70,26 @@ GLuint vbo[3];
 GLuint vao;
 GLuint ibo;
 
+GLuint lineVao;
+GLuint lineVbo;
+
 unsigned int positionIndex;
 unsigned int normalIndex;
 unsigned int colorIndex;
+unsigned int lineIndex;
+unsigned int sizeLinePos;
 
-GLProgram * glProgram;
+GLProgram * photoRealistProgram;
+GLProgram * toonProgram;
+GLProgram * lineProgram;
 
 void loadVbo();
-void loadShaders(const std::string &vertexShader, const std::string &fragmentShader);
+void loadGLPrograms();
 void renderVbo();
 void initiliazeColor();
 
-static std::vector<float> colorResponses; // Cached per-vertex color response, updated at each frame
+static std::vector<float> colorResponses;
+std::vector<float> linePos;
 
 void printUsage () {
 	std::cerr << std::endl
@@ -120,56 +129,68 @@ void init (const char * modelFilename) {
   	mesh->loadOFF (modelFilename);
     bvh = new BVH(mesh);//Build BVH tree with the mesh
 
-    //std::cerr << "nb of nodes : " << bvh->getNbNodes() << std::endl;
-    //std::cerr << "nb of leaves : " << bvh->getNbLeaves() << std::endl;
-
     colorResponses.resize (4*mesh->positions().size());
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
-
-    loadShaders("shaderVBO.vert", "shaderVBO.frag");
-    loadVbo();
-    initiliazeColor();
 
     //Add light sources here (PS: pls don't)
     lightSources = std::vector<LightSource>();
     lightSources.push_back(LightSource(Vec3<float>(4,4,1),Vec3<float>(5.0,0.0,0.0)));
 
-    modeShader = glProgram->getUniformLocation("mode");
-    shininessShader = glProgram->getUniformLocation("shininess");
-    alphaShader = glProgram->getUniformLocation("alpha");
-    F0Shader = glProgram->getUniformLocation("F0");
-    lightPosShader = glProgram->getUniformLocation("lightPos");
-
-    glProgram->setUniform1i(modeShader, mode);
-    glProgram->setUniform1f(shininessShader, shininess);
-    glProgram->setUniform1f(alphaShader, alpha);
-    glProgram->setUniform1f(F0Shader, F0);
-    glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+    loadGLPrograms();
+    loadVbo();
+    initiliazeColor();
 }
 
-void loadShaders(const std::string &vertexShader, const std::string &fragmentShader) {
+void loadGLPrograms() {
 
-    try {
+    photoRealistProgram = GLProgram::genVFProgram ("Simple GL Program", "shaderVBO.vert", "shaderVBO.frag");
 
-        glProgram = GLProgram::genVFProgram ("Simple GL Program", vertexShader, fragmentShader);
-        glProgram->use (); // Activate the shader program
-        std::cerr << glProgram->infoLog();
+        modeShader = photoRealistProgram->getUniformLocation("mode");
+        shininessShader = photoRealistProgram->getUniformLocation("shininess");
+        alphaShader = photoRealistProgram->getUniformLocation("alpha");
+        F0Shader = photoRealistProgram->getUniformLocation("F0");
+        lightPosShader = photoRealistProgram->getUniformLocation("lightPos");
 
-    } catch (Exception & e) {
-        cerr << e.msg () << endl;
-    }
+        photoRealistProgram->setUniform1i(modeShader, mode);
+        photoRealistProgram->setUniform1f(shininessShader, shininess);
+        photoRealistProgram->setUniform1f(alphaShader, alpha);
+        photoRealistProgram->setUniform1f(F0Shader, F0);
+        photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+
+    toonProgram = GLProgram::genVFProgram ("Simple GL Program", "shaderVBO.vert", "toonVBO.frag");
+
+        lightPosShader = toonProgram->getUniformLocation("lightPos");
+        toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+
+    lineProgram = GLProgram::genVFProgram ("Line Program", "shaderLineVBO.vert", "shaderLineVBO.frag");
+
 }
 
 void loadVbo() {
-
-    positionIndex = glGetAttribLocation (glProgram->id(), "VertexPosition") ;
-    normalIndex = glGetAttribLocation (glProgram->id(), "VertexNormal") ;
-    colorIndex = glGetAttribLocation (glProgram->id(), "VertexColor") ;
+ 
+    positionIndex = 0;
+    normalIndex = 1;
+    colorIndex = 2;
+    lineIndex = 0;
 
     glGenBuffers(1, &ibo);
     glGenBuffers(3, vbo);
-    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &lineVbo);
 
+    glGenVertexArrays(1, &vao);
+    glGenVertexArrays(1, &lineVao);
+
+    //LOADING VAO AND VBO FOR LINE SHADER
+    glBindVertexArray(lineVao);
+        //Buffer d'indices
+        glBindBuffer(GL_ARRAY_BUFFER, lineVbo);
+            linePos = bvh->getPosBuffer();
+            sizeLinePos = linePos.size();
+            glBufferData(GL_ARRAY_BUFFER, sizeLinePos * sizeof(GL_FLOAT), &linePos[0], GL_STATIC_DRAW);
+            glVertexAttribPointer(lineIndex, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+            glEnableVertexAttribArray(lineIndex);
+
+    //LOADING VAO AND VBO FOR PHOTOREALISTIC AND CARTOON SHADERS
     glBindVertexArray(vao); // Verrouillage du VAO
         // Buffer d'indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); // Verrouillage du IBO
@@ -179,21 +200,20 @@ void loadVbo() {
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
             // Allocation de la mémoire vidéo
             glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
-            glEnableVertexAttribArray (positionIndex);
             glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
+            glEnableVertexAttribArray (positionIndex);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Verrouillage du VBO
             // Allocation de la mémoire vidéo
             glBufferData(GL_ARRAY_BUFFER, mesh->normals().size()*sizeof(mesh->normals()[0]), &(mesh->normals()[0]), GL_STATIC_DRAW);
-            glEnableVertexAttribArray (normalIndex) ;
             glVertexAttribPointer(normalIndex, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+            glEnableVertexAttribArray (normalIndex) ;
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
             // Allocation de la mémoire vidéo
-            glBufferData(GL_ARRAY_BUFFER, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]), GL_DYNAMIC_DRAW);
-            glEnableVertexAttribArray (colorIndex) ;
+            glBufferData(GL_ARRAY_BUFFER, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]), GL_STATIC_DRAW);
             glVertexAttribPointer(colorIndex, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+            glEnableVertexAttribArray (colorIndex) ;
 }
 
 
@@ -223,26 +243,14 @@ void initiliazeColor() {
 
 void toggleToonShader() {
 
-    auto _shaders = glProgram->getShaders();
     if(!toonShader){
 
         try {
 
-            GLShader * fs = new GLShader ("Toon Fragment Shader", GL_FRAGMENT_SHADER);
-            fs->loadFromFile ("toonVBO.frag");
-            fs->compile ();
-            glProgram->detach(_shaders[1]);
-            glProgram->attach(fs);
-            glProgram->link();
-            glProgram->use();
-
-            lightPosShader = glProgram->getUniformLocation("lightPos");
-
-            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
-
+            toonProgram->use();
             toonShader = true;
-
-        } catch (Exception & e) {
+        } 
+        catch (Exception & e) {
             cerr << e.msg () << endl;
         }
     }
@@ -250,29 +258,11 @@ void toggleToonShader() {
 
         try {
 
-            GLShader * fs = new GLShader ("Photorealist Fragment Shader", GL_FRAGMENT_SHADER);
-            fs->loadFromFile ("shaderVBO.frag");
-            fs->compile ();
-            glProgram->detach(_shaders[1]);
-            glProgram->attach(fs);
-            glProgram->link();
-            glProgram->use();   
-
-            modeShader = glProgram->getUniformLocation("mode");
-            shininessShader = glProgram->getUniformLocation("shininess");
-            alphaShader = glProgram->getUniformLocation("alpha");
-            F0Shader = glProgram->getUniformLocation("F0");
-            lightPosShader = glProgram->getUniformLocation("lightPos");
-
-            glProgram->setUniform1i(modeShader, mode);
-            glProgram->setUniform1f(shininessShader, shininess);
-            glProgram->setUniform1f(alphaShader, alpha);
-            glProgram->setUniform1f(F0Shader, F0);
-            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
-
+            photoRealistProgram->use();
             toonShader = false;
 
-        } catch (Exception & e) {
+        } 
+        catch (Exception & e) {
             cerr << e.msg () << endl;
         }
 
@@ -367,11 +357,10 @@ void computePerVertexAO (unsigned int numOfSamples) {
             lightRay = LightRay(currPos, direction);
             direction.normalize();
 
-            if(lightRay.intersectsBVH(bvh)) sum += dot(n, direction);
+            if(!lightRay.intersectsBVH(bvh)) sum += dot(n, direction);
         }
 
         sum *= 1.0f/numOfSamples;
-        sum = 1.0f - sum;
         colorResponses[4*l+3] *= sum;
 
         l--;
@@ -383,10 +372,20 @@ void computePerVertexAO (unsigned int numOfSamples) {
         glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
 }
 
-void renderVbo() {
+void render() {
+
+    if(drawBVH) {
+
+        lineProgram->use();
+        glBindVertexArray(lineVao);
+            glDrawArrays(GL_LINES, 0, sizeLinePos);
+    }
+
+    if(toonShader) toonProgram->use();
+    else photoRealistProgram->use();
 
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, 3*mesh->triangles().size(), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
+        glDrawElements(GL_TRIANGLES, 3*mesh->triangles().size(), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
 
 void reshape(int w, int h) {
@@ -396,11 +395,13 @@ void reshape(int w, int h) {
 void display () {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     camera.apply ();
-    renderVbo();
+
+    render();
     for(GLenum err; (err = glGetError()) != GL_NO_ERROR;)
     {
       cerr << err << std::endl;
     }
+
     glFlush ();
     glutSwapBuffers ();
 }
@@ -422,7 +423,8 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addT(0.1);
             }
-            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 's':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -430,7 +432,8 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addT(-0.1);
             }
-            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'q':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -438,7 +441,8 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addP(-0.1);
             }
-            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'd':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -446,7 +450,8 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addP(0.1);
             }
-            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'a':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -454,7 +459,8 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addR(0.1);
             }
-            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'e':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -462,7 +468,8 @@ void key (unsigned char keyPressed, int x, int y) {
 
                 lightSources[j].addR(-0.1);
             }
-            glProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
         case 't':
             computePerVertexShadow();
@@ -475,53 +482,65 @@ void key (unsigned char keyPressed, int x, int y) {
             break;
         case 'y':
             alpha = fmin(1,alpha + 0.05);
-            glProgram->setUniform1f(alphaShader, alpha);
+            photoRealistProgram->setUniform1f(alphaShader, alpha);
             break;
         case 'h':
             //bvh->drawBVH(mesh, colorResponses);
             /*alpha = fmax(0, alpha-0.05);
-            glProgram->setUniform1f(alphaShader, alpha);*/
-            break;
-        case 'x':
-            mesh->loadOFF(DEFAULT_MESH_FILE);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
-            // Allocation de la mémoire vidéo
-                glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
+            photoRealistProgram->setUniform1f(alphaShader, alpha);*/
             break;
         case 'v':
-            mesh->simplify(64);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
-            // Allocation de la mémoire vidéo
-                glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
-            break;
-        case 'c':
             mesh->laplacianFilter();
             glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
             // Allocation de la mémoire vidéo
                 glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Verrouillage du VBO
+                // Remplacement du contenu en VRAM
+                glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->normals().size()*sizeof(mesh->normals()[0]), &(mesh->normals()[0]));
+            break;
+        case 'x' :
+            mesh->loadOFF(DEFAULT_MESH_FILE);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
+            // Allocation de la mémoire vidéo
+                glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Verrouillage du VBO
+                // Remplacement du contenu en VRAM
+                glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->normals().size()*sizeof(mesh->normals()[0]), &(mesh->normals()[0]));
+            break;
+        case 'c':
+            mesh->geometricalLaplacian();
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
+            // Allocation de la mémoire vidéo
+                glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Verrouillage du VBO
+                // Remplacement du contenu en VRAM
+                glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->normals().size()*sizeof(mesh->normals()[0]), &(mesh->normals()[0]));
+            break;
+        case 'b' :
+            drawBVH = !drawBVH;
             break;
         case 'u':
             F0 += 0.1;
-            glProgram->setUniform1f(F0Shader, F0);
+            photoRealistProgram->setUniform1f(F0Shader, F0);
             break;
         case 'j':
             F0 = fmax(0, F0-0.1);
-            glProgram->setUniform1f(F0Shader, F0);
+            photoRealistProgram->setUniform1f(F0Shader, F0);
             break;
         case '0':
             toggleToonShader();
             break;
         case '1':
             mode = 1;
-            glProgram->setUniform1i(modeShader, mode);
+            photoRealistProgram->setUniform1i(modeShader, mode);
             break;
         case '2':
             mode = 2;
-            glProgram->setUniform1i(modeShader, mode);
+            photoRealistProgram->setUniform1i(modeShader, mode);
             break;
         case '3':
             mode = 3;
-            glProgram->setUniform1i(modeShader, mode);
+            photoRealistProgram->setUniform1i(modeShader, mode);
             break;
 	    case 27:
 	        exit (0);
