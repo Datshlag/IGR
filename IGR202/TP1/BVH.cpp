@@ -1,7 +1,7 @@
 #include "BVH.h"
 #include <cfloat>
 
-unsigned int BVH::max_density = 100;
+unsigned int BVH::max_density = 1000;
 unsigned int BVH::nb_node = 0;
 unsigned int BVH::nb_leaves = 0;
 
@@ -60,6 +60,8 @@ BVH::BVH(const Mesh* _mesh): mesh(_mesh) {
 
     leftChild = new BVH(_mesh, subIndexes1, subBbox1);
     rightChild = new BVH(_mesh, subIndexes2, subBbox2);
+
+    indexes.clear();
 }
 
 BVH::BVH(const Mesh* _mesh, const std::vector<int> &_indexes, const Bbox &_bbox): mesh(_mesh), indexes(_indexes), bbox(_bbox), leftChild(NULL), rightChild(NULL) {
@@ -75,7 +77,15 @@ BVH::BVH(const Mesh* _mesh, const std::vector<int> &_indexes, const Bbox &_bbox)
 
         leftChild = new BVH(_mesh, subIndexes1, subBbox1);
         rightChild = new BVH(_mesh, subIndexes2, subBbox2);
+
+        indexes.clear();
     }
+}
+
+BVH::~BVH() {
+
+    delete leftChild;
+    delete rightChild;
 }
 
 void BVH::split (std::vector<int> &subIndexes1, 

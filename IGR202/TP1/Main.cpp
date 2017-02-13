@@ -18,12 +18,14 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <cstdio>
 #include <cstdlib>
 #include <algorithm>
 #include <cmath>
+#include <cfloat>
 #include <time.h>
 
 #include "Vec3.h"
@@ -39,15 +41,15 @@ using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
-static const string DEFAULT_MESH_FILE ("models/max_50K.off");
+static const string DEFAULT_MESH_FILE ("models/man.off");
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
 static GLint window;
 static unsigned int FPS = 0;
 static bool fullScreen = false;
-bool toonShader = false;
-bool drawBVH = false;
+static bool toonShader = false;
+static bool drawBVH = false;
 
 static Camera camera;
 static Mesh* mesh;
@@ -65,6 +67,7 @@ GLint shininessShader;
 GLint alphaShader;
 GLint F0Shader;
 GLint lightPosShader;
+GLint lightPosToonShader;
 
 GLuint vbo[3];
 GLuint vao;
@@ -83,6 +86,9 @@ GLProgram * photoRealistProgram;
 GLProgram * toonProgram;
 GLProgram * lineProgram;
 
+void glInit();
+void loadLights();
+void loadMesh(const char*);
 void loadVbo();
 void loadGLPrograms();
 void renderVbo();
@@ -113,7 +119,34 @@ void printUsage () {
          << " q, <esc>: Quit" << std::endl << std::endl;
 }
 
+//TRUC DE XAVIER, FAIRE SEMBLANT ET CHANGER LE NOM DES VARIABLES
+void advanceBar(float percent)
+{
+    int nbBar = int(percent/5);
+    if(percent < 100)
+        std::cout << std::setfill('0') << std::setw(2) << int(percent) << " % |";
+    else
+        std::cout << "Done |";
+    for(int i = 0; i < nbBar; ++i)
+        std::cout << "█";
+    for(int i = nbBar; i < 20; ++i)
+        std::cout << " ";
+    std::cout << "|\r";
+    std::cout.flush();
+}
+
 void init (const char * modelFilename) {
+    
+    glInit();
+    loadMesh(modelFilename);
+    loadLights();
+    loadGLPrograms();
+    loadVbo();
+    initiliazeColor();
+}
+
+void glInit() {
+
     glewExperimental = GL_TRUE;
     glewInit (); // init glew, which takes in charges the modern OpenGL calls (v>1.2, shaders, etc)
 
@@ -125,45 +158,60 @@ void init (const char * modelFilename) {
     glLineWidth (2.0); // Set the width of edges in GL_LINE polygon mode
     glClearColor (0.1f, 0.1f, 0.1f, 1.0f); // Background color
 
-    mesh = new Mesh();
-  	mesh->loadOFF (modelFilename);
-    bvh = new BVH(mesh);//Build BVH tree with the mesh
-
-    colorResponses.resize (4*mesh->positions().size());
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
+}
+
+void loadMesh(const char * modelFilename) { 
+
+    mesh = new Mesh();
+    mesh->loadOFF (modelFilename);
+    bvh = new BVH(mesh);//Build BVH tree with the mesh
+    colorResponses.resize (4*mesh->positions().size());
+}
+
+void loadLights () {
 
     //Add light sources here (PS: pls don't)
     lightSources = std::vector<LightSource>();
     lightSources.push_back(LightSource(Vec3<float>(4,4,1),Vec3<float>(5.0,0.0,0.0)));
-
-    loadGLPrograms();
-    loadVbo();
-    initiliazeColor();
 }
 
 void loadGLPrograms() {
+    try {
+        photoRealistProgram = GLProgram::genVFProgram ("Simple GL Program", "shaderVBO.vert", "shaderVBO.frag");
 
-    photoRealistProgram = GLProgram::genVFProgram ("Simple GL Program", "shaderVBO.vert", "shaderVBO.frag");
+            modeShader = photoRealistProgram->getUniformLocation("mode");
+            shininessShader = photoRealistProgram->getUniformLocation("shininess");
+            alphaShader = photoRealistProgram->getUniformLocation("alpha");
+            F0Shader = photoRealistProgram->getUniformLocation("F0");
+            lightPosShader = photoRealistProgram->getUniformLocation("lightPos");
 
-        modeShader = photoRealistProgram->getUniformLocation("mode");
-        shininessShader = photoRealistProgram->getUniformLocation("shininess");
-        alphaShader = photoRealistProgram->getUniformLocation("alpha");
-        F0Shader = photoRealistProgram->getUniformLocation("F0");
-        lightPosShader = photoRealistProgram->getUniformLocation("lightPos");
+            photoRealistProgram->setUniform1i(modeShader, mode);
+            photoRealistProgram->setUniform1f(shininessShader, shininess);
+            photoRealistProgram->setUniform1f(alphaShader, alpha);
+            photoRealistProgram->setUniform1f(F0Shader, F0);
+            photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+    }    
+    catch (Exception & e) {
+        cerr << "Photorealistic shader " << e.msg () << endl;
+    }
 
-        photoRealistProgram->setUniform1i(modeShader, mode);
-        photoRealistProgram->setUniform1f(shininessShader, shininess);
-        photoRealistProgram->setUniform1f(alphaShader, alpha);
-        photoRealistProgram->setUniform1f(F0Shader, F0);
-        photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
-
-    toonProgram = GLProgram::genVFProgram ("Simple GL Program", "shaderVBO.vert", "toonVBO.frag");
-
-        lightPosShader = toonProgram->getUniformLocation("lightPos");
-        toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
-
-    lineProgram = GLProgram::genVFProgram ("Line Program", "shaderLineVBO.vert", "shaderLineVBO.frag");
-
+    try {
+        toonProgram = GLProgram::genVFProgram ("Simple GL Program", "shaderVBO.vert", "toonVBO.frag");
+        lightPosToonShader = toonProgram->getUniformLocation("lightPos");
+        toonProgram->setUniform3f(lightPosToonShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+    }
+    catch (Exception & e) {
+        cerr << "Toon shader " << e.msg () << endl;
+    }
+    
+    try {
+        
+        lineProgram = GLProgram::genVFProgram ("Line Program", "shaderLineVBO.vert", "shaderLineVBO.frag");
+    }
+    catch (Exception & e) {
+        cerr << "Line shader " << e.msg () << endl;
+    }
 }
 
 void loadVbo() {
@@ -275,24 +323,21 @@ void computePerVertexShadow () {
     bool intersects;
 
     Vec3f lightPos = lightSources[0].getPos();
-    std::vector<Vec3f> positions = mesh->positions();
-    std::vector<Triangle> triangles = mesh->triangles();
+    auto positions = mesh->positions();
+    auto triangles = mesh->triangles();
     unsigned int nbVertex = positions.size();
 
     unsigned int l = 0;
-    int i;
-    while(l < 4*nbVertex) {
+    for(unsigned int i = 0; i < nbVertex; i++) {
 
         // On donne au vertex ses valeurs d'Albedo
         colorResponses[l++] = matAlbedo[0];
         colorResponses[l++] = matAlbedo[1];
         colorResponses[l++] = matAlbedo[2];
 
-        i=l/4;
-
         // Rayon partant du vertex en direction de la source de lumière
         ray = LightRay(positions.at(i), normalize(lightPos-positions.at(i)));
-        intersects = ray.intersectsBVH(bvh);
+        intersects = ray.intersectsBVH(bvh, FLT_MAX);
 
         // On change le signe de la 4ème coordonnée en fonction de s'il y a eu intersection
         if(intersects) colorResponses[l++] = -1.0;
@@ -305,7 +350,7 @@ void computePerVertexShadow () {
         glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
 }
 
-void computePerVertexAO (unsigned int numOfSamples) {
+void computePerVertexAO (unsigned int numOfSamples, float radius) {
 
     std::random_device rd;
     std::default_random_engine generator(rd());
@@ -326,45 +371,30 @@ void computePerVertexAO (unsigned int numOfSamples) {
     Vec3f n;
     Vec3f u, v;
 
-    Vec3f XVector = {1.f, 0.f, 0.f};
-    Vec3f YVector = {0.f, 1.f, 0.f};
+    for(unsigned int j = 0; j < nbVertex; j++) {
 
-    unsigned int l = nbVertex - 1;
-
-    while(l != 0) {
-
+        currPos = positions.at(j);
+        n = normalize(normals.at(j));
         sum = 0.0;
-
-        currPos = positions.at(l);
-        n = normalize(normals.at(l));
 
         for(int i = numOfSamples; i--;) {
 
-            if (dot(normals[i], XVector) < 0.80f)
-                u = cross(normals.at(i), XVector);
-            else
-                u = cross(normals.at(i), YVector);
-
-            u.normalize();
-            v = cross(normals[i], u);
-            v.normalize();
-
+            n.getTwoOrthogonals(u, v);
             float n1 = range(generator);
             float n2 = range(generator);
+            Vec3f direction = n + n1*u + n2*v;
 
-            Vec3f direction = normals[i] + n1*u + n2*v;
-
-            lightRay = LightRay(currPos, direction);
             direction.normalize();
+            lightRay = LightRay(currPos, direction);
 
-            if(!lightRay.intersectsBVH(bvh)) sum += dot(n, direction);
+            if(!lightRay.intersectsBVH(bvh, radius)) sum += dot(n, direction);
         }
 
         sum *= 1.0f/numOfSamples;
-        colorResponses[4*l+3] *= sum;
-
-        l--;
+        colorResponses[4*j+3] *= sum;
+        advanceBar(float(j)/nbVertex*100);
     }
+    advanceBar(100);
 
     // Envoi des données au buffer sur le GPU
     glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
@@ -424,8 +454,8 @@ void key (unsigned char keyPressed, int x, int y) {
                 lightSources[j].addT(0.1);
             }
             photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
-            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
-			break;
+            toonProgram->setUniform3f(lightPosToonShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            break;
 		case 's':
 			for(unsigned int j=0; j<lightSources.size(); j++)
             {
@@ -433,7 +463,7 @@ void key (unsigned char keyPressed, int x, int y) {
                 lightSources[j].addT(-0.1);
             }
             photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
-            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            toonProgram->setUniform3f(lightPosToonShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'q':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -442,7 +472,7 @@ void key (unsigned char keyPressed, int x, int y) {
                 lightSources[j].addP(-0.1);
             }
             photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
-            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            toonProgram->setUniform3f(lightPosToonShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'd':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -451,7 +481,7 @@ void key (unsigned char keyPressed, int x, int y) {
                 lightSources[j].addP(0.1);
             }
             photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
-            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            toonProgram->setUniform3f(lightPosToonShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'a':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -460,7 +490,7 @@ void key (unsigned char keyPressed, int x, int y) {
                 lightSources[j].addR(0.1);
             }
             photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
-            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            toonProgram->setUniform3f(lightPosToonShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
 		case 'e':
 			for(unsigned int j=0; j<lightSources.size(); j++)
@@ -469,7 +499,7 @@ void key (unsigned char keyPressed, int x, int y) {
                 lightSources[j].addR(-0.1);
             }
             photoRealistProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
-            toonProgram->setUniform3f(lightPosShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
+            toonProgram->setUniform3f(lightPosToonShader, lightSources[0].getPos()[0], lightSources[0].getPos()[1], lightSources[0].getPos()[2]);
 			break;
         case 't':
             computePerVertexShadow();
@@ -478,7 +508,7 @@ void key (unsigned char keyPressed, int x, int y) {
             initiliazeColor();
             break;
         case 'g':
-            computePerVertexAO(32);
+            computePerVertexAO(32, 0.1f);
             break;
         case 'y':
             alpha = fmin(1,alpha + 0.05);

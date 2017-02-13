@@ -55,5 +55,6 @@ void main (void) {
     }
 
     vec4 color = vec4(invAttenuation * (diffuse + spec), 1.0);
+    
     colorOut = color;
 }
