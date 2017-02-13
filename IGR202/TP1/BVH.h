@@ -12,7 +12,7 @@ class BVH {
 		BVH* leftChild;
 		BVH* rightChild;
 
-		const Mesh* mesh;
+		const Mesh& mesh;
 
 		std::vector<int> indexes;
 
@@ -27,9 +27,8 @@ class BVH {
 
 	public:
 		~BVH();
-		BVH();
-		BVH(const Mesh* _mesh);
-		BVH(const Mesh* _mesh, const std::vector<int> &_indexes, const Bbox &_bbox);
+		BVH(const Mesh &_mesh);
+		BVH(const Mesh &_mesh, const std::vector<int> &_indexes, const Bbox &_bbox);
 
 		void split (std::vector<int> &subIndexes1, 
             std::vector<int> &subIndexes2,
@@ -42,11 +41,9 @@ class BVH {
 		const BVH* getLeftChild() const { return leftChild; }
 		const BVH* getRightChild() const { return rightChild; }
 		const Bbox getBbox() const { return bbox; }
-		const std::vector<int> getIndexes() const { return indexes; }
-		const Mesh* getMesh() const { return mesh; }
+		const std::vector<int> &getIndexes() const { return indexes; }
+		const Mesh &getMesh() const { return mesh; }
 
 		int getNbNodes() const { return nb_node; }
 		int getNbLeaves() const { return nb_leaves; }
-
-		//void drawBVH(const Mesh &mesh, std::vector<float> &colors) const { }
 };

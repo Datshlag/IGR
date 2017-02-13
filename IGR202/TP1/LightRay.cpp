@@ -1,5 +1,5 @@
 #include "LightRay.h"
-#define EPSILON 0.0001f
+#define EPSILON 0.0000001f
 
 int LightRay::count = 0;
 
@@ -32,8 +32,6 @@ bool LightRay::intersectsTriangle(const Vec3f & p0, const Vec3f & p1, const Vec3
 
 	float t = dot(e1, q);
 	return (t > EPSILON && t < radius);
-
-
 }
 			
 bool LightRay::intersectsBox(const Bbox &bbox, float radius) const {
@@ -58,7 +56,6 @@ bool LightRay::intersectsBox(const Bbox &bbox, float radius) const {
 bool LightRay::intersectsBVH(const BVH *bvh, float radius) const{
 
 	Bbox bbox = bvh->getBbox();
-
 	if(intersectsBox(bbox, radius)) {
 
 		const BVH * leftChild = bvh->getLeftChild();
@@ -74,10 +71,10 @@ bool LightRay::intersectsBVH(const BVH *bvh, float radius) const{
 	return false;
 }
 
-bool LightRay::intersectsContent(const std::vector<int> &indexes, const Mesh *mesh, float radius) const {
+bool LightRay::intersectsContent(const std::vector<int> &indexes, const Mesh &mesh, float radius) const {
 
-	std::vector<Triangle> triangles = mesh->triangles();
-	std::vector<Vec3f> positions = mesh->positions();
+	const std::vector<Triangle>& triangles = mesh.triangles();
+	const std::vector<Vec3f>& positions = mesh.positions();
     Triangle currTri;
     bool intersects = false;
 

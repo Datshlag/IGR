@@ -41,7 +41,7 @@ void main (void) {
 
     //Shadow informations
     if(C.w <= 0.0) invAttenuation *= -0.1 * C.w;
-    else if(C.w > 0.0) invAttenuation *= C.w;
+    else if(C.w > 0.0) invAttenuation *= C.w * C.w;
 
     float nDotOmegaI = max(0.0, dot(omegaI, n));
     if(nDotOmegaI > 0) {
@@ -55,6 +55,6 @@ void main (void) {
     }
 
     vec4 color = vec4(invAttenuation * (diffuse + spec), 1.0);
-    
+
     colorOut = color;
 }

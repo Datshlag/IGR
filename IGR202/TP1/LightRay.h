@@ -26,7 +26,7 @@ class LightRay {
 		bool intersectsTriangle(const Vec3f & p0, const Vec3f & p1, const Vec3f & p2, float radius) const;
 		bool intersectsBVH(const BVH *bvh, float radius) const;
 		bool intersectsBox(const Bbox &bbox, float radius) const;
-		bool intersectsContent(const std::vector<int> &indexes, const Mesh *mesh, float radius) const;
+		bool intersectsContent(const std::vector<int> &indexes, const Mesh &mesh, float radius) const;
 
 	private:
 		Vec3f origin;

@@ -1,18 +1,17 @@
 #include "BVH.h"
 #include <cfloat>
 
-unsigned int BVH::max_density = 1000;
+unsigned int BVH::max_density = 20;
 unsigned int BVH::nb_node = 0;
 unsigned int BVH::nb_leaves = 0;
 
-BVH::BVH(): mesh(NULL) { }
-BVH::BVH(const Mesh* _mesh): mesh(_mesh) {
+BVH::BVH(const Mesh &_mesh): mesh(_mesh) {
 
     nb_node++;
-    std::vector<Vec3f> positions = mesh->positions();
+    const std::vector<Vec3f>& positions = mesh.positions();
 
     //All triangles belong to first BHV
-    std::vector<int> v(mesh->triangles().size());
+    std::vector<int> v(mesh.triangles().size());
     for(unsigned int i = 0; i < v.size(); i++) {
 
         v[i]=i;
@@ -50,8 +49,8 @@ BVH::BVH(const Mesh* _mesh): mesh(_mesh) {
 
     bbox = Bbox(Vec3f(minX, minY, minZ), Vec3f(maxX, maxY, maxZ), meanPos);
 
-    std::vector<int> subIndexes1 = std::vector<int>();
-    std::vector<int> subIndexes2 = std::vector<int>();
+    std::vector<int> subIndexes1 (0);
+    std::vector<int> subIndexes2 (0);
 
     Bbox subBbox1;
     Bbox subBbox2;
@@ -61,15 +60,15 @@ BVH::BVH(const Mesh* _mesh): mesh(_mesh) {
     leftChild = new BVH(_mesh, subIndexes1, subBbox1);
     rightChild = new BVH(_mesh, subIndexes2, subBbox2);
 
-    indexes.clear();
+    indexes = std::vector<int> ();
 }
-
-BVH::BVH(const Mesh* _mesh, const std::vector<int> &_indexes, const Bbox &_bbox): mesh(_mesh), indexes(_indexes), bbox(_bbox), leftChild(NULL), rightChild(NULL) {
+    
+BVH::BVH(const Mesh &_mesh, const std::vector<int> &_indexes, const Bbox &_bbox): mesh(_mesh), indexes(_indexes), bbox(_bbox), leftChild(NULL), rightChild(NULL) {
 
     if (indexes.size() > max_density) {
 
-        std::vector<int> subIndexes1 = std::vector<int>();
-        std::vector<int> subIndexes2 = std::vector<int>();
+        std::vector<int> subIndexes1 (0);
+        std::vector<int> subIndexes2 (0);
         Bbox subBbox1;
         Bbox subBbox2;
 
@@ -78,7 +77,7 @@ BVH::BVH(const Mesh* _mesh, const std::vector<int> &_indexes, const Bbox &_bbox)
         leftChild = new BVH(_mesh, subIndexes1, subBbox1);
         rightChild = new BVH(_mesh, subIndexes2, subBbox2);
 
-        indexes.clear();
+        indexes = std::vector<int> ();
     }
 }
 
@@ -118,8 +117,8 @@ void BVH::split (std::vector<int> &subIndexes1,
     Vec3f meanPos1, meanPos2;
     meanPos1 = meanPos2 = Vec3f(0, 0, 0);
 
-    std::vector<Triangle> triangles = mesh->triangles();
-    std::vector<Vec3f> positions = mesh->positions();
+    const std::vector<Triangle> &triangles = mesh.triangles();
+    const std::vector<Vec3f> &positions = mesh.positions();
 
     Triangle currTri;
     Vec3f V0, V1, V2, bar;

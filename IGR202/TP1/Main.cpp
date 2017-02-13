@@ -41,7 +41,7 @@ using namespace std;
 
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
-static const string DEFAULT_MESH_FILE ("models/man.off");
+static const string DEFAULT_MESH_FILE ("models/max_50K.off");
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
@@ -119,7 +119,7 @@ void printUsage () {
          << " q, <esc>: Quit" << std::endl << std::endl;
 }
 
-//TRUC DE XAVIER, FAIRE SEMBLANT ET CHANGER LE NOM DES VARIABLES
+//TRUC DE XAVIER, FAIRE SEMBLANT ET CHANGER LE NOM
 void advanceBar(float percent)
 {
     int nbBar = int(percent/5);
@@ -165,7 +165,7 @@ void loadMesh(const char * modelFilename) {
 
     mesh = new Mesh();
     mesh->loadOFF (modelFilename);
-    bvh = new BVH(mesh);//Build BVH tree with the mesh
+    bvh = new BVH(*mesh);//Build BVH tree with the mesh
     colorResponses.resize (4*mesh->positions().size());
 }
 
@@ -508,16 +508,23 @@ void key (unsigned char keyPressed, int x, int y) {
             initiliazeColor();
             break;
         case 'g':
-            computePerVertexAO(32, 0.1f);
+            computePerVertexAO(128, 0.2f);
             break;
         case 'y':
-            alpha = fmin(1,alpha + 0.05);
+            alpha = fmin(1.f, alpha + 0.05);
             photoRealistProgram->setUniform1f(alphaShader, alpha);
             break;
         case 'h':
-            //bvh->drawBVH(mesh, colorResponses);
-            /*alpha = fmax(0, alpha-0.05);
-            photoRealistProgram->setUniform1f(alphaShader, alpha);*/
+            alpha = fmax(0.f, alpha - 0.05);
+            photoRealistProgram->setUniform1f(alphaShader, alpha);
+            break;
+        case 'i':
+            shininess += 0.1;
+            photoRealistProgram->setUniform1f(shininessShader, shininess);
+            break;
+        case 'k':
+            shininess = fmax(0, shininess-0.1);
+            photoRealistProgram->setUniform1f(shininessShader, shininess);
             break;
         case 'v':
             mesh->laplacianFilter();
