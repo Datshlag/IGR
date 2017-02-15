@@ -1,5 +1,11 @@
 #pragma once
+
+#include <memory>
+
 #include "MultimediaObject.h"
+#include "Version.h"
+
+class Data;
 
 class Video : public MultimediaObject {
 

@@ -14,7 +14,7 @@ PROG = tp_inf224
 #
 # Fichiers sources (NE PAS METTRE les .h ni les .o seulement les .cpp)
 #
-SOURCES = MultimediaObject.cpp Main.cpp Video.cpp Picture.cpp Film.cpp Group.cpp
+SOURCES = MultimediaObject.cpp Main.cpp Video.cpp Film.cpp Group.cpp Data.cpp Picture.cpp
 
 #
 # Fichiers objets (ne pas modifier sauf si l'extension n'est pas .cpp)
@@ -32,7 +32,7 @@ CXX = c++
 #   -std=c++11 pour C++11
 # Exemple: CXXFLAGS= -std=c++11 -Wall -O -I/usr/local/qt/include
 #
-CXXFLAGS = -std=c++11 -Wall -g -O2
+CXXFLAGS = -std=c++11 -Wall -g -O3
 
 #
 # Options de l'editeur de liens

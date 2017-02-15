@@ -2,16 +2,33 @@
 
 using namespace std;
 
-Group::~Group() { }
+#if VERSION == 8
 
-Group::Group(string _groupName): list<MultimediaObject*>(), groupName(_groupName) { }
+	Group::~Group() { }
+	Group::Group(string _groupName): list<MultimediaObject*>(), groupName(_groupName) { }
+	string Group::getName() const { return groupName; }
+	void Group::displayElements(ostream& os) const {
 
-string Group::getName() const { return groupName; }
+		os << "Group "<< getName() << " contains : " << endl;
+		for(auto it = begin(); it != end(); it++) {
 
-void Group::displayElements(ostream& os) const {
-
-	for(auto it = begin(); it != end(); it++) {
-
-		(*it)->display(os);
+			(*it)->display(os);
+		}
 	}
-}
+
+#elif VERSION >= 9
+
+	typedef  shared_ptr<MultimediaObject> MOPtr;
+	Group::~Group() { }
+	Group::Group(string _groupName): list<MOPtr>(), groupName(_groupName) { }
+	string Group::getName() const { return groupName; }
+	void Group::displayElements(ostream& os) const {
+
+		os << "Group "<< getName() << " contains : " << endl;
+		for(auto it = begin(); it != end(); it++) {
+
+			(*it)->display(os);
+		}
+	}
+
+#endif

@@ -22,7 +22,7 @@ const int* Film::getChapters() const { return chapters; }
 
 void Film::setChapters(const int * newChapters, int newChaptersNumber) {
 
-	delete[] chapters;
+	if(chapters) delete[] chapters;
 	numberOfChapters = newChaptersNumber;
 	chapters = new int[numberOfChapters];
 	std::copy_n(newChapters, numberOfChapters, chapters);

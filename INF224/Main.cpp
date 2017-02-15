@@ -1,20 +1,22 @@
 #include <iostream>
 #include <string>
+#include <memory>
 #include <algorithm>
 #include <list>
 
-#include "MultimediaObject.h"
-#include "Video.h"
-#include "Picture.h"
-#include "Group.h"
-#include "Film.h"
+#include "Version.h"
 
-enum VERSION {ETAPE5, ETAPE6, ETAPE7};
-VERSION curr_version = ETAPE7;
+#include "MultimediaObject.h"
+#include "Film.h"
+#include "Group.h"
+#include "Picture.h"
+#include "Video.h"
+#include "Data.h"
+
 
 int main (int argc, char ** argv) {
 
-	if(curr_version == ETAPE5) {
+	#if VERSION == 5
 
 		MultimediaObject** multimediaObjectArray = new MultimediaObject*[2];
 		multimediaObjectArray[0] = new Video("FILM1", "film1.mp3", 120);
@@ -22,9 +24,9 @@ int main (int argc, char ** argv) {
 
 		multimediaObjectArray[0]->play();
 		multimediaObjectArray[1]->play();
-	}
+	#endif
 
-	if(curr_version == ETAPE6) {
+	#if VERSION == 6
 
 		int chapters [] = {10, 20, 30, 40, 50};
 		Film* film = new Film("cool movie", "./cool_movie", 150, chapters, 5);
@@ -37,7 +39,7 @@ int main (int argc, char ** argv) {
 		film->displayChapters(std::cout);
 
 		/*  Ci-dessous ne compile pas car rompt l'encapsulation forcée par le const, 
-			on protège donc les données de film.
+			on protège donc les données du film.
 
 			chapters = film->getChapters(); 
 			chapters[0] = 2;
@@ -46,15 +48,15 @@ int main (int argc, char ** argv) {
 			chapters_const = film->getChapters();
 			chapters_const[0] = 2;
 		*/
-	}
+	#endif
 
-	if(curr_version == ETAPE7) {
+	#if VERSION == 8
 
-		Picture* pic1 = new Picture("PIC1", "pic1.png", 1920.0, 1080.0);
-		Picture* pic2 = new Picture("PIC2", "pic2.png", 1920.0, 1080.0);
+		MultimediaObject* pic1 = new Picture("PIC1", "pic1.png", 1920.0, 1080.0);
+		MultimediaObject* pic2 = new Picture("PIC2", "pic2.png", 1920.0, 1080.0);
 
-		Video* vid1 = new Video("FILM1", "film1.mp3", 120);
-		Video* vid2 = new Video("FILM2", "film2.mp3", 120);
+		MultimediaObject* vid1 = new Video("FILM1", "film1.mp3", 120);
+		MultimediaObject* vid2 = new Video("FILM2", "film2.mp3", 120);
 
 		Group* group1 = new Group("cool stuff");
 		group1->push_back(pic1);
@@ -81,7 +83,52 @@ int main (int argc, char ** argv) {
 			vid2 = NULL;
 			group2->displayElements(std::cout);
 		*/
-	}
+	#endif
+
+	#if VERSION == 9
+
+		std::shared_ptr<MultimediaObject> pic1 (new Picture("PIC1", "pic1.png", 1920.0, 1080.0));
+		std::shared_ptr<MultimediaObject> pic2 (new Picture("PIC2", "pic2.png", 1920.0, 1080.0));
+
+		std::shared_ptr<MultimediaObject> vid1 (new Video("FILM1", "film1.mp3", 120));
+		std::shared_ptr<MultimediaObject> vid2 (new Video("FILM2", "film2.mp3", 120));
+
+		Group* group1 = new Group("cool stuff");
+		group1->push_back(pic1);
+		group1->push_back(pic2);
+		group1->push_back(vid1);
+
+		Group* group2 = new Group("fun stuff");
+		group2->push_back(pic2);
+		group2->push_back(vid1);
+		group2->push_back(vid2);
+
+		pic1.reset();
+		pic2.reset();
+		vid1.reset();
+		vid2.reset();
+
+		std::cout << "Deleting group1 containing pic1, pic2 and vid1" << std::endl;
+		delete group1;
+
+		std::cout << "Deleting group2 containing pic2, vid1 and vid2" << std::endl;
+		delete group2;
+
+	#endif
+
+	#if VERSION == 10
+
+		Data *data = new Data();
+
+		data->newVideo("chat.mp4");
+		data->newVideo("chien.mp4");
+		data->newGroup("Animaux");
+		data->searchMultimediaObject("chien.mp4", std::cout);
+		data->searchGroup("voyage", std::cout);
+
+		delete data;
+
+	#endif
 
 	return 0;
 }

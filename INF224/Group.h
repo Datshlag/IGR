@@ -1,21 +1,43 @@
 #pragma once
+
 #include <list>
 #include <string>
+#include <memory>
+
 #include "MultimediaObject.h"
+#include "Version.h"
+
+class Data;
+
 using namespace std;
 
-typedef ptrMo = shared_ptr<MultimediaObject>;
+#if VERSION == 8
 
-class Group : public list<ptrMo> {
+	class Group : public list<MultimediaObject*> {
 
-	private:
-		string groupName;
+		private:
+			string groupName;
 
-	public:
-		~Group();
-		Group(string _groupName);
+		public:
+			~Group();
+			Group(string _groupName);
+			string getName() const;
+			void displayElements(ostream& os) const;
+	};
 
-		string getName() const;
+#elif VERSION >= 9
 
-		void displayElements(ostream& os) const;
-};
+	typedef shared_ptr<MultimediaObject> MOPtr;
+	class Group : public list<MOPtr> {
+
+		private:
+			string groupName;
+
+		public:
+			~Group();
+			Group(string _groupName);
+			string getName() const;
+			void displayElements(ostream& os) const;
+	};
+
+#endif

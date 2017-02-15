@@ -1,11 +1,15 @@
 #pragma once
+
 #include "Video.h"
+#include "Version.h"
+
+class Data;
 
 class Film : public Video {
 
-  private:
-      int* chapters;
-      int numberOfChapters;
+    private:
+        int* chapters;
+        int numberOfChapters;
 
     public:
         virtual ~Film();
@@ -21,6 +25,5 @@ class Film : public Video {
         const int* getChapters() const;
 
         void setChapters(const int* newChapters, int newChaptersNumber);
-
         void displayChapters(std::ostream& os) const;
 };
