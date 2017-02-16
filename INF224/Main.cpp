@@ -12,6 +12,9 @@
 #include "Picture.h"
 #include "Video.h"
 #include "Data.h"
+#include "tcpServer.h"
+
+const int PORT = 3331;
 
 
 int main (int argc, char ** argv) {
@@ -127,6 +130,35 @@ int main (int argc, char ** argv) {
 		data->searchGroup("voyage", std::cout);
 
 		delete data;
+
+	#endif
+
+	#if VERSION == 11
+
+		// cree le TCPServer
+		shared_ptr<TCPServer> server(new TCPServer());
+
+		// cree l'objet qui gère les données
+		shared_ptr<Data> data(new Data());
+		data->newVideo("chien.mp4");
+		data->newGroup("vacances")->push_back(data->newFilm("VACANCES2012.avi"));
+
+		// le serveur appelera cette méthode chaque fois qu'il y a une requête
+		server->setCallback(*data, &Data::processRequest);
+
+		// lance la boucle infinie du serveur
+		cout << "Starting Server on port " << PORT << endl;
+		cout << "Known requests are the following :" << endl;
+		cout << " * search group _groupname" << endl;
+		cout << " * search content _contentname" << endl;
+		cout << " * play _contentname" << endl;
+		int status = server->run(PORT);
+
+		// en cas d'erreur
+		if (status < 0) {
+			cerr << "Could not start Server on port " << PORT << endl;
+			return 1;
+		}
 
 	#endif
 

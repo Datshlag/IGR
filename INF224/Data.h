@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <sstream>
 
 #include "Version.h"
 #include "MultimediaObject.h"
@@ -8,8 +9,10 @@
 #include "Video.h"
 #include "Picture.h"
 #include "Group.h"
+#include "tcpServer.h"
 
 using namespace std;
+using namespace cppu;
 
 typedef shared_ptr<Group> GroupPtr;
 typedef shared_ptr<MultimediaObject> MOPtr;
@@ -34,4 +37,6 @@ class Data {
 		void searchMultimediaObject(const string &name, ostream &os) const;
 		void searchGroup(const string &name, ostream &os) const;
 		void playMultimediaObject(const string &name, ostream &os) const;
+
+		bool processRequest(TCPConnection& cnx, const string& request, string& response);
 };

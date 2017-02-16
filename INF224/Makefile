@@ -14,7 +14,7 @@ PROG = tp_inf224
 #
 # Fichiers sources (NE PAS METTRE les .h ni les .o seulement les .cpp)
 #
-SOURCES = MultimediaObject.cpp Main.cpp Video.cpp Film.cpp Group.cpp Data.cpp Picture.cpp
+SOURCES = MultimediaObject.cpp Main.cpp Video.cpp Film.cpp Group.cpp Data.cpp Picture.cpp tcpServer.cpp cppSocket.cpp
 
 #
 # Fichiers objets (ne pas modifier sauf si l'extension n'est pas .cpp)
@@ -43,7 +43,7 @@ LDFLAGS =
 # Librairies a utiliser
 # Exemple: LDLIBS = -L/usr/local/qt/lib -lqt
 #
-LDLIBS =
+LDLIBS = -lpthread
 
 
 ##########################################

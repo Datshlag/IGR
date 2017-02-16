@@ -24,10 +24,11 @@ using namespace std;
 	string Group::getName() const { return groupName; }
 	void Group::displayElements(ostream& os) const {
 
-		os << "Group "<< getName() << " contains : " << endl;
+		os << "Group '"<< getName() << "' contains : ";
 		for(auto it = begin(); it != end(); it++) {
 
 			(*it)->display(os);
+			os << " / ";
 		}
 	}
 

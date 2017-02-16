@@ -15,6 +15,6 @@ std::string mo::getPath() const { return pathname; }
 
 void mo::display(std::ostream &os) const {
 
-    os << " name : " << name << std::endl
-       << " path : " << pathname << std::endl;
+    os << " name : " << name << " "
+       << " path : " << pathname;
 }
