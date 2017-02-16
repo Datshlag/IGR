@@ -1,9 +1,13 @@
 #pragma once
 
+#include <iostream>
+#include <string>
+#include <algorithm>
+
 #include "Video.h"
 #include "Version.h"
 
-class Data;
+using namespace std;
 
 class Film : public Video {
 
@@ -15,15 +19,18 @@ class Film : public Video {
         virtual ~Film();
 
         Film();
-        Film (std::string name, 
-            std::string pathname, 
+        Film (string name, 
+            string pathname, 
             int _length, 
             int* _chapters,
             int _numberOfChapters);
 
         int getNumberOfChapters() const;
         const int* getChapters() const;
+        string getClassName() const override;
 
         void setChapters(const int* newChapters, int newChaptersNumber);
-        void displayChapters(std::ostream& os) const;
+        void displayChapters(ostream& os) const;
+        void write(ostream& os) const;
+        void read(istream &is) override;
 };

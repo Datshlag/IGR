@@ -4,7 +4,7 @@ using namespace std;
 
 #if VERSION == 8
 
-	Group::~Group() { }
+	Group::~Group() { /*cout << "Group " << groupName << "destroyed";*/ }
 	Group::Group(string _groupName): list<MultimediaObject*>(), groupName(_groupName) { }
 	string Group::getName() const { return groupName; }
 	void Group::displayElements(ostream& os) const {

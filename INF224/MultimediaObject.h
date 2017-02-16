@@ -3,25 +3,28 @@
 #include <iostream>
 #include <string>
 
+using namespace std;
+
 class MultimediaObject {
 
     private:
-        std::string name;
-        std::string pathname;
+        string name;
+        string pathname;
 
     public:
         virtual ~MultimediaObject ();
-
         MultimediaObject();
-        MultimediaObject(const std::string &name, const std::string &pathname);
+        MultimediaObject(const string &name, const string &pathname);
 
-        std::string getName() const;
-        std::string getPath() const;
+        string getName() const;
+        string getPath() const;
+        virtual string getClassName() const;
 
-        void setName(const std::string &_name);
-        void setPath(const std::string &_pathname);
+        void setName(const string &_name);
+        void setPath(const string &_pathname);
 
-        void display(std::ostream &os) const;
-
+        virtual void display(ostream &os) const;
         virtual void play() const = 0;
+        virtual void write(ostream &os) const;
+        virtual void read(istream &is);
 };

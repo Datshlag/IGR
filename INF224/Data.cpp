@@ -3,24 +3,48 @@
 Data::~Data() { }
 Data::Data() { }
 
-MOPtr Data::newVideo(const string &name) {
+VideoPtr Data::newVideo(const string &name) {
 
-	MOPtr video(new Video(name, "./" + name, 0));
+	VideoPtr video(new Video(name, "./" + name, 0));
 	mOTable[name] = video;
 	return video;
 }
 
-MOPtr Data::newPicture(const string &name) {
+VideoPtr Data::newVideo(istream& is) {
 
-	MOPtr picture(new Picture(name, "./" + name, 0.0, 0.0));
+	VideoPtr video(new Video("name", "./", 0));
+	video->read(is);
+	mOTable[video->getName()] = video;
+	return video;
+}
+
+PicPtr Data::newPicture(const string &name) {
+
+	PicPtr picture(new Picture(name, "./" + name, 0.0, 0.0));
 	mOTable[name] = picture;
 	return picture;
 }
 
-MOPtr Data::newFilm(const string &name) {
+PicPtr Data::newPicture(istream &is) {
 
-	MOPtr film(new Film(name, "./" + name, 0, nullptr, 0));
+	PicPtr picture(new Picture("name", "./", 0.0, 0.0));
+	picture->read(is);
+	mOTable[picture->getName()] = picture;
+	return picture;
+}
+
+FilmPtr Data::newFilm(const string &name) {
+
+	FilmPtr film(new Film(name, "./" + name, 0, nullptr, 0));
 	mOTable[name] = film;
+	return film;
+}
+
+FilmPtr Data::newFilm(istream& is) {
+
+	FilmPtr film(new Film("name", "./", 0, nullptr, 0));
+	film->read(is);
+	mOTable[film->getName()] = film;
 	return film;
 }
 
@@ -29,6 +53,18 @@ GroupPtr Data::newGroup(const string &name) {
 	GroupPtr group(new Group(name));
 	groupTable[name] = group;
 	return group;
+}
+
+void Data::displayElements(ostream& os) const {
+
+	os << mOTable.size() << " elements : " << endl;
+	for(auto it: mOTable) {
+
+		os << "  * " << (it.second)->getClassName() << ":";
+		(it.second)->display(os);
+		os << endl;
+	}
+
 }
 
 void Data::searchMultimediaObject(const string &name, ostream &os) const {
@@ -102,5 +138,52 @@ bool Data::processRequest(TCPConnection& cnx, const string& request, string& res
 	response = respss.str();
 
 	// renvoyer false si on veut clore la connexion avec le client
+	return true;
+}
+
+bool Data::save(const string& fileName) const {
+
+	ofstream f(fileName);
+	if(!f) {
+
+		cerr << "Couldn't open file '" << fileName << "'" << std::endl;
+		return false;
+	}
+
+	for(auto it: mOTable) {
+
+		string str = (it.second)->getClassName();
+		f << str << endl;
+		(it.second)->write(f);
+	}
+
+	return true;
+}
+
+bool Data::load(const string& fileName) {
+
+	ifstream f(fileName);
+ 	if (!f) {
+		cerr << "Can't open file " << fileName << endl;
+		return false;
+ 	}
+
+	while (f) { 
+
+		string str;
+		getline(f, str);
+
+
+		if (str == "Video") {
+			VideoPtr video = newVideo(f);
+		}
+		else if (str == "Picture") {
+			PicPtr picture = newPicture(f);
+		}
+		else if (str == "Film") {
+			FilmPtr film = newFilm(f);
+		}
+	}
+
 	return true;
 }

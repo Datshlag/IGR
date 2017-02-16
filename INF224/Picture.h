@@ -1,29 +1,34 @@
 #pragma once
 
-#include <memory>
+#include <iostream>
+#include <string>
 
 #include "MultimediaObject.h"
 #include "Version.h"
 
-class Data;
+using namespace std;
 
 class Picture : public MultimediaObject {
 
-  private:
+    private:
         double latitude;
         double longitude;
 
-  public:
+    public:
         virtual ~Picture();
 
         Picture();
-        Picture(const std::string &name, const std::string &pathname, const double &_latitude, const double &_longitude);
+        Picture(const string &name, const string &pathname, const double &_latitude, const double &_longitude);
 
         double getLatitude() const;
         double getLongitude() const;
+        string getClassName() const override;
 
-        void setLength(const double &_latitude);
+        void setLatitude(const double &_latitude);
         void setLongitude(const double &_longitude);
 
+        void display(ostream& os) const override;
         void play() const override;
+        void write(ostream &os) const override;
+        void read(istream &is) override;
 };

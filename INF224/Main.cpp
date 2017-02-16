@@ -162,5 +162,37 @@ int main (int argc, char ** argv) {
 
 	#endif
 
+	#if VERSION == 12
+
+		Data* data = new Data();
+
+		auto video = data->newVideo("lol.mp4");
+		video->setLength(42);
+
+		auto film = data->newFilm("Toto en vacances.avi");
+		film->setLength(15);
+		int chapters[] = {1, 2, 3, 4, 5};
+		film->setChapters(chapters, 5);
+
+		auto picture = data->newPicture("cat.jpg");
+		picture->setLongitude(480);
+		picture->setLatitude(600);
+
+		cout << "Data before saving : " << std::endl;
+		data->displayElements(cout);
+		bool i = data->save("DATA");
+		if(!i) cout << "Couldn't save";
+
+		cout << "Loading new data..." << endl;
+
+		Data* data2 = new Data();
+		cout << "Data after loading : " << std::endl;
+		bool j = data2->load("DATA");
+		if(!j) cout << "Couldn't read";
+
+		data2->displayElements(cout);
+
+	#endif
+
 	return 0;
 }
