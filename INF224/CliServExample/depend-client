@@ -1,2 +1,0 @@
-client.o: client.cpp cppsocket.h
-cppsocket.o: cppsocket.cpp cppsocket.h

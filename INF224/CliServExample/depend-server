@@ -1,3 +1,0 @@
-server.o: server.cpp tcpserver.h cppsocket.h
-tcpserver.o: tcpserver.cpp tcpserver.h cppsocket.h
-cppsocket.o: cppsocket.cpp cppsocket.h
