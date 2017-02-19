@@ -1,0 +1,249 @@
+\hypertarget{classPicture}{}\section{Picture Class Reference}
+\label{classPicture}\index{Picture@{Picture}}
+
+
+\hyperlink{classPicture}{Picture} class, extends the abstract class \hyperlink{classMultimediaObject}{Multimedia\+Object}.  
+
+
+
+
+{\ttfamily \#include $<$Picture.\+h$>$}
+
+
+
+Inheritance diagram for Picture\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=172pt]{classPicture__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Picture\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=172pt]{classPicture__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \hyperlink{classPicture_af09bc804565eb973016527ff720ee504}{$\sim$\+Picture} ()
+\begin{DoxyCompactList}\small\item\em Destroys the picture. \end{DoxyCompactList}\item 
+\hypertarget{classPicture_ae71db353784869ca50fd695c6c89c9f3}{}\hyperlink{classPicture_ae71db353784869ca50fd695c6c89c9f3}{Picture} ()\label{classPicture_ae71db353784869ca50fd695c6c89c9f3}
+
+\begin{DoxyCompactList}\small\item\em Constructs the picture. \end{DoxyCompactList}\item 
+\hyperlink{classPicture_a5a385595e86d57a60fc3ee0deac7a434}{Picture} (const string \&name, const string \&pathname, const double \&\+\_\+latitude, const double \&\+\_\+longitude)
+\begin{DoxyCompactList}\small\item\em Constructs the picture. \end{DoxyCompactList}\item 
+double \hyperlink{classPicture_aa1ee860b82a140bfb1c83217d06f2cd7}{get\+Latitude} () const 
+\begin{DoxyCompactList}\small\item\em Gets the latitude. \end{DoxyCompactList}\item 
+double \hyperlink{classPicture_a5c26ca5c555d29735c7dfa5cdfa83286}{get\+Longitude} () const 
+\begin{DoxyCompactList}\small\item\em Gets the longitude. \end{DoxyCompactList}\item 
+string \hyperlink{classPicture_a91c2c1237c8bef245be245ea8aa6ef82}{get\+Class\+Name} () const override
+\begin{DoxyCompactList}\small\item\em Gets the class name. \end{DoxyCompactList}\item 
+void \hyperlink{classPicture_af4d86c3c40c1b6a6450a14f3f13da1a4}{set\+Latitude} (const double \&\+\_\+latitude)
+\begin{DoxyCompactList}\small\item\em Sets the latitude. \end{DoxyCompactList}\item 
+void \hyperlink{classPicture_a3f0d272d5df7dfcbb1cfa9a216a05134}{set\+Longitude} (const double \&\+\_\+longitude)
+\begin{DoxyCompactList}\small\item\em Sets the longitude. \end{DoxyCompactList}\item 
+void \hyperlink{classPicture_ac9ec4fc3fe578eeb6f22ce82ab32bc6a}{display} (ostream \&os) const override
+\begin{DoxyCompactList}\small\item\em Displays info on the picture. \end{DoxyCompactList}\item 
+\hypertarget{classPicture_a9c3aab87ad22bf2020c50fa3e1845e40}{}void \hyperlink{classPicture_a9c3aab87ad22bf2020c50fa3e1845e40}{play} () const override\label{classPicture_a9c3aab87ad22bf2020c50fa3e1845e40}
+
+\begin{DoxyCompactList}\small\item\em Shows the picture using imagej.\+S. \end{DoxyCompactList}\item 
+void \hyperlink{classPicture_ac54200304abe61c179262f54747b6691}{write} (ostream \&os) const override
+\begin{DoxyCompactList}\small\item\em Used to write the picture\textquotesingle{}s content, in a file for instance. \end{DoxyCompactList}\item 
+void \hyperlink{classPicture_a5d47e31992676d32a7fda30fbb3d3643}{read} (istream \&is) override
+\begin{DoxyCompactList}\small\item\em Used to read the video\textquotesingle{}s content, from a file for instance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classPicture}{Picture} class, extends the abstract class \hyperlink{classMultimediaObject}{Multimedia\+Object}. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classPicture_af09bc804565eb973016527ff720ee504}{}\index{Picture@{Picture}!````~Picture@{$\sim$\+Picture}}
+\index{````~Picture@{$\sim$\+Picture}!Picture@{Picture}}
+\subsubsection[{$\sim$\+Picture}]{\setlength{\rightskip}{0pt plus 5cm}pic\+::$\sim$\+Picture (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classPicture_af09bc804565eb973016527ff720ee504}
+
+
+Destroys the picture. 
+
+Destructor used just to keep track of the objects. \hypertarget{classPicture_a5a385595e86d57a60fc3ee0deac7a434}{}\index{Picture@{Picture}!Picture@{Picture}}
+\index{Picture@{Picture}!Picture@{Picture}}
+\subsubsection[{Picture}]{\setlength{\rightskip}{0pt plus 5cm}pic\+::\+Picture (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{name, }
+\item[{const string \&}]{pathname, }
+\item[{const double \&}]{\+\_\+latitude, }
+\item[{const double \&}]{\+\_\+longitude}
+\end{DoxyParamCaption}
+)}\label{classPicture_a5a385595e86d57a60fc3ee0deac7a434}
+
+
+Constructs the picture. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & The name \\
+\hline
+\mbox{\tt in}  & {\em pathname} & The pathname \\
+\hline
+\mbox{\tt in}  & {\em \+\_\+latitude} & The latitude \\
+\hline
+\mbox{\tt in}  & {\em \+\_\+longitude} & The longitude \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classPicture_ac9ec4fc3fe578eeb6f22ce82ab32bc6a}{}\index{Picture@{Picture}!display@{display}}
+\index{display@{display}!Picture@{Picture}}
+\subsubsection[{display}]{\setlength{\rightskip}{0pt plus 5cm}void pic\+::display (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classPicture_ac9ec4fc3fe578eeb6f22ce82ab32bc6a}
+
+
+Displays info on the picture. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em os} & The output stream \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classMultimediaObject_a9249406bc68f3aea92c87744c3f657da}{Multimedia\+Object}.
+
+\hypertarget{classPicture_a91c2c1237c8bef245be245ea8aa6ef82}{}\index{Picture@{Picture}!get\+Class\+Name@{get\+Class\+Name}}
+\index{get\+Class\+Name@{get\+Class\+Name}!Picture@{Picture}}
+\subsubsection[{get\+Class\+Name}]{\setlength{\rightskip}{0pt plus 5cm}string pic\+::get\+Class\+Name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classPicture_a91c2c1237c8bef245be245ea8aa6ef82}
+
+
+Gets the class name. 
+
+\begin{DoxyReturn}{Returns}
+The class name. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classMultimediaObject_a9eca3c9328fe9141dbdfd571e348aded}{Multimedia\+Object}.
+
+\hypertarget{classPicture_aa1ee860b82a140bfb1c83217d06f2cd7}{}\index{Picture@{Picture}!get\+Latitude@{get\+Latitude}}
+\index{get\+Latitude@{get\+Latitude}!Picture@{Picture}}
+\subsubsection[{get\+Latitude}]{\setlength{\rightskip}{0pt plus 5cm}double pic\+::get\+Latitude (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\label{classPicture_aa1ee860b82a140bfb1c83217d06f2cd7}
+
+
+Gets the latitude. 
+
+\begin{DoxyReturn}{Returns}
+The latitude. 
+\end{DoxyReturn}
+\hypertarget{classPicture_a5c26ca5c555d29735c7dfa5cdfa83286}{}\index{Picture@{Picture}!get\+Longitude@{get\+Longitude}}
+\index{get\+Longitude@{get\+Longitude}!Picture@{Picture}}
+\subsubsection[{get\+Longitude}]{\setlength{\rightskip}{0pt plus 5cm}double pic\+::get\+Longitude (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\label{classPicture_a5c26ca5c555d29735c7dfa5cdfa83286}
+
+
+Gets the longitude. 
+
+\begin{DoxyReturn}{Returns}
+The longitude. 
+\end{DoxyReturn}
+\hypertarget{classPicture_a5d47e31992676d32a7fda30fbb3d3643}{}\index{Picture@{Picture}!read@{read}}
+\index{read@{read}!Picture@{Picture}}
+\subsubsection[{read}]{\setlength{\rightskip}{0pt plus 5cm}void pic\+::read (
+\begin{DoxyParamCaption}
+\item[{istream \&}]{is}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classPicture_a5d47e31992676d32a7fda30fbb3d3643}
+
+
+Used to read the video\textquotesingle{}s content, from a file for instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em is} & The input stream. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classMultimediaObject_af8689299cabe973f9828a69b84ebbce7}{Multimedia\+Object}.
+
+\hypertarget{classPicture_af4d86c3c40c1b6a6450a14f3f13da1a4}{}\index{Picture@{Picture}!set\+Latitude@{set\+Latitude}}
+\index{set\+Latitude@{set\+Latitude}!Picture@{Picture}}
+\subsubsection[{set\+Latitude}]{\setlength{\rightskip}{0pt plus 5cm}void pic\+::set\+Latitude (
+\begin{DoxyParamCaption}
+\item[{const double \&}]{\+\_\+latitude}
+\end{DoxyParamCaption}
+)}\label{classPicture_af4d86c3c40c1b6a6450a14f3f13da1a4}
+
+
+Sets the latitude. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em \+\_\+latitude} & The latitude \\
+\hline
+\end{DoxyParams}
+\hypertarget{classPicture_a3f0d272d5df7dfcbb1cfa9a216a05134}{}\index{Picture@{Picture}!set\+Longitude@{set\+Longitude}}
+\index{set\+Longitude@{set\+Longitude}!Picture@{Picture}}
+\subsubsection[{set\+Longitude}]{\setlength{\rightskip}{0pt plus 5cm}void pic\+::set\+Longitude (
+\begin{DoxyParamCaption}
+\item[{const double \&}]{\+\_\+longitude}
+\end{DoxyParamCaption}
+)}\label{classPicture_a3f0d272d5df7dfcbb1cfa9a216a05134}
+
+
+Sets the longitude. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em \+\_\+longitude} & The longitude \\
+\hline
+\end{DoxyParams}
+\hypertarget{classPicture_ac54200304abe61c179262f54747b6691}{}\index{Picture@{Picture}!write@{write}}
+\index{write@{write}!Picture@{Picture}}
+\subsubsection[{write}]{\setlength{\rightskip}{0pt plus 5cm}void pic\+::write (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classPicture_ac54200304abe61c179262f54747b6691}
+
+
+Used to write the picture\textquotesingle{}s content, in a file for instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em os} & The output stream. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classMultimediaObject_af838c533bbfc85230c8569dd16be457b}{Multimedia\+Object}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Picture.\+h\item 
+Picture.\+cpp\end{DoxyCompactItemize}

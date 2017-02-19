@@ -1,0 +1,4 @@
+<map id="Video" name="Video">
+<area shape="rect" id="node3" href="$classFilm.html" title="Film class, extends the video class. Using pointers for learning purpose. " alt="" coords="43,155,90,181"/>
+<area shape="rect" id="node2" href="$classMultimediaObject.html" title="Abstract class for a multimedia object. " alt="" coords="5,5,128,32"/>
+</map>

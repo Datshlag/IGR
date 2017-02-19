@@ -1,0 +1,11 @@
+MultimediaObject.o: MultimediaObject.cpp MultimediaObject.h
+Main.o: Main.cpp Version.h MultimediaObject.h Film.h Video.h Group.h \
+ Picture.h Data.h tcpServer.h cppSocket.h
+Video.o: Video.cpp Video.h MultimediaObject.h Version.h
+Film.o: Film.cpp Film.h Video.h MultimediaObject.h Version.h
+Group.o: Group.cpp Group.h MultimediaObject.h Version.h
+Data.o: Data.cpp Data.h Version.h MultimediaObject.h Film.h Video.h \
+ Picture.h Group.h tcpServer.h cppSocket.h
+Picture.o: Picture.cpp Picture.h MultimediaObject.h Version.h
+tcpServer.o: tcpServer.cpp tcpServer.h cppSocket.h
+cppSocket.o: cppSocket.cpp cppSocket.h

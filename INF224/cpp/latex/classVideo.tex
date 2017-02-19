@@ -1,0 +1,212 @@
+\hypertarget{classVideo}{}\section{Video Class Reference}
+\label{classVideo}\index{Video@{Video}}
+
+
+\hyperlink{classVideo}{Video} class, extends the abstract class \hyperlink{classMultimediaObject}{Multimedia\+Object}.  
+
+
+
+
+{\ttfamily \#include $<$Video.\+h$>$}
+
+
+
+Inheritance diagram for Video\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=172pt]{classVideo__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Video\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=172pt]{classVideo__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \hyperlink{classVideo_a9a4f47fd7672b90c86d4c10176f89bb3}{$\sim$\+Video} ()
+\begin{DoxyCompactList}\small\item\em Destroys the object. \end{DoxyCompactList}\item 
+\hypertarget{classVideo_ac973e3d02151bb2bf7b75deda0c2ca5a}{}\hyperlink{classVideo_ac973e3d02151bb2bf7b75deda0c2ca5a}{Video} ()\label{classVideo_ac973e3d02151bb2bf7b75deda0c2ca5a}
+
+\begin{DoxyCompactList}\small\item\em Creates the object. \end{DoxyCompactList}\item 
+\hyperlink{classVideo_a0e70b25d96356f5ea3413f8f56cef897}{Video} (const string \&name, const string \&pathname, const int \&\+\_\+length)
+\begin{DoxyCompactList}\small\item\em Creates the object. \end{DoxyCompactList}\item 
+int \hyperlink{classVideo_afb9ed2097e0367a3c417321115ab965b}{get\+Length} () const 
+\begin{DoxyCompactList}\small\item\em Gets the length. \end{DoxyCompactList}\item 
+string \hyperlink{classVideo_a675d26365c71c29bc4b4b50ec2b36bc6}{get\+Class\+Name} () const override
+\begin{DoxyCompactList}\small\item\em Gets the class name. \end{DoxyCompactList}\item 
+void \hyperlink{classVideo_a90609ca4de9b4465e5facc27cc4b08e2}{set\+Length} (const int \&\+\_\+length)
+\begin{DoxyCompactList}\small\item\em Sets the length. \end{DoxyCompactList}\item 
+void \hyperlink{classVideo_a8acaac2f61e1989cf3a7dcafd14d8daf}{display} (ostream \&os) const override
+\begin{DoxyCompactList}\small\item\em Displays info on the video. \end{DoxyCompactList}\item 
+\hypertarget{classVideo_a61a4f3672781ab2db2d79dbbb2b1c228}{}void \hyperlink{classVideo_a61a4f3672781ab2db2d79dbbb2b1c228}{play} () const override\label{classVideo_a61a4f3672781ab2db2d79dbbb2b1c228}
+
+\begin{DoxyCompactList}\small\item\em Plays the video using mpv. \end{DoxyCompactList}\item 
+void \hyperlink{classVideo_ae71c8af72630d7d145bd948121aac01b}{write} (ostream \&os) const override
+\begin{DoxyCompactList}\small\item\em Used to write the video\textquotesingle{}s content, in a file for instance. \end{DoxyCompactList}\item 
+void \hyperlink{classVideo_a82ebc9192a50d9235f733a50f6710951}{read} (istream \&is) override
+\begin{DoxyCompactList}\small\item\em Used to read the video\textquotesingle{}s content, from a file for instance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classVideo}{Video} class, extends the abstract class \hyperlink{classMultimediaObject}{Multimedia\+Object}. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classVideo_a9a4f47fd7672b90c86d4c10176f89bb3}{}\index{Video@{Video}!````~Video@{$\sim$\+Video}}
+\index{````~Video@{$\sim$\+Video}!Video@{Video}}
+\subsubsection[{$\sim$\+Video}]{\setlength{\rightskip}{0pt plus 5cm}vid\+::$\sim$\+Video (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classVideo_a9a4f47fd7672b90c86d4c10176f89bb3}
+
+
+Destroys the object. 
+
+Destructor used just to keep track of the objects. \hypertarget{classVideo_a0e70b25d96356f5ea3413f8f56cef897}{}\index{Video@{Video}!Video@{Video}}
+\index{Video@{Video}!Video@{Video}}
+\subsubsection[{Video}]{\setlength{\rightskip}{0pt plus 5cm}vid\+::\+Video (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{name, }
+\item[{const string \&}]{pathname, }
+\item[{const int \&}]{\+\_\+length}
+\end{DoxyParamCaption}
+)}\label{classVideo_a0e70b25d96356f5ea3413f8f56cef897}
+
+
+Creates the object. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & The name \\
+\hline
+\mbox{\tt in}  & {\em pathname} & The pathname \\
+\hline
+\mbox{\tt in}  & {\em \+\_\+length} & The length \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classVideo_a8acaac2f61e1989cf3a7dcafd14d8daf}{}\index{Video@{Video}!display@{display}}
+\index{display@{display}!Video@{Video}}
+\subsubsection[{display}]{\setlength{\rightskip}{0pt plus 5cm}void vid\+::display (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classVideo_a8acaac2f61e1989cf3a7dcafd14d8daf}
+
+
+Displays info on the video. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em os} & The output stream. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classMultimediaObject_a9249406bc68f3aea92c87744c3f657da}{Multimedia\+Object}.
+
+\hypertarget{classVideo_a675d26365c71c29bc4b4b50ec2b36bc6}{}\index{Video@{Video}!get\+Class\+Name@{get\+Class\+Name}}
+\index{get\+Class\+Name@{get\+Class\+Name}!Video@{Video}}
+\subsubsection[{get\+Class\+Name}]{\setlength{\rightskip}{0pt plus 5cm}string vid\+::get\+Class\+Name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classVideo_a675d26365c71c29bc4b4b50ec2b36bc6}
+
+
+Gets the class name. 
+
+\begin{DoxyReturn}{Returns}
+The class name. 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{classMultimediaObject_a9eca3c9328fe9141dbdfd571e348aded}{Multimedia\+Object}.
+
+\hypertarget{classVideo_afb9ed2097e0367a3c417321115ab965b}{}\index{Video@{Video}!get\+Length@{get\+Length}}
+\index{get\+Length@{get\+Length}!Video@{Video}}
+\subsubsection[{get\+Length}]{\setlength{\rightskip}{0pt plus 5cm}int vid\+::get\+Length (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\label{classVideo_afb9ed2097e0367a3c417321115ab965b}
+
+
+Gets the length. 
+
+\begin{DoxyReturn}{Returns}
+The length. 
+\end{DoxyReturn}
+\hypertarget{classVideo_a82ebc9192a50d9235f733a50f6710951}{}\index{Video@{Video}!read@{read}}
+\index{read@{read}!Video@{Video}}
+\subsubsection[{read}]{\setlength{\rightskip}{0pt plus 5cm}void vid\+::read (
+\begin{DoxyParamCaption}
+\item[{istream \&}]{is}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classVideo_a82ebc9192a50d9235f733a50f6710951}
+
+
+Used to read the video\textquotesingle{}s content, from a file for instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em is} & The input stream. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classMultimediaObject_af8689299cabe973f9828a69b84ebbce7}{Multimedia\+Object}.
+
+\hypertarget{classVideo_a90609ca4de9b4465e5facc27cc4b08e2}{}\index{Video@{Video}!set\+Length@{set\+Length}}
+\index{set\+Length@{set\+Length}!Video@{Video}}
+\subsubsection[{set\+Length}]{\setlength{\rightskip}{0pt plus 5cm}void vid\+::set\+Length (
+\begin{DoxyParamCaption}
+\item[{const int \&}]{\+\_\+length}
+\end{DoxyParamCaption}
+)}\label{classVideo_a90609ca4de9b4465e5facc27cc4b08e2}
+
+
+Sets the length. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em \+\_\+length} & The length \\
+\hline
+\end{DoxyParams}
+\hypertarget{classVideo_ae71c8af72630d7d145bd948121aac01b}{}\index{Video@{Video}!write@{write}}
+\index{write@{write}!Video@{Video}}
+\subsubsection[{write}]{\setlength{\rightskip}{0pt plus 5cm}void vid\+::write (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}\label{classVideo_ae71c8af72630d7d145bd948121aac01b}
+
+
+Used to write the video\textquotesingle{}s content, in a file for instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em os} & The output stream. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \hyperlink{classMultimediaObject_af838c533bbfc85230c8569dd16be457b}{Multimedia\+Object}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Video.\+h\item 
+Video.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,3 @@
+<map id="cppu::TCPConnection" name="cppu::TCPConnection">
+<area shape="rect" id="node2" href="$classcppu_1_1SocketBuffer.html" title="Preserves record boundaries when exchanging data between connected TCP/IP sockets. This class ensures that one call to writeLine() corresponds to one and exactly one call to readLine() on the other side. This differs from the behavior of Socket::send() and Socket::receive() because TCP/IP connected sockets do not preserve record boundaries. writeLine() and readLine() solve this problem by automatically adding and searching for a separator between successive lines. " alt="" coords="13,5,148,32"/>
+</map>

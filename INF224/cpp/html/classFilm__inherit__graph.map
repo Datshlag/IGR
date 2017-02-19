@@ -1,0 +1,4 @@
+<map id="Film" name="Film">
+<area shape="rect" id="node2" href="$classVideo.html" title="Video class, extends the abstract class MultimediaObject. " alt="" coords="39,80,94,107"/>
+<area shape="rect" id="node3" href="$classMultimediaObject.html" title="Abstract class for a multimedia object. " alt="" coords="5,5,128,32"/>
+</map>

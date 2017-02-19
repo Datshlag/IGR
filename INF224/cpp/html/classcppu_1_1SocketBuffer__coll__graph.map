@@ -1,0 +1,4 @@
+<map id="cppu::SocketBuffer" name="cppu::SocketBuffer">
+<area shape="rect" id="node2" href="$classcppu_1_1Socket.html" title="TCP/IP or UDP/Datagram socket. This class encapsulates a TCP/IP or UDP/Datagram socket. AF_INET connections following the IPv4 Internet protocol are supported. " alt="" coords="5,5,104,32"/>
+<area shape="rect" id="node3" href="$structcppu_1_1InputBuffer.html" title="cppu::InputBuffer" alt="" coords="128,5,251,32"/>
+</map>

@@ -1,0 +1,223 @@
+\hypertarget{classMultimediaObject}{}\section{Multimedia\+Object Class Reference}
+\label{classMultimediaObject}\index{Multimedia\+Object@{Multimedia\+Object}}
+
+
+Abstract class for a multimedia object.  
+
+
+
+
+{\ttfamily \#include $<$Multimedia\+Object.\+h$>$}
+
+
+
+Inheritance diagram for Multimedia\+Object\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=186pt]{classMultimediaObject__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classMultimediaObject_a9f24b38d405a785a73660885ede3b9c5}{}virtual \hyperlink{classMultimediaObject_a9f24b38d405a785a73660885ede3b9c5}{$\sim$\+Multimedia\+Object} ()\label{classMultimediaObject_a9f24b38d405a785a73660885ede3b9c5}
+
+\begin{DoxyCompactList}\small\item\em Destroys the object. \end{DoxyCompactList}\item 
+\hypertarget{classMultimediaObject_abba8b5f14970dcd1f035c25dd6cdc0bc}{}\hyperlink{classMultimediaObject_abba8b5f14970dcd1f035c25dd6cdc0bc}{Multimedia\+Object} ()\label{classMultimediaObject_abba8b5f14970dcd1f035c25dd6cdc0bc}
+
+\begin{DoxyCompactList}\small\item\em Creates the object. \end{DoxyCompactList}\item 
+\hyperlink{classMultimediaObject_ac08b63898b63faedcab9f03fa4d44506}{Multimedia\+Object} (const string \&name, const string \&pathname)
+\begin{DoxyCompactList}\small\item\em Creates the object. \end{DoxyCompactList}\item 
+string \hyperlink{classMultimediaObject_aef20e4a114ff0013ca01b6477bc0282e}{get\+Name} () const 
+\begin{DoxyCompactList}\small\item\em Gets the name. \end{DoxyCompactList}\item 
+string \hyperlink{classMultimediaObject_a493f2d99c38a0c835a689cf8a0aca0c3}{get\+Path} () const 
+\begin{DoxyCompactList}\small\item\em Gets the path. \end{DoxyCompactList}\item 
+virtual string \hyperlink{classMultimediaObject_a9eca3c9328fe9141dbdfd571e348aded}{get\+Class\+Name} () const 
+\begin{DoxyCompactList}\small\item\em Gets the class name. \end{DoxyCompactList}\item 
+void \hyperlink{classMultimediaObject_ad8b8d859412978bd6bbcacedf8f5a2fa}{set\+Name} (const string \&\+\_\+name)
+\begin{DoxyCompactList}\small\item\em Sets the name. \end{DoxyCompactList}\item 
+void \hyperlink{classMultimediaObject_abf9ff0aa53c66fd18e87bd5d5739e70e}{set\+Path} (const string \&\+\_\+pathname)
+\begin{DoxyCompactList}\small\item\em Sets the path. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classMultimediaObject_a9249406bc68f3aea92c87744c3f657da}{display} (ostream \&os) const 
+\begin{DoxyCompactList}\small\item\em Displays info on the object. \end{DoxyCompactList}\item 
+\hypertarget{classMultimediaObject_a4fc54cf0e9fe39e1b885f995f49f9194}{}virtual void \hyperlink{classMultimediaObject_a4fc54cf0e9fe39e1b885f995f49f9194}{play} () const =0\label{classMultimediaObject_a4fc54cf0e9fe39e1b885f995f49f9194}
+
+\begin{DoxyCompactList}\small\item\em Plays the object. This method is abstract. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classMultimediaObject_af838c533bbfc85230c8569dd16be457b}{write} (ostream \&os) const 
+\begin{DoxyCompactList}\small\item\em Used to write the object\textquotesingle{}s content, in a file for instance. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classMultimediaObject_af8689299cabe973f9828a69b84ebbce7}{read} (istream \&is)
+\begin{DoxyCompactList}\small\item\em Used to read the object\textquotesingle{}s content, from a file for instance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Abstract class for a multimedia object. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classMultimediaObject_ac08b63898b63faedcab9f03fa4d44506}{}\index{Multimedia\+Object@{Multimedia\+Object}!Multimedia\+Object@{Multimedia\+Object}}
+\index{Multimedia\+Object@{Multimedia\+Object}!Multimedia\+Object@{Multimedia\+Object}}
+\subsubsection[{Multimedia\+Object}]{\setlength{\rightskip}{0pt plus 5cm}mo\+::\+Multimedia\+Object (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{name, }
+\item[{const string \&}]{pathname}
+\end{DoxyParamCaption}
+)}\label{classMultimediaObject_ac08b63898b63faedcab9f03fa4d44506}
+
+
+Creates the object. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & The name \\
+\hline
+\mbox{\tt in}  & {\em pathname} & The pathname \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classMultimediaObject_a9249406bc68f3aea92c87744c3f657da}{}\index{Multimedia\+Object@{Multimedia\+Object}!display@{display}}
+\index{display@{display}!Multimedia\+Object@{Multimedia\+Object}}
+\subsubsection[{display}]{\setlength{\rightskip}{0pt plus 5cm}void mo\+::display (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\label{classMultimediaObject_a9249406bc68f3aea92c87744c3f657da}
+
+
+Displays info on the object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em os} & The output stream. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \hyperlink{classPicture_ac9ec4fc3fe578eeb6f22ce82ab32bc6a}{Picture}, and \hyperlink{classVideo_a8acaac2f61e1989cf3a7dcafd14d8daf}{Video}.
+
+\hypertarget{classMultimediaObject_a9eca3c9328fe9141dbdfd571e348aded}{}\index{Multimedia\+Object@{Multimedia\+Object}!get\+Class\+Name@{get\+Class\+Name}}
+\index{get\+Class\+Name@{get\+Class\+Name}!Multimedia\+Object@{Multimedia\+Object}}
+\subsubsection[{get\+Class\+Name}]{\setlength{\rightskip}{0pt plus 5cm}string mo\+::get\+Class\+Name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\label{classMultimediaObject_a9eca3c9328fe9141dbdfd571e348aded}
+
+
+Gets the class name. 
+
+\begin{DoxyReturn}{Returns}
+The class name. 
+\end{DoxyReturn}
+
+
+Reimplemented in \hyperlink{classFilm_a6e2b00b6a47bd58b925cca372167697c}{Film}, \hyperlink{classPicture_a91c2c1237c8bef245be245ea8aa6ef82}{Picture}, and \hyperlink{classVideo_a675d26365c71c29bc4b4b50ec2b36bc6}{Video}.
+
+\hypertarget{classMultimediaObject_aef20e4a114ff0013ca01b6477bc0282e}{}\index{Multimedia\+Object@{Multimedia\+Object}!get\+Name@{get\+Name}}
+\index{get\+Name@{get\+Name}!Multimedia\+Object@{Multimedia\+Object}}
+\subsubsection[{get\+Name}]{\setlength{\rightskip}{0pt plus 5cm}string mo\+::get\+Name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\label{classMultimediaObject_aef20e4a114ff0013ca01b6477bc0282e}
+
+
+Gets the name. 
+
+\begin{DoxyReturn}{Returns}
+The name. 
+\end{DoxyReturn}
+\hypertarget{classMultimediaObject_a493f2d99c38a0c835a689cf8a0aca0c3}{}\index{Multimedia\+Object@{Multimedia\+Object}!get\+Path@{get\+Path}}
+\index{get\+Path@{get\+Path}!Multimedia\+Object@{Multimedia\+Object}}
+\subsubsection[{get\+Path}]{\setlength{\rightskip}{0pt plus 5cm}string mo\+::get\+Path (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const}\label{classMultimediaObject_a493f2d99c38a0c835a689cf8a0aca0c3}
+
+
+Gets the path. 
+
+\begin{DoxyReturn}{Returns}
+The path. 
+\end{DoxyReturn}
+\hypertarget{classMultimediaObject_af8689299cabe973f9828a69b84ebbce7}{}\index{Multimedia\+Object@{Multimedia\+Object}!read@{read}}
+\index{read@{read}!Multimedia\+Object@{Multimedia\+Object}}
+\subsubsection[{read}]{\setlength{\rightskip}{0pt plus 5cm}void mo\+::read (
+\begin{DoxyParamCaption}
+\item[{istream \&}]{is}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classMultimediaObject_af8689299cabe973f9828a69b84ebbce7}
+
+
+Used to read the object\textquotesingle{}s content, from a file for instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em is} & The input stream. \\
+\hline
+\end{DoxyParams}
+We use getline so that we don\textquotesingle{}t stop at the first space encountered. 
+
+Reimplemented in \hyperlink{classPicture_a5d47e31992676d32a7fda30fbb3d3643}{Picture}, \hyperlink{classFilm_a97a0c42300b580e677eedbdfdf973947}{Film}, and \hyperlink{classVideo_a82ebc9192a50d9235f733a50f6710951}{Video}.
+
+\hypertarget{classMultimediaObject_ad8b8d859412978bd6bbcacedf8f5a2fa}{}\index{Multimedia\+Object@{Multimedia\+Object}!set\+Name@{set\+Name}}
+\index{set\+Name@{set\+Name}!Multimedia\+Object@{Multimedia\+Object}}
+\subsubsection[{set\+Name}]{\setlength{\rightskip}{0pt plus 5cm}void mo\+::set\+Name (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{\+\_\+name}
+\end{DoxyParamCaption}
+)}\label{classMultimediaObject_ad8b8d859412978bd6bbcacedf8f5a2fa}
+
+
+Sets the name. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em \+\_\+name} & The name \\
+\hline
+\end{DoxyParams}
+\hypertarget{classMultimediaObject_abf9ff0aa53c66fd18e87bd5d5739e70e}{}\index{Multimedia\+Object@{Multimedia\+Object}!set\+Path@{set\+Path}}
+\index{set\+Path@{set\+Path}!Multimedia\+Object@{Multimedia\+Object}}
+\subsubsection[{set\+Path}]{\setlength{\rightskip}{0pt plus 5cm}void mo\+::set\+Path (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{\+\_\+pathname}
+\end{DoxyParamCaption}
+)}\label{classMultimediaObject_abf9ff0aa53c66fd18e87bd5d5739e70e}
+
+
+Sets the path. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em \+\_\+pathname} & The pathname \\
+\hline
+\end{DoxyParams}
+\hypertarget{classMultimediaObject_af838c533bbfc85230c8569dd16be457b}{}\index{Multimedia\+Object@{Multimedia\+Object}!write@{write}}
+\index{write@{write}!Multimedia\+Object@{Multimedia\+Object}}
+\subsubsection[{write}]{\setlength{\rightskip}{0pt plus 5cm}void mo\+::write (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}\label{classMultimediaObject_af838c533bbfc85230c8569dd16be457b}
+
+
+Used to write the object\textquotesingle{}s content, in a file for instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em os} & The output stream. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \hyperlink{classPicture_ac54200304abe61c179262f54747b6691}{Picture}, \hyperlink{classFilm_ae18fda84b1c5894c277efb8fe3f8de11}{Film}, and \hyperlink{classVideo_ae71c8af72630d7d145bd948121aac01b}{Video}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Multimedia\+Object.\+h\item 
+Multimedia\+Object.\+cpp\end{DoxyCompactItemize}
