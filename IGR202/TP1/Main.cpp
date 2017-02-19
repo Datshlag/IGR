@@ -166,7 +166,6 @@ void loadMesh(const char * modelFilename) {
     mesh = new Mesh();
     mesh->loadOFF (modelFilename);
     bvh = new BVH(*mesh);//Build BVH tree with the mesh
-    colorResponses.resize (4*mesh->positions().size());
 }
 
 void loadLights () {
@@ -259,6 +258,7 @@ void loadVbo() {
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
             // Allocation de la mémoire vidéo
+            colorResponses.resize (4*mesh->positions().size());
             glBufferData(GL_ARRAY_BUFFER, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]), GL_STATIC_DRAW);
             glVertexAttribPointer(colorIndex, 4, GL_FLOAT, GL_FALSE, 0, NULL);
             glEnableVertexAttribArray (colorIndex) ;
@@ -526,8 +526,13 @@ void key (unsigned char keyPressed, int x, int y) {
             shininess = fmax(0, shininess-0.1);
             photoRealistProgram->setUniform1f(shininessShader, shininess);
             break;
+        case 'n':
+            drawBVH = !drawBVH;
+            break;
         case 'v':
             mesh->laplacianFilter();
+            colorResponses.resize (4*mesh->positions().size());
+            initiliazeColor();
             glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
             // Allocation de la mémoire vidéo
                 glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
@@ -554,7 +559,11 @@ void key (unsigned char keyPressed, int x, int y) {
                 glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->normals().size()*sizeof(mesh->normals()[0]), &(mesh->normals()[0]));
             break;
         case 'b' :
-            drawBVH = !drawBVH;
+            mesh->simplify(64);
+            loadVbo();
+            initiliazeColor();
+            delete bvh;
+            bvh = new BVH(*mesh);
             break;
         case 'u':
             F0 += 0.1;
@@ -568,28 +577,31 @@ void key (unsigned char keyPressed, int x, int y) {
             toggleToonShader();
             break;
         case '1':
+            if(toonShader) toggleToonShader();
             mode = 1;
             photoRealistProgram->setUniform1i(modeShader, mode);
             break;
         case '2':
+            if(toonShader) toggleToonShader();
             mode = 2;
             photoRealistProgram->setUniform1i(modeShader, mode);
             break;
         case '3':
+            if(toonShader) toggleToonShader();
             mode = 3;
             photoRealistProgram->setUniform1i(modeShader, mode);
             break;
-	    case 27:
-	        exit (0);
-	        break;
-	    case 'w':
-	        GLint mode[2];
-			glGetIntegerv (GL_POLYGON_MODE, mode);
-			glPolygonMode (GL_FRONT_AND_BACK, mode[1] ==  GL_FILL ? GL_LINE : GL_FILL);
-	        break;
-	    default:
-	        printUsage ();
-	        break;
+        case 27:
+            exit (0);
+            break;
+        case 'w':
+            GLint mode[2];
+            glGetIntegerv (GL_POLYGON_MODE, mode);
+            glPolygonMode (GL_FRONT_AND_BACK, mode[1] ==  GL_FILL ? GL_LINE : GL_FILL);
+            break;
+        default:
+            printUsage ();
+            break;
     }
 }
 

@@ -17,15 +17,13 @@
 #include <cmath>
 #include <cfloat>
 
-using namespace std;
-
 void Mesh::clear () {
     m_positions.clear ();
     m_normals.clear ();
     m_triangles.clear ();
 }
 
-void Mesh::loadOFF (const std::string & filename) {
+void Mesh::loadOFF (const string & filename) {
     clear ();
 	ifstream in (filename.c_str ());
     if (!in)
@@ -46,7 +44,7 @@ void Mesh::loadOFF (const std::string & filename) {
     in.close ();
     centerAndScaleToUnit ();
     recomputeNormals ();
-    addBottomPlane(128, 1);
+    //addBottomPlane(128, 1);
 }
 
 void Mesh::recomputeNormals () {
@@ -93,13 +91,13 @@ void Mesh::centerAndScaleToUnit () {
 
 void Mesh::addBottomPlane(unsigned int nbVertex, float width) {
 
-    float pas = 2*width/((float)nbVertex);
+    float pas = 2 * width / ((float) nbVertex);
 
     unsigned int prevVertexSize = m_positions.size();
     unsigned int prevTriangleSize = m_triangles.size();
 
-    std::cerr << "triangle size :" << prevTriangleSize << " " << prevTriangleSize + 2*(nbVertex-1)*(nbVertex-1) << std::endl;
-    std::cerr << "vertex size :" << prevVertexSize << " " << prevVertexSize + nbVertex*nbVertex <<  std::endl;
+    cout << "triangle size :" << prevTriangleSize << " " << prevTriangleSize + 2*(nbVertex-1)*(nbVertex-1) << endl;
+    cout << "vertex size :" << prevVertexSize << " " << prevVertexSize + nbVertex*nbVertex <<  endl;
 
     m_positions.resize(prevVertexSize + nbVertex*nbVertex);
     m_normals.resize(prevVertexSize + nbVertex*nbVertex);
@@ -128,8 +126,8 @@ void Mesh::addBottomPlane(unsigned int nbVertex, float width) {
 
 void Mesh::laplacianFilter(){
 
-    std::vector<std::vector<int> > neighbours (m_positions.size(), std::vector<int>());
-    std::vector<Vec3f> new_positions (m_positions.size(), Vec3f(0, 0, 0));
+    vector<vector<int> > neighbours (m_positions.size(), vector<int>());
+    vector<Vec3f> new_positions (m_positions.size(), Vec3f(0, 0, 0));
 
     for(unsigned int j = 0; j < m_triangles.size(); j++) {
 
@@ -153,7 +151,7 @@ void Mesh::laplacianFilter(){
 
         for(unsigned int i = 0; i < m_positions.size(); i++) {
     
-            std::vector<int> curr_neighbours = neighbours[i];
+            vector<int> curr_neighbours = neighbours[i];
             Vec3f neighbors_bar;
     
             for(unsigned int l = 0; l < curr_neighbours.size(); l++) {
@@ -171,8 +169,8 @@ void Mesh::laplacianFilter(){
 
 void Mesh::geometricalLaplacian() {
 
-    std::vector<std::vector<Triangle> > neighbours (m_positions.size(), std::vector<Triangle>());
-    std::vector<Vec3f> new_positions = m_positions;
+    vector<vector<Triangle> > neighbours (m_positions.size(), vector<Triangle>());
+    vector<Vec3f> new_positions = m_positions;
 
     for(unsigned int j = 0; j < m_triangles.size(); j++) {
 
@@ -254,6 +252,7 @@ void Mesh::simplify(unsigned int resolution) {
         if(posZ > maxZ) maxZ = posZ;
     }
 
+    //Making the box a little larger
     maxX *= 1.1;
     maxY *= 1.1;
     maxZ *= 1.1;
@@ -262,8 +261,8 @@ void Mesh::simplify(unsigned int resolution) {
     minZ *= 1.1;
 
     //grille 3d
-    std::vector<std::vector<std::vector<Vec3f> > > grille_3D(resolution, std::vector<std::vector<Vec3f> >(resolution, std::vector<Vec3f> (resolution, Vec3f(0, 0, 0) ) ) );
-    std::vector<std::vector<std::vector<int> > > grille_3D_count(resolution, std::vector<std::vector<int> >(resolution, std::vector<int> (resolution, 0) ) );
+    vector<vector<vector<Vec3f> > > grille_3D(resolution, vector<vector<Vec3f> >(resolution, vector<Vec3f> (resolution, Vec3f(0, 0, 0) ) ) );
+    vector<vector<vector<int> > > grille_3D_count(resolution, vector<vector<int> >(resolution, vector<int> (resolution, 0) ) );
 
     //Calcul des représentants
     int caseX, caseY, caseZ;
@@ -274,28 +273,28 @@ void Mesh::simplify(unsigned int resolution) {
         posY = currPos[1];
         posZ = currPos[2];
 
-        caseX = floor((posX - minX) * (resolution - 1)/(maxX - minX));
-        caseY = floor((posY - minY) * (resolution - 1)/(maxY - minY));
-        caseZ = floor((posZ - minZ) * (resolution - 1)/(maxZ - minZ));
+        caseX = floor((posX - minX) * (resolution - 1) / (maxX - minX));
+        caseY = floor((posY - minY) * (resolution - 1) / (maxY - minY));
+        caseZ = floor((posZ - minZ) * (resolution - 1) / (maxZ - minZ));
 
         grille_3D[caseX][caseY][caseZ] += currPos;
         grille_3D_count[caseX][caseY][caseZ]++;
 
-        /*std::cerr << " x : " << caseX << " y : " << caseY << " z : " << caseZ << std::endl;
-        std::cerr << " nb : " << grille_3D_count[caseX][caseY][caseZ] << std::endl;*/
     }
 
-    //Nouvelles positions
-    std::vector<Vec3f> new_positions = std::vector<Vec3f>();
+    vector<Vec3f> new_positions = vector<Vec3f>();
     for(unsigned int i = 0; i < resolution; i++) {
 
         for(unsigned int j = 0; j < resolution; j++) {
 
             for(unsigned int k = 0; k < resolution; k++) {
 
-                grille_3D[i][j][k] *= 1.0f/grille_3D_count[i][j][k];
-                std::cerr << grille_3D[i][j][k] << std::endl;
-                new_positions.push_back(grille_3D[i][j][k]);
+                if(grille_3D_count[i][j][k] > 0) {
+
+                    grille_3D[i][j][k] *= 1.0f/grille_3D_count[i][j][k];
+                    new_positions.push_back(grille_3D[i][j][k]);
+                }
+                else new_positions.push_back(Vec3f(0.0, 0.0, 0.0));
             }
         }
     }
@@ -306,7 +305,7 @@ void Mesh::simplify(unsigned int resolution) {
     int caseY0, caseY1, caseY2;
     int caseZ0, caseZ1, caseZ2;
     int case0, case1, case2;
-    std::vector<Triangle> new_triangles = std::vector<Triangle>();
+    vector<Triangle> new_triangles = vector<Triangle>();
 
     for(unsigned int i = 0; i < m_triangles.size(); i++) {
 
@@ -343,17 +342,24 @@ void Mesh::simplify(unsigned int resolution) {
         case1 = resolution * resolution * caseX1 + resolution * caseY1 + caseZ1;
         case2 = resolution * resolution * caseX2 + resolution * caseY2 + caseZ2;
 
-        if(!(case0 == case1 && case1==case2)) {
+        if(case0 != case1 || case1 != case2) {
 
-            new_triangles.push_back(Triangle(case0, case1, case2));
+            new_triangles.push_back(Triangle(case0, case1, case2));     
         }
 
     }
 
-    //m_positions = new_positions;
-    //m_triangles = new_triangles;
-    //recomputeNormals();
+    m_positions = new_positions;
+    m_triangles = new_triangles;
+    recomputeNormals();
 
-    std::cerr << " vertices : " << m_positions.size()
-    << " triangles : " << new_triangles.size() << std::endl;
+    cout << " vertices : " << m_positions.size()
+    << " triangles : " << m_triangles.size() << endl;
+
+    for(unsigned int i=0; i < m_triangles.size(); i++) {
+
+        cout << m_triangles[i][0] << " "  << m_triangles[i][1] << " " << m_triangles[i][2] << endl;
+        cout << m_positions[m_triangles[i][0]] << endl << m_positions[m_triangles[i][1]] << endl << m_positions[m_triangles[i][2]] << endl << endl;
+    }
+
 }
