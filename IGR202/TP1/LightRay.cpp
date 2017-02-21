@@ -1,14 +1,14 @@
 #include "LightRay.h"
-#define EPSILON 0.0000001f
 
-int LightRay::count = 0;
+#define EPSILON 0.0000001f
 
 LightRay::LightRay(const Vec3f & origin, const Vec3f & direction): origin(origin), direction(direction) { 
 
+	//puts nan if dividing by zero, not really a problem here.
 	inv_direction = Vec3f(1.0/direction[0], 1.0/direction[1], 1.0/direction[2]);
 }
 
-
+// Using the algorithm from the lessons.
 bool LightRay::intersectsTriangle(const Vec3f & p0, const Vec3f & p1, const Vec3f & p2, float radius) const {
 
 	Vec3f e0 = p1 - p0;
@@ -33,7 +33,8 @@ bool LightRay::intersectsTriangle(const Vec3f & p0, const Vec3f & p1, const Vec3
 	float t = dot(e1, q);
 	return (t > EPSILON && t < radius);
 }
-			
+
+// Using "slabs"	method. The idea of the algorithm can be found here : https://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
 bool LightRay::intersectsBox(const Bbox &bbox, float radius) const {
 
 	Vec3f minCorner = bbox.minCorner;
@@ -46,13 +47,14 @@ bool LightRay::intersectsBox(const Bbox &bbox, float radius) const {
     float tz1 = (minCorner[2] - origin[2]) * inv_direction[2]; 
     float tz2 = (maxCorner[2] - origin[2]) * inv_direction[2]; 
 
-    float tmin = std::max(std::max(std::min(tx1, tx2), std::min(ty1, ty2)), std::min(tz1, tz2));
-    float tmax = std::min(std::min(std::max(tx1, tx2), std::max(ty1, ty2)), std::max(tz1, tz2));
+    float tmin = max(max(min(tx1, tx2), min(ty1, ty2)), min(tz1, tz2));
+    float tmax = min(min(max(tx1, tx2), max(ty1, ty2)), max(tz1, tz2));
 
     if ((tmax > 0 && tmax > tmin && tmin < radius)) return true;
     else return false;
 }
 
+// Recursively testing if the ray intersects one of the sons of the current node. If all we have is a leaf, we call the method below.
 bool LightRay::intersectsBVH(const BVH *bvh, float radius) const{
 
 	Bbox bbox = bvh->getBbox();
@@ -71,10 +73,11 @@ bool LightRay::intersectsBVH(const BVH *bvh, float radius) const{
 	return false;
 }
 
-bool LightRay::intersectsContent(const std::vector<int> &indexes, const Mesh &mesh, float radius) const {
+// Called when bvh is just a leaf. We test the intersection with the triangles of the leaf.
+bool LightRay::intersectsContent(const vector<int> &indexes, const Mesh &mesh, float radius) const {
 
-	const std::vector<Triangle>& triangles = mesh.triangles();
-	const std::vector<Vec3f>& positions = mesh.positions();
+	const vector<Triangle>& triangles = mesh.triangles();
+	const vector<Vec3f>& positions = mesh.positions();
     Triangle currTri;
     bool intersects = false;
 

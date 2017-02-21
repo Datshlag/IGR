@@ -1,12 +1,8 @@
 #version 130
 
-// ----------------------------------------------
-// Informatique Graphique 3D & Réalité Virtuelle.
-// Travaux Pratiques
-// Shaders
-// Copyright (C) 2015 Tamy Boubekeur
-// All rights reserved.
-// ----------------------------------------------
+// -------------------- //
+// Simple vertex shader //
+// -------------------- //
 
 in vec3 VertexPosition;
 in vec3 VertexNormal;

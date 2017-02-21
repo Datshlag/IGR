@@ -1,12 +1,8 @@
 #version 130
 
-// ----------------------------------------------
-// Informatique Graphique 3D & Réalité Virtuelle.
-// Travaux Pratiques
-// Shaders
-// Copyright (C) 2015 Tamy Boubekeur
-// All rights reserved.
-// ----------------------------------------------
+// ----------------------------------------------------------- //
+// Simple fragment shader used to display the lines of the BVH //
+// ----------------------------------------------------------- //
 
 out vec4 colorOut;
 

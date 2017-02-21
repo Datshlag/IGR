@@ -3,47 +3,40 @@
 #include "Vec3.h"
 #include "Bbox.h"
 #include "Mesh.h"
+
 #include <iostream>
+#include <cfloat>
+
+using namespace std;
 
 class BVH {
 
 	private :
-		Bbox bbox;
-		BVH* leftChild;
-		BVH* rightChild;
-
-		const Mesh& mesh;
-
-		std::vector<int> indexes;
-
-		static unsigned int max_density;
-		static unsigned int nb_node;
-		static unsigned int nb_leaves;
-
-		void split (const std::vector<int> &subIndexes1,
-				  	const std::vector<int> &subIndexes2,
-				  	const Bbox &subBbox1,
-				  	const Bbox &subBbox2) const;
+		Bbox bbox; //Bounding box
+		BVH* leftChild; //left child
+		BVH* rightChild; //right child
+		const Mesh& mesh; //reference to the mesh for all the computing part
+		vector<int> indexes; //null if not a leaf, else contains the indexes in mesh.triangles() of the triangles in the bounding box.
+		static unsigned int max_density; //We choose to create a leaf as soon as there is less than max_density triangles in the bounding volume
 
 	public:
 		~BVH();
 		BVH(const Mesh &_mesh);
-		BVH(const Mesh &_mesh, const std::vector<int> &_indexes, const Bbox &_bbox);
-
-		void split (std::vector<int> &subIndexes1, 
-            std::vector<int> &subIndexes2,
-            Bbox &subBbox1,
-            Bbox &subBbox2) const;
-
-		std::vector<float> getPosBuffer();
-		void computePosBuffer (std::vector<float> &linePos, unsigned int depth);
+		BVH(const Mesh &_mesh, const vector<int> &_indexes, const Bbox &_bbox);
 
 		const BVH* getLeftChild() const { return leftChild; }
 		const BVH* getRightChild() const { return rightChild; }
 		const Bbox getBbox() const { return bbox; }
-		const std::vector<int> &getIndexes() const { return indexes; }
+		const vector<int> &getIndexes() const { return indexes; }
 		const Mesh &getMesh() const { return mesh; }
+		vector<float> getLinesPositions();
 
-		int getNbNodes() const { return nb_node; }
-		int getNbLeaves() const { return nb_leaves; }
+		//Used to split the current bvh and create its sons.
+		void split (vector<int> &subIndexes1, 
+            vector<int> &subIndexes2,
+            Bbox &subBbox1,
+            Bbox &subBbox2) const;
+
+		//Used to compute the positions of the lines used to display the bounding volumes
+		void computeLinesPositions (vector<float> &linePos, unsigned int depth);
 };

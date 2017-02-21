@@ -45,7 +45,7 @@ class Mesh {
         void centerAndScaleToUnit ();
 
         /// Apply laplacian filter to mesh
-        void laplacianFilter();
+        void topologicaLaplacianFilter();
 
         /// Apply topological laplacian filter
         void geometricalLaplacian();
@@ -53,7 +53,7 @@ class Mesh {
         /// simplify mesh with OCS
         void simplify(unsigned int resolution);
 
-        /// Add a bottom plane consisting of 2 * nbVertex^2 triangles
+        /// Add a bottom plane consisting of 2 * nbVertex * nbVertex triangles
         void addBottomPlane(unsigned int nbVertex, float width);
 
     private:

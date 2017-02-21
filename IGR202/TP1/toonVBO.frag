@@ -2,13 +2,9 @@
 
 #define M_PI 3.1415926535897932384626433832795
 
-// ----------------------------------------------
-// Informatique Graphique 3D & Réalité Virtuelle.
-// Travaux Pratiques
-// Shaders
-// Copyright (C) 2015 Tamy Boubekeur
-// All rights reserved.
-// ----------------------------------------------
+// ------------------------------------------- //
+// Fragment shader used for the "toon" shading //
+// ------------------------------------------- //
 
 uniform vec3 lightPos;
 const vec3 lightColor = vec3 (1.0, 1.0, 1.0);
@@ -37,19 +33,23 @@ void main (void) {
     vec3 omegaH = normalize(omega0 + omegaI);
 
     float d = distance(p,l);
-    float invAttenuation = 20.0/(1.0+d+d*d);
+    float invAttenuation = 100.0/(1.0+d+d*d);
 
     //Shadow informations
     if(C.w <= 0.0) invAttenuation *= -0.1 * C.w;
     else if(C.w > 0.0) invAttenuation *= C.w * C.w;
 
     float nDotOmegaI = max(0.0, dot(omegaI, n));
+
+    //If the fragment is visible
     if(nDotOmegaI > 0) {
         diffuse = matAlbedo;
 
+        //If angle with normal is too low, fragment is black
         float nDotOmega0 = max(0.0, dot(n, omega0));
         if(nDotOmega0 < 0.25) diffuse = vec3(0.0, 0.0, 0.0);
 
+        //If specular component is really important, fragment is white
         float nDotOmegaH = max(0.0, dot(omegaH, n));
         if(nDotOmegaH > 0.9999) spec = vec3(1.0, 1.0, 1.0);
     }

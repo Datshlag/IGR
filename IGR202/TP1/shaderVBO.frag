@@ -2,13 +2,9 @@
 
 #define M_PI 3.1415926535897932384626433832795
 
-// ----------------------------------------------
-// Informatique Graphique 3D & Réalité Virtuelle.
-// Travaux Pratiques
-// Shaders
-// Copyright (C) 2015 Tamy Boubekeur
-// All rights reserved.
-// ----------------------------------------------
+// -------------------------------------------------------------- //
+// Fragment shader that can render the scene using different BRDF //
+// -------------------------------------------------------------- //
 
 uniform vec3 lightPos;
 const vec3 lightColor = vec3 (1.0, 1.0, 1.0);
@@ -41,18 +37,22 @@ void main (void) {
     vec3 l = vec3(gl_ModelViewMatrix * vec4(lightPos, 1.0));
     vec3 n = normalize (gl_NormalMatrix * N);
 
+    //Computing omega vectors
     vec3 omegaI = normalize (l - p);
     vec3 omega0 = normalize (-p);
     vec3 omegaH = normalize(omega0 + omegaI);
 
     float d = distance(p,l);
-    float attenuation = 50.0/(1.0+d+d*d);
+    float attenuation = 100.0/(1.0+d+d*d);
 
+    //Choosing the BRDF
     if (mode == 1) blinnPhong(omegaI, omega0, omegaH, n);
     else if (mode == 2) cookTorrance(omegaI, omega0, omegaH, n);
     else if (mode == 3) GGX(omegaI, omega0, omegaH, n);
 
-    if(C.w <= 0.0) attenuation *= 0.0001 * C.w;
+
+    //Using AO and shadows
+    if(C.w <= 0.0) attenuation *= 0.001 * C.w;
     else if(C.w > 0.0) attenuation *=  C.w;
 
     vec4 color = vec4(attenuation * (spec + diffuse), 1.0);

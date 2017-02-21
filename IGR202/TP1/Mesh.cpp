@@ -44,6 +44,7 @@ void Mesh::loadOFF (const string & filename) {
     in.close ();
     centerAndScaleToUnit ();
     recomputeNormals ();
+    //Uncomment to add bottom plane
     //addBottomPlane(128, 1);
 }
 
@@ -64,7 +65,7 @@ void Mesh::recomputeNormals () {
         c = asin(cross(e02, e12).length());
 
         n.normalize ();
-        //On pondère avec l'angle de l'arête incidente
+        //Here we weigth the vertex with angle of the incidental vertex.
         m_normals[m_triangles[i][0]] += n * a;
         m_normals[m_triangles[i][1]] += n * b;
         m_normals[m_triangles[i][2]] += n * c;
@@ -89,6 +90,7 @@ void Mesh::centerAndScaleToUnit () {
         m_positions[i] = (m_positions[i] - c) / maxD;
 }
 
+//Used to add a bottom plan to the mesh to test the shadows for instance.
 void Mesh::addBottomPlane(unsigned int nbVertex, float width) {
 
     float pas = 2 * width / ((float) nbVertex);
@@ -124,11 +126,15 @@ void Mesh::addBottomPlane(unsigned int nbVertex, float width) {
     }
 }
 
-void Mesh::laplacianFilter(){
+//Topological Laplacian filter as seen in the lessons.
+void Mesh::topologicaLaplacianFilter(){
 
+    //We start by computing all the neighbours of each vertex.
     vector<vector<int> > neighbours (m_positions.size(), vector<int>());
     vector<Vec3f> new_positions (m_positions.size(), Vec3f(0, 0, 0));
 
+    //Notice that in fact all nieghbours are present twice in the lists, which doesn't really matter here since
+    //they all have the same weigth in the following computings.
     for(unsigned int j = 0; j < m_triangles.size(); j++) {
 
         auto curr_tri = m_triangles.at(j);
@@ -147,28 +153,32 @@ void Mesh::laplacianFilter(){
         neighbours[v2].push_back(v1);
     }
 
-    for(unsigned int k = 10; k--;) {
+    //Here we actually compute the barycenter of the neighbours for each vertex and then store it
+    //in the new_positions vector.
+    for(unsigned int i = 0; i < m_positions.size(); i++) {
 
-        for(unsigned int i = 0; i < m_positions.size(); i++) {
-    
-            vector<int> curr_neighbours = neighbours[i];
-            Vec3f neighbors_bar;
-    
-            for(unsigned int l = 0; l < curr_neighbours.size(); l++) {
-    
-                neighbors_bar += m_positions.at(curr_neighbours[l]);
-            }
-            neighbors_bar *= 1.0f/curr_neighbours.size();
-            new_positions[i] = neighbors_bar;
+        vector<int> curr_neighbours = neighbours[i];
+        Vec3f neighbors_bar;
+
+        for(unsigned int l = 0; l < curr_neighbours.size(); l++) {
+
+            neighbors_bar += m_positions.at(curr_neighbours[l]);
         }
+        neighbors_bar *= 1.0f/curr_neighbours.size();
+        new_positions[i] = neighbors_bar;
     }
 
+
+    //switching old positions with the new ones and recomputing normals.
     m_positions = new_positions;
     recomputeNormals();
 }
 
+//Geometrical Laplacian filter as seen in the lessons.
 void Mesh::geometricalLaplacian() {
 
+    //We start by computing the neighbours. Here we can't allow any duplicates so
+    //we use a different technique : instead of adding vertices as neighbours, we directly add triangles
     vector<vector<Triangle> > neighbours (m_positions.size(), vector<Triangle>());
     vector<Vec3f> new_positions = m_positions;
 
@@ -185,12 +195,14 @@ void Mesh::geometricalLaplacian() {
         neighbours[v2].push_back(curr_tri);
     }
 
+    //Computing the geometrical Laplacian coefficients
     for(unsigned int i = 0; i < m_positions.size(); i++) {
 
         auto curr_neighbours = neighbours[i];
         Vec3f curr_pos = m_positions[i];
 
         Vec3f laplacian = Vec3f(0, 0, 0);
+        //V is a normalization factor
         float v = 0.0;
 
         for(unsigned int j = 0; j < curr_neighbours.size(); j++) {
@@ -206,10 +218,7 @@ void Mesh::geometricalLaplacian() {
             Vec3f e02 = normalize(m_positions[curr_tri[(pos + 2)%3]] - m_positions[curr_tri[pos]]);
             Vec3f e12 = normalize(m_positions[curr_tri[(pos + 2)%3]] - m_positions[curr_tri[(pos + 1)%3]]);
 
-            Vec3f e0 = normalize(m_positions[curr_tri[pos]]);
-            Vec3f e1 = normalize(m_positions[curr_tri[(pos + 1)%3]]);
-            Vec3f e2 = normalize(m_positions[curr_tri[(pos + 2)%3]]);
-
+            //Computing the cotan values (cos/sin)
             float alpha01 =  dot(-e01, e12) / cross(e01, e12).length() ;
             float alpha02 =  dot(-e02, -e12) / cross(e02, e12).length() ;
 
@@ -226,6 +235,7 @@ void Mesh::geometricalLaplacian() {
     recomputeNormals();
 }
 
+//Simplifying the mesh with OCS algorithm.
 void Mesh::simplify(unsigned int resolution) {
 
     float minX, minY, minZ;
@@ -236,7 +246,7 @@ void Mesh::simplify(unsigned int resolution) {
     float posX, posY, posZ;
     Vec3f currPos;
 
-    //Calcul d'un cube englobant
+    //Computing bounding box
     for(unsigned int i = 0; i < m_positions.size(); i++) {
 
         currPos = m_positions.at(i);
@@ -260,7 +270,7 @@ void Mesh::simplify(unsigned int resolution) {
     minY *= 1.1;
     minZ *= 1.1;
 
-    //grille 3d
+    //3D grid
     vector<vector<vector<Vec3f> > > grille_3D(resolution, vector<vector<Vec3f> >(resolution, vector<Vec3f> (resolution, Vec3f(0, 0, 0) ) ) );
     vector<vector<vector<int> > > grille_3D_count(resolution, vector<vector<int> >(resolution, vector<int> (resolution, 0) ) );
 
@@ -299,7 +309,7 @@ void Mesh::simplify(unsigned int resolution) {
         }
     }
 
-    //Nouveaux triangles
+    //New triangles
     Triangle currTriangle;
     int caseX0, caseX1, caseX2;
     int caseY0, caseY1, caseY2;
@@ -352,14 +362,4 @@ void Mesh::simplify(unsigned int resolution) {
     m_positions = new_positions;
     m_triangles = new_triangles;
     recomputeNormals();
-
-    cout << " vertices : " << m_positions.size()
-    << " triangles : " << m_triangles.size() << endl;
-
-    for(unsigned int i=0; i < m_triangles.size(); i++) {
-
-        cout << m_triangles[i][0] << " "  << m_triangles[i][1] << " " << m_triangles[i][2] << endl;
-        cout << m_positions[m_triangles[i][0]] << endl << m_positions[m_triangles[i][1]] << endl << m_positions[m_triangles[i][2]] << endl << endl;
-    }
-
 }

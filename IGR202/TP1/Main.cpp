@@ -42,6 +42,7 @@ using namespace std;
 static const unsigned int DEFAULT_SCREENWIDTH = 1024;
 static const unsigned int DEFAULT_SCREENHEIGHT = 768;
 static const string DEFAULT_MESH_FILE ("models/max_50K.off");
+string modelFileName;
 
 static const string appTitle ("Informatique Graphique & Realite Virtuelle - Travaux Pratiques - Algorithmes de Rendu");
 static const string myName ("Aloïs Pourchot");
@@ -53,7 +54,7 @@ static bool drawBVH = false;
 
 static Camera camera;
 static Mesh* mesh;
-static std::vector<LightSource> lightSources;
+static vector<LightSource> lightSources;
 static BVH* bvh;
 
 static int mode = 1;
@@ -88,68 +89,83 @@ GLProgram * lineProgram;
 
 void glInit();
 void loadLights();
-void loadMesh(const char*);
+void loadMesh(string);
 void loadVbo();
 void loadGLPrograms();
 void renderVbo();
 void initiliazeColor();
 
-static std::vector<float> colorResponses;
-std::vector<float> linePos;
+static vector<float> colorResponses;
+vector<float> linePos;
 
+//Printing how to use the program
 void printUsage () {
-	std::cerr << std::endl
-		 << appTitle << std::endl
-         << "Author: " << myName << std::endl << std::endl
-         << "Usage: ./main [<file.off>]" << std::endl
-         << "Commands:" << std::endl
-         << "------------------" << std::endl
-         << " ?: Print help" << std::endl
-		 << " w: Toggle wireframe mode" << std::endl
-         << " <drag>+<left button>: rotate model" << std::endl
-         << " <drag>+<right button>: move model" << std::endl
-         << " <drag>+<middle button>: zoom" << std::endl
-         << " z, s, q, d, a, e: move light" << std::endl
-         << " t, g: increase, decrease shinisess" << std::endl
-         << " y, h: increase, decrease alpha" << std::endl
-         << " u, j: increase, decrease F0" << std::endl
-         << " 1: Lambert + Blinn-Phong" << std::endl
-         << " 2: Cook-Torrance" << std::endl
-         << " 3: GGX" << std::endl
-         << " q, <esc>: Quit" << std::endl << std::endl;
+	cerr << endl
+		 << appTitle << endl
+         << "Author: " << myName << endl << endl
+         << "Usage: ./main [<file.off>]" << endl
+         << "Commands:" << endl
+         << "------------------" << endl
+         << " ?: Print help" << endl
+		 << " w: Toggle wireframe mode" << endl
+         << " <drag> + <left button>: Rotate model" << endl
+         << " <drag> + <right button>: Move model" << endl
+         << " <drag> + <middle button>: Zoom" << endl
+         << " z, s, q, d, a, e: Move light" << endl
+         << "------------------" << endl
+         << " t: Compute shadows" << endl
+         << " g: Compute AO" << endl
+         << " n: Show BVH" << endl
+         << " r: Reload colors" << endl
+         << "------------------" << endl
+         << " y, h: Increase, decrease shinisess" << endl
+         << " u, j: Increase, decrease alpha" << endl
+         << " i, k: Increase, decrease F0" << endl
+         << " 0: NPR" << endl
+         << " 1: Lambert + Blinn-Phong" << endl
+         << " 2: Cook-Torrance" << endl
+         << " 3: GGX" << endl
+         << "------------------" << endl
+         << " c: Topological laplacian filter" << endl
+         << " v: Geometrical laplacian filter" << endl
+         << " b: OCS mesh simplifying algorithm" << endl
+         << " x: Reload mesh" << endl
+         << "------------------" << endl
+         << " <esc>: Quit" << endl;
 }
 
-//TRUC DE XAVIER, FAIRE SEMBLANT ET CHANGER LE NOM
+//Simple advance bar to show the user the progression of the computings
 void advanceBar(float percent)
 {
     int nbBar = int(percent/5);
     if(percent < 100)
-        std::cout << std::setfill('0') << std::setw(2) << int(percent) << " % |";
+        cout << setfill('0') << setw(2) << int(percent) << " % |";
     else
-        std::cout << "Done |";
+        cout << "Done |";
     for(int i = 0; i < nbBar; ++i)
-        std::cout << "█";
+        cout << "█";
     for(int i = nbBar; i < 20; ++i)
-        std::cout << " ";
-    std::cout << "|\r";
-    std::cout.flush();
+        cout << " ";
+    cout << "|\r";
+    cout.flush();
 }
 
-void init (const char * modelFilename) {
+//Initiliazing stuff
+void init (string _modelFileName) {
     
     glInit();
-    loadMesh(modelFilename);
+    loadMesh(_modelFileName);
     loadLights();
     loadGLPrograms();
     loadVbo();
     initiliazeColor();
 }
 
+//Initiliazing glew
 void glInit() {
 
     glewExperimental = GL_TRUE;
     glewInit (); // init glew, which takes in charges the modern OpenGL calls (v>1.2, shaders, etc)
-
     glCullFace (GL_BACK);     // Specifies the faces to cull (here the ones pointing away from the camera)
     glEnable (GL_CULL_FACE); // Enables face culling (based on the orientation defined by the CW/CCW enumeration).
     glDepthFunc (GL_LESS); // Specify the depth test for the z-buffer
@@ -161,20 +177,23 @@ void glInit() {
     camera.resize (DEFAULT_SCREENWIDTH, DEFAULT_SCREENHEIGHT);
 }
 
-void loadMesh(const char * modelFilename) { 
+//Loading the mesh and the BVH
+void loadMesh(string _modelFileName) { 
 
+    modelFileName = _modelFileName;
     mesh = new Mesh();
-    mesh->loadOFF (modelFilename);
+    mesh->loadOFF (modelFileName);
+    if(bvh) delete bvh;
     bvh = new BVH(*mesh);//Build BVH tree with the mesh
 }
 
+//Loading the light
 void loadLights () {
-
-    //Add light sources here (PS: pls don't)
-    lightSources = std::vector<LightSource>();
-    lightSources.push_back(LightSource(Vec3<float>(4,4,1),Vec3<float>(5.0,0.0,0.0)));
+    
+    lightSources.push_back(LightSource(Vec3<float>(10.0,0.0,0.0),Vec3<float>(1.0,0.0,1.0)));
 }
 
+//Creating the glPrograms and linking parameters between those programs and this one.
 void loadGLPrograms() {
     try {
         photoRealistProgram = GLProgram::genVFProgram ("Simple GL Program", "shaderVBO.vert", "shaderVBO.frag");
@@ -213,6 +232,7 @@ void loadGLPrograms() {
     }
 }
 
+//Creating vao and vbo and sending data to the gpu
 void loadVbo() {
  
     positionIndex = 0;
@@ -229,52 +249,52 @@ void loadVbo() {
 
     //LOADING VAO AND VBO FOR LINE SHADER
     glBindVertexArray(lineVao);
-        //Buffer d'indices
+        //Index buffer
         glBindBuffer(GL_ARRAY_BUFFER, lineVbo);
-            linePos = bvh->getPosBuffer();
+            linePos = bvh->getLinesPositions();
             sizeLinePos = linePos.size();
             glBufferData(GL_ARRAY_BUFFER, sizeLinePos * sizeof(GL_FLOAT), &linePos[0], GL_STATIC_DRAW);
             glVertexAttribPointer(lineIndex, 3, GL_FLOAT, GL_FALSE, 0, NULL);
             glEnableVertexAttribArray(lineIndex);
 
     //LOADING VAO AND VBO FOR PHOTOREALISTIC AND CARTOON SHADERS
-    glBindVertexArray(vao); // Verrouillage du VAO
-        // Buffer d'indices
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); // Verrouillage du IBO
-            // Allocation de la mémoire vidéo
+    glBindVertexArray(vao); //Locking VAO
+        //Index buffer
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo); //Locking IBO
+            //Video memory allocation
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->triangles().size()*sizeof(Triangle), &(mesh->triangles())[0], GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
-            // Allocation de la mémoire vidéo
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); //Locking VBO
+             //Video memory allocation
             glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
             glVertexAttribPointer(positionIndex, 3, GL_FLOAT, GL_FALSE, 0, NULL);
             glEnableVertexAttribArray (positionIndex);
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Verrouillage du VBO
-            // Allocation de la mémoire vidéo
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); //Locking VBO
+            //Video memory allocation
             glBufferData(GL_ARRAY_BUFFER, mesh->normals().size()*sizeof(mesh->normals()[0]), &(mesh->normals()[0]), GL_STATIC_DRAW);
             glVertexAttribPointer(normalIndex, 3, GL_FLOAT, GL_FALSE, 0, NULL);
             glEnableVertexAttribArray (normalIndex) ;
 
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
-            // Allocation de la mémoire vidéo
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); //Locking VBO
+             //Video memory allocation
             colorResponses.resize (4*mesh->positions().size());
             glBufferData(GL_ARRAY_BUFFER, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]), GL_STATIC_DRAW);
             glVertexAttribPointer(colorIndex, 4, GL_FLOAT, GL_FALSE, 0, NULL);
             glEnableVertexAttribArray (colorIndex) ;
 }
 
-
+//Initializing the colors sent to the gpu using the material albedo
 void initiliazeColor() {
 
     unsigned int l = 0;
 
-    std::vector<Vec3f> positions = mesh->positions();
-    std::vector<Triangle> triangles = mesh->triangles();
+    vector<Vec3f> positions = mesh->positions();
+    vector<Triangle> triangles = mesh->triangles();
 
     unsigned int nbVertex = positions.size();
 
-    // On met tous les vertex à la même valeur d'Albedo
+    //All vertices receive the albedo value
     while(l < 4*nbVertex)
     {
 
@@ -284,11 +304,12 @@ void initiliazeColor() {
         colorResponses[l++] = 1.0;
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
-        // Remplacement du contenu en VRAM
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); //Locking VBO
+        //Video memory allocation
         glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
 }
 
+//Called to toggle the use of the toonshader
 void toggleToonShader() {
 
     if(!toonShader){
@@ -317,6 +338,7 @@ void toggleToonShader() {
     }
 }
 
+//Called to compute the shadows
 void computePerVertexShadow () {
 
     LightRay ray;
@@ -330,35 +352,39 @@ void computePerVertexShadow () {
     unsigned int l = 0;
     for(unsigned int i = 0; i < nbVertex; i++) {
 
-        // On donne au vertex ses valeurs d'Albedo
+        //Vertex receives albedo value
         colorResponses[l++] = matAlbedo[0];
         colorResponses[l++] = matAlbedo[1];
         colorResponses[l++] = matAlbedo[2];
 
-        // Rayon partant du vertex en direction de la source de lumière
+        //Ray emerging from the vertex in direction of the lightsource
         ray = LightRay(positions.at(i), normalize(lightPos-positions.at(i)));
         intersects = ray.intersectsBVH(bvh, FLT_MAX);
 
-        // On change le signe de la 4ème coordonnée en fonction de s'il y a eu intersection
+        //If intersection occurs we change the sign
         if(intersects) colorResponses[l++] = -1.0;
         else colorResponses[l++] = 1.0;
+
+        advanceBar(float(i)/nbVertex*100);
     }
+    advanceBar(100);
 
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
-        // Remplacement du contenu en VRAM
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); //Locking VBO
+        //Video memory allocation
         glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
 }
 
+//Computing the AO coefficients. For better visibility, toggle toon mode with '0'.
 void computePerVertexAO (unsigned int numOfSamples, float radius) {
 
-    std::random_device rd;
-    std::default_random_engine generator(rd());
-    std::uniform_real_distribution<float> range(-1.f,1.f);
+    random_device rd;
+    default_random_engine generator(rd());
+    uniform_real_distribution<float> range(-1.f,1.f);
 
-    std::vector<Vec3f> positions = mesh->positions();
-    std::vector<Vec3f> normals = mesh->normals();
-    std::vector<Triangle> triangles = mesh->triangles();
+    vector<Vec3f> positions = mesh->positions();
+    vector<Vec3f> normals = mesh->normals();
+    vector<Triangle> triangles = mesh->triangles();
 
     unsigned int nbVertex = positions.size();
 
@@ -379,6 +405,7 @@ void computePerVertexAO (unsigned int numOfSamples, float radius) {
 
         for(int i = numOfSamples; i--;) {
 
+            //Creating the random ray
             n.getTwoOrthogonals(u, v);
             float n1 = range(generator);
             float n2 = range(generator);
@@ -387,6 +414,7 @@ void computePerVertexAO (unsigned int numOfSamples, float radius) {
             direction.normalize();
             lightRay = LightRay(currPos, direction);
 
+            //If no intersection we receive more light from this direction
             if(!lightRay.intersectsBVH(bvh, radius)) sum += dot(n, direction);
         }
 
@@ -396,12 +424,12 @@ void computePerVertexAO (unsigned int numOfSamples, float radius) {
     }
     advanceBar(100);
 
-    // Envoi des données au buffer sur le GPU
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); // Verrouillage du VBO
-        // Remplacement du contenu en VRAM
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]); //Locking VBO
+        //Video memory allocation
         glBufferSubData(GL_ARRAY_BUFFER, 0, colorResponses.size()*sizeof(colorResponses[0]), &(colorResponses[0]));
 }
 
+//Called to load the appropriate shaders and render the scene
 void render() {
 
     if(drawBVH) {
@@ -418,10 +446,12 @@ void render() {
         glDrawElements(GL_TRIANGLES, 3*mesh->triangles().size(), GL_UNSIGNED_INT, BUFFER_OFFSET(0));
 }
 
+//Reshaping camera
 void reshape(int w, int h) {
     camera.resize (w, h);
 }
 
+//Main graphic loop
 void display () {
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     camera.apply ();
@@ -429,13 +459,14 @@ void display () {
     render();
     for(GLenum err; (err = glGetError()) != GL_NO_ERROR;)
     {
-      cerr << err << std::endl;
+      cerr << err << endl;
     }
 
     glFlush ();
     glutSwapBuffers ();
 }
 
+//Reacting according to the user's input, please take a look at "printUsage" for more easily readable description. Very ugly.
 void key (unsigned char keyPressed, int x, int y) {
     switch (keyPressed) {
 	    case 'f':
@@ -530,7 +561,7 @@ void key (unsigned char keyPressed, int x, int y) {
             drawBVH = !drawBVH;
             break;
         case 'v':
-            mesh->laplacianFilter();
+            mesh->topologicaLaplacianFilter();
             colorResponses.resize (4*mesh->positions().size());
             initiliazeColor();
             glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
@@ -541,13 +572,9 @@ void key (unsigned char keyPressed, int x, int y) {
                 glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->normals().size()*sizeof(mesh->normals()[0]), &(mesh->normals()[0]));
             break;
         case 'x' :
-            mesh->loadOFF(DEFAULT_MESH_FILE);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Verrouillage du VBO
-            // Allocation de la mémoire vidéo
-                glBufferData(GL_ARRAY_BUFFER, mesh->positions().size()*sizeof(mesh->positions()[0]), &(mesh->positions()[0]), GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Verrouillage du VBO
-                // Remplacement du contenu en VRAM
-                glBufferSubData(GL_ARRAY_BUFFER, 0, mesh->normals().size()*sizeof(mesh->normals()[0]), &(mesh->normals()[0]));
+            loadMesh(modelFileName);
+            loadVbo();
+            initiliazeColor();
             break;
         case 'c':
             mesh->geometricalLaplacian();
@@ -562,8 +589,6 @@ void key (unsigned char keyPressed, int x, int y) {
             mesh->simplify(64);
             loadVbo();
             initiliazeColor();
-            delete bvh;
-            bvh = new BVH(*mesh);
             break;
         case 'u':
             F0 += 0.1;
@@ -605,11 +630,15 @@ void key (unsigned char keyPressed, int x, int y) {
     }
 }
 
+//Handling mouse events
 void mouse (int button, int state, int x, int y) {
+
     camera.handleMouseClickEvent (button, state, x, y);
 }
 
+//Handling mouse events
 void motion (int x, int y) {
+
     camera.handleMouseMoveEvent (x, y);
 }
 

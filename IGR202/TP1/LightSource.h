@@ -2,59 +2,59 @@
 
 #include "Vec3.h"
 
+using namespace std;
+
 void polar2Cartesian (float phi, float theta, float r, float & x, float & y, float & z) {
-  x = r * sin (theta) * cos (phi);
-  y = r * sin (theta) * sin (phi);
-  z = r * cos (theta);
+    
+    x = r * sin (theta) * cos (phi);
+    y = r * sin (theta) * sin (phi);
+    z = r * cos (theta);
 }
 
 class LightSource{
 
-  public:
-    LightSource(Vec3f pos, Vec3<float> color, float intensity=1.0): pos(pos), color(color), intensity(intensity)
-    {
+    public:
+        LightSource(Vec3f pos, Vec3<float> color, float intensity=1.0): pos(pos), color(color), intensity(intensity) { }
+        Vec3f getPos() const {
 
-    }
+            float x,y,z;
+            polar2Cartesian(pos[1], pos[2], pos[0], x, y, z);
+            return Vec3f(x,y,z);
+        }
 
-    Vec3f getPos() const {
+        void addP(float toAddP){
 
-      float x,y,z;
-      polar2Cartesian(pos[1], pos[2], pos[0], x, y, z);
-      return Vec3f(x,y,z);
-     }
+          pos[1] = fmod(pos[1] + toAddP,2*M_PI);
+        }
 
-    void addP(float toAddP){
+        void addT(float toAddT){
 
-      pos[1] = std::fmod(pos[1] + toAddP,2*M_PI);
-    }
+          pos[2] = fmod(pos[2] + toAddT,2*M_PI);
+        }
 
-    void addT(float toAddT){
+        void addR(float toAddR){
 
-      pos[2] = std::fmod(pos[2] + toAddT,2*M_PI);
-    }
+          pos[0] = fmax(0.0, pos[0] + toAddR);
+        }
 
-    void addR(float toAddR){
+        void addLum(float toAddLum){
 
-      pos[0] = fmax(0.0, pos[0] + toAddR);
-    }
+          intensity+=toAddLum;
+        }
 
-    void addLum(float toAddLum){
+        float getIntensity() const {
 
-      intensity+=toAddLum;
-    }
+          return intensity;
+        }
 
-    float getIntensity() const {
+        Vec3<float> getColor() const {
 
-      return intensity;
-    }
+          return color;
+        }
 
-    Vec3<float> getColor() const {
-
-      return color;
-    }
-
-  private:
-    Vec3<float> pos;
-    Vec3<float> color;
-    double intensity;
+    private:
+        Vec3<float> pos;
+        Vec3<float> color;
+        double intensity;
 };
+

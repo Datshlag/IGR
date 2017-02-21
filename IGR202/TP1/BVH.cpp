@@ -1,17 +1,21 @@
 #include "BVH.h"
-#include <cfloat>
 
 unsigned int BVH::max_density = 20;
-unsigned int BVH::nb_node = 0;
-unsigned int BVH::nb_leaves = 0;
 
+BVH::~BVH() {
+
+    delete leftChild;
+    delete rightChild;
+}
+
+//We recursively build the bvh by splitting the current bvh into two new bvh. This constructor is used for the first call only.
 BVH::BVH(const Mesh &_mesh): mesh(_mesh) {
 
-    nb_node++;
-    const std::vector<Vec3f>& positions = mesh.positions();
+    //Very important to use a reference here, otherwise we would copy all the data !
+    const vector<Vec3f>& positions = mesh.positions();
 
     //All triangles belong to first BHV
-    std::vector<int> v(mesh.triangles().size());
+    vector<int> v(mesh.triangles().size());
     for(unsigned int i = 0; i < v.size(); i++) {
 
         v[i]=i;
@@ -49,26 +53,31 @@ BVH::BVH(const Mesh &_mesh): mesh(_mesh) {
 
     bbox = Bbox(Vec3f(minX, minY, minZ), Vec3f(maxX, maxY, maxZ), meanPos);
 
-    std::vector<int> subIndexes1 (0);
-    std::vector<int> subIndexes2 (0);
+    vector<int> subIndexes1 (0);
+    vector<int> subIndexes2 (0);
 
     Bbox subBbox1;
     Bbox subBbox2;
 
+    //Splitting the indexes in two
     split(subIndexes1, subIndexes2, subBbox1, subBbox2);
 
+    //Creating the two childs.
     leftChild = new BVH(_mesh, subIndexes1, subBbox1);
     rightChild = new BVH(_mesh, subIndexes2, subBbox2);
 
-    indexes = std::vector<int> ();
+    //Emptying the indexes since we won't need them here.
+    indexes = vector<int> ();
 }
-    
-BVH::BVH(const Mesh &_mesh, const std::vector<int> &_indexes, const Bbox &_bbox): mesh(_mesh), indexes(_indexes), bbox(_bbox), leftChild(NULL), rightChild(NULL) {
+
+//We recursively build the bvh by splitting the current bvh into two new bvh. This constructor is used for every call after the first one.
+//Because we add as a parameter the indexes of the triangle in the father.
+BVH::BVH(const Mesh &_mesh, const vector<int> &_indexes, const Bbox &_bbox): mesh(_mesh), indexes(_indexes), bbox(_bbox), leftChild(NULL), rightChild(NULL) {
 
     if (indexes.size() > max_density) {
 
-        std::vector<int> subIndexes1 (0);
-        std::vector<int> subIndexes2 (0);
+        vector<int> subIndexes1 (0);
+        vector<int> subIndexes2 (0);
         Bbox subBbox1;
         Bbox subBbox2;
 
@@ -77,18 +86,13 @@ BVH::BVH(const Mesh &_mesh, const std::vector<int> &_indexes, const Bbox &_bbox)
         leftChild = new BVH(_mesh, subIndexes1, subBbox1);
         rightChild = new BVH(_mesh, subIndexes2, subBbox2);
 
-        indexes = std::vector<int> ();
+        indexes = vector<int> ();
     }
 }
 
-BVH::~BVH() {
-
-    delete leftChild;
-    delete rightChild;
-}
-
-void BVH::split (std::vector<int> &subIndexes1, 
-            std::vector<int> &subIndexes2,
+//This method is used to split the current set of indexes into two distinct sets.
+void BVH::split (vector<int> &subIndexes1, 
+            vector<int> &subIndexes2,
             Bbox &subBbox1,
             Bbox &subBbox2) const {
 
@@ -103,7 +107,8 @@ void BVH::split (std::vector<int> &subIndexes1,
     else if (yDim >= zDim) split = 1;
     else split = 2;
 
-    //We then divide the set of triangles between the two subsets. In the meantime we compute the new mean position, and the bbox of the subsets
+    //We then divide the set of triangles between the two subsets. 
+    //In the meantime we compute the new mean positions, and the bounding volumes of the children.
     float minX1, minY1, minZ1;
     minX1 = minY1 = minZ1 = FLT_MAX;
     float maxX1, maxY1, maxZ1;
@@ -117,8 +122,9 @@ void BVH::split (std::vector<int> &subIndexes1,
     Vec3f meanPos1, meanPos2;
     meanPos1 = meanPos2 = Vec3f(0, 0, 0);
 
-    const std::vector<Triangle> &triangles = mesh.triangles();
-    const std::vector<Vec3f> &positions = mesh.positions();
+    //Using references to prevent any expensive copy.
+    const vector<Triangle> &triangles = mesh.triangles();
+    const vector<Vec3f> &positions = mesh.positions();
 
     Triangle currTri;
     Vec3f V0, V1, V2, bar;
@@ -230,17 +236,19 @@ void BVH::split (std::vector<int> &subIndexes1,
     subBbox2 = Bbox(Vec3f(minX2, minY2, minZ2), Vec3f(maxX2, maxY2, maxZ2), meanPos2);
 }
 
-std::vector<float> BVH::getPosBuffer() {
+//Called to get the positions of the lines of the different bounding volumes.
+vector<float> BVH::getLinesPositions() {
 
-    std::vector<float> linePos = std::vector<float> ();
-    computePosBuffer(linePos, 20);
+    vector<float> linePos = vector<float> ();
+    //We use a default depth of 10.
+    computeLinesPositions(linePos, 10);
     return linePos;
 }
 
-void BVH::computePosBuffer (std::vector<float> &linePos, unsigned int depth) {
+//Called recursively to compute the lines of the bounding boxes of the hierarchy.
+void BVH::computeLinesPositions (vector<float> &linePos, unsigned int depth) {
 
-    if(depth == 0)
-        return;
+    if(depth == 0) return;
     // 4 segments for x coord
     // First
 
@@ -362,6 +370,6 @@ void BVH::computePosBuffer (std::vector<float> &linePos, unsigned int depth) {
 
 
     // Call recursively for the children
-    if(leftChild) leftChild->computePosBuffer(linePos, depth-1);
-    if(rightChild) rightChild->computePosBuffer(linePos, depth-1);
+    if(leftChild) leftChild->computeLinesPositions(linePos, depth - 1);
+    if(rightChild) rightChild->computeLinesPositions(linePos, depth - 1);
 }
