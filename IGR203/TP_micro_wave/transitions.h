@@ -1,0 +1,4 @@
+#ifndef TRANSITIONS_H
+#define TRANSITIONS_H
+
+#endif // TRANSITIONS_H
