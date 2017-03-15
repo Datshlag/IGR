@@ -51,16 +51,6 @@ int main() {
 			dist[names[name2]][names[name1]] = 1;
 		}
 
-		/*for(int i = 0; i < P; i++) {
-
-			for(int j = 0; j < P; j++) {
-
-				//if(dist[i][j] > maxD) maxD = dist[i][j];
-				cout << "i: " << i << " j: " << j  << " " << dist[i][j] << endl;
-			}
-		}*/
-
-		cout << endl;
 		//floydwarshall
 		for(int k = 0; k < P; k++) {
 			
@@ -89,7 +79,7 @@ int main() {
 		else cout << maxD <<endl;
 
 		scanf("%d%d", &P, &R);
-		if(P && R) cout << endl;
+		cout << endl;
 		nb++;
 	}
 
