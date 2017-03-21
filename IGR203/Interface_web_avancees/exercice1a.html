@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+		<div id="menu">
+			<ul>
+			<li><a href="#Inbox">Inbox</a></li>
+			<li><a href="#Sent">Sent</a></li>
+			<li><a href="#Spam">Spam</a></li>
+			<li><a href="#Archive">Archive</a></li>
+			</ul>
+		</div>
+	</body>
+</html>
+<script>
+
+	function showMessage() {
+
+		s = location.hash;
+		if( s != "") {
+
+			var div = document.getElementById("menu");
+			var message = document.createElement("p");
+			message.innerHTML = "Vous etes dans : " + s;
+			message.id = "message";
+
+			var message_exists = document.getElementById("message");
+			if(message_exists) div.removeChild(message_exists);
+
+			div.appendChild(message);
+		}
+	}
+
+	window.onhashchange = showMessage;
+	window.onload = showMessage;
+</script>
+
