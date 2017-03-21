@@ -45,37 +45,20 @@ var loadJSON = function(url) {
 		var status = xhr.status;
 		if (status == 200) {
 
-			data = JSON.parse(xhr.response);
-			var s = '<table>\
-                    	<tr>\
-                        	<th>Expéditeur</th>\
-                        	<th>Destinataire</th>\
-                        	<th>Date</th>\
-                        	<th>Sujet</th>\
-                    	</tr>';
+            $.get("exercice2b.template", function(template) {
 
-        	for(i = 0; i < data['mails'].length; i++) {
-
-        		var s_ = '<tr>';
-                    s_ += '<td>' + data['mails'][i]['from'] + '</td>';
-                    s_ += '<td>' + data['mails'][i]['to'] + '</td>';
-                    s_ += '<td>' + data['mails'][i]['date'] + '</td>';
-                    s_ += '<td>' + data['mails'][i]['subject'] + '</td>';
-                    s_ += '</tr>';
-                    s  += s_;
-                }
-
-            s += '</table>';
-            $('#mails').html(s);
+    			data = JSON.parse(xhr.response);
+                var html = Mustache.to_html(template, data);
+                document.getElementById("mails").innerHTML = html;
+            });
 		}
 		else {
 
-			//error occured
-		}
+        }
     };
 
     xhr.open('GET', url, true);
     xhr.send();
-};
+};  
 
 app.run('#/');

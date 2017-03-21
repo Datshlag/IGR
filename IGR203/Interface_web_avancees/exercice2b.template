@@ -1,0 +1,22 @@
+<table>
+	<tr>
+    	<th>Expéditeur</th>
+    	<th>Destinataire</th>
+    	<th>Date</th>	
+    	<th>Sujet</th>
+	</tr>
+
+	{{#mails}}
+	<tr>
+	   	<td>{{from}}</td>
+        <td>{{to}}</td>
+        <td>{{date}}</td>
+        <td>{{subject}}</td>
+	</tr>
+	{{/mails}}
+
+	{{#empty}}
+	  <p>The list is empty.</p>
+	{{/empty}}
+
+</table>
