@@ -1,35 +1,53 @@
 var div = document.getElementById("menu");
-var message = document.getElementById("message");
+var inbox = document.getElementById("inbox");
+var sent = document.getElementById("sent");
+var spam = document.getElementById("spam");
+var archive = document.getElementById("archive");
 
 var app = Sammy(function() {
 
 	this.get('#/', function() {
 
-		message.innerHTML = "";
+		inbox.style="color: #fafafa; text-decoration: none";
+        sent.style="color: #1b1e24; text-decoration: none";
+        spam.style="color: #1b1e24; text-decoration: none";
+        archive.style="color: #1b1e24; text-decoration: none";
 		loadJSON("http://perso.telecom-paristech.fr/~concolat/cours/TP/igr203/mails-inbox.json");
 	});
 
 	this.get('#Inbox', function() {
 
-		message.innerHTML = "Vous êtes dans : Inbox";
+		inbox.style="color: #fafafa; text-decoration: none";
+        sent.style="color: #1b1e24; text-decoration: none";
+        spam.style="color: #1b1e24; text-decoration: none";
+        archive.style="color: #1b1e24; text-decoration: none";
 		loadJSON("http://perso.telecom-paristech.fr/~concolat/cours/TP/igr203/mails-inbox.json");
 	});
 
   	this.get('#Sent', function() {
 
-		message.innerHTML = "Vous êtes dans : Sent";
+		sent.style="color: #fafafa; text-decoration: none";
+        inbox.style="color: #1b1e24; text-decoration: none";
+        spam.style="color: #1b1e24; text-decoration: none";
+        archive.style="color: #1b1e24; text-decoration: none";
 		loadJSON("http://perso.telecom-paristech.fr/~concolat/cours/TP/igr203/mails-sent.json");
   	});
 
   	this.get('#Spam', function() {
 
-		message.innerHTML = "Vous êtes dans : Spam";
+		spam.style="color: #fafafa; text-decoration: none";
+        inbox.style="color: #1b1e24; text-decoration: none";
+        sent.style="color: #1b1e24; text-decoration: none";
+        archive.style="color: #1b1e24; text-decoration: none";
 		loadJSON("http://perso.telecom-paristech.fr/~concolat/cours/TP/igr203/mails-spam.json");
   	});
 
   	this.get('#Archive', function() {
 
-		message.innerHTML = "Vous êtes dans : Archive";
+		archive.style="color: #fafafa; text-decoration: none";
+        inbox.style="color: #1b1e24; text-decoration: none";
+        sent.style="color: #1b1e24; text-decoration: none";
+        spam.style="color: #1b1e24; text-decoration: none";
 		loadJSON("http://perso.telecom-paristech.fr/~concolat/cours/TP/igr203/mails-archives.json");
   	});
 
