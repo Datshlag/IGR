@@ -74,7 +74,7 @@ int main() {
 
 
 		//On se contente de regarder le volume que l'on peut gonfler pour chaque permutation de point
-		//possible. Comme il y a eu plus 6 points, on teste au plus 720 permutations, ce qui est acceptable.
+		//possible. Comme il y a au plus 6 points, on teste au plus 720 permutations, ce qui est acceptable.
 		do {	
 
 			radius.clear();
