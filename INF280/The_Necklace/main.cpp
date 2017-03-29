@@ -31,28 +31,8 @@ int main() {
 			adj[a-1][b-1]++;
 			if(a != b) adj[b-1][a-1]++;
 		}
-
-		/*for(int k = 0; k < 50; k++) {
-
-			for(int l= 0; l < 50; l++) {
-
-				cout << adj[k][l] << " ";
-			}
-			cout << endl;
-		}*/
 		
 		int b = findEulerianCircuit(adj, circuit, first);
-
-		/*cout << endl << endl;
-		for(int k = 0; k < 50; k++) {
-
-			for(int l= 0; l < 50; l++) {
-
-				cout << adj[k][l] << " ";
-			}
-			cout << endl;
-		}*/
-		
 
 		cout << "Case #" << i + 1 << endl;
 		if(b && circuit.size() == N + 1) {

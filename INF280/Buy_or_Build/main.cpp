@@ -49,15 +49,18 @@ void unite(const int& x, const int& y){
 	if (rankX == rankY) set[parentX].second++;
 }
 
-int kruskal(const vector<Edge>& edges) {
+int kruskal(const vector<Edge>& edges, int nbVertex, int n) {
 
 	int cost = 0;
+	int count = n;
 	for(auto &tmp : edges) {
 
+		if(count == nbVertex - 1) break;
 		if (find(tmp.u) != find(tmp.v)) {
 
 			unite(tmp.u, tmp.v);
 			cost += tmp.d;
+			count++;
 		}
 	}
 	return cost;
@@ -117,7 +120,7 @@ int main() {
 		}
 		sort(edges.begin(), edges.end());
 
-		ans = kruskal(edges);
+		ans = kruskal(edges, n, 0);
 
 		for (int j = 1; j < (1 << q); j++)
 		{	
@@ -129,6 +132,7 @@ int main() {
 			}
 
 			int cost = 0;
+			int nb = 0;
 			for (int k = 0; k < q; k++)
 			{	
 				if (j & (1 << k))
@@ -136,14 +140,19 @@ int main() {
 					cost += costs[k];
 					for (int l = 1; l < networks[k].size(); l++)
 					{
-						unite(networks[k][l - 1], networks[k][l]);
+						if(find(networks[k][l - 1]) != find(networks[k][l])) {
+
+							unite(networks[k][l - 1], networks[k][l]);
+							nb++;
+						}
 					}
 				}
 			}
-			int tmp = kruskal(edges);
+			int tmp = kruskal(edges, n, nb);
 			ans = min(ans, cost + tmp);
 		}
 		cout << ans << endl;
+		if(i < T - 1) cout << endl;
 	}
 
 	return 0;
