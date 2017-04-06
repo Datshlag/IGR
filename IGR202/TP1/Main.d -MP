@@ -1,0 +1,2 @@
+Main.o: Main.cpp Vec3.h Camera.h Mesh.h Triangle.h GLProgram.h \
+ Exception.h GLShader.h LightSource.h LightRay.h BVH.h Bbox.h

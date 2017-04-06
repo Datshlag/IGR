@@ -208,7 +208,7 @@ void Mesh::geometricalLaplacian() {
         for(unsigned int j = 0; j < curr_neighbours.size(); j++) {
 
             Triangle curr_tri = curr_neighbours[j];
-            int pos;
+            int pos = 0;
 
             if(curr_tri[0] == i) pos = 0;
             if(curr_tri[1] == i) pos = 1;

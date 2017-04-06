@@ -1,0 +1,348 @@
+\hypertarget{classData}{}\section{Data Class Reference}
+\label{classData}\index{Data@{Data}}
+
+
+\hyperlink{classData}{Data} class. This is the class which is used to keep tracks of all the multimediaobjects and groups created. \hyperlink{classData}{Data} is stored using std\+::map, using names as keys. We use smart pointers everywhere for a better memory usage.  
+
+
+
+
+{\ttfamily \#include $<$Data.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \hyperlink{classData_aab31956423290f0d62dcca47ab4d16dd}{$\sim$\+Data} ()
+\begin{DoxyCompactList}\small\item\em Destroys the data object. \end{DoxyCompactList}\item 
+\hypertarget{classData_af11f741cb7f587e2e495452a8905a22a}{}\hyperlink{classData_af11f741cb7f587e2e495452a8905a22a}{Data} ()\label{classData_af11f741cb7f587e2e495452a8905a22a}
+
+\begin{DoxyCompactList}\small\item\em Creates the data object. \end{DoxyCompactList}\item 
+Video\+Ptr \hyperlink{classData_a9a86e93e191dc4244c18928b908861cc}{new\+Video} (const string \&name)
+\begin{DoxyCompactList}\small\item\em Used to create a new blank video. \end{DoxyCompactList}\item 
+Video\+Ptr \hyperlink{classData_a9e7919b3ca3390c0002cd2ba2854bbc4}{new\+Video} (istream \&is)
+\begin{DoxyCompactList}\small\item\em Used to create a new video from a file. \end{DoxyCompactList}\item 
+Pic\+Ptr \hyperlink{classData_a1fb51b0d2aee38a233b505c8e4fb862d}{new\+Picture} (const string \&name)
+\begin{DoxyCompactList}\small\item\em Used to create a new blank picture. \end{DoxyCompactList}\item 
+Pic\+Ptr \hyperlink{classData_ac0d33face47c9aa31c5ced3bba1ba348}{new\+Picture} (istream \&is)
+\begin{DoxyCompactList}\small\item\em Used to create a new picture from a file. \end{DoxyCompactList}\item 
+Film\+Ptr \hyperlink{classData_abf84f4ca94b966ffe9f0a5272e4048d7}{new\+Film} (const string \&name)
+\begin{DoxyCompactList}\small\item\em Used to create a new blank film. \end{DoxyCompactList}\item 
+Film\+Ptr \hyperlink{classData_aa14f12c39b4d568353606420b691296f}{new\+Film} (istream \&is)
+\begin{DoxyCompactList}\small\item\em Used to create a new film from a file. \end{DoxyCompactList}\item 
+Group\+Ptr \hyperlink{classData_a94d766d884a27444fdca887a60e1162c}{new\+Group} (const string \&name)
+\begin{DoxyCompactList}\small\item\em Used to create a new blank group. \end{DoxyCompactList}\item 
+void \hyperlink{classData_a792f2e1f05c9d068892aad4940e27ff6}{display\+Elements} (ostream \&os) const 
+\begin{DoxyCompactList}\small\item\em Displays info on all the elements of the m\+O\+Table. \end{DoxyCompactList}\item 
+void \hyperlink{classData_ada79ae2968738413d48250a684ae63ec}{search\+Multimedia\+Object} (const string \&name, ostream \&os) const 
+\begin{DoxyCompactList}\small\item\em Look for a multimedia object with the given name in the multimediaobject table. \end{DoxyCompactList}\item 
+void \hyperlink{classData_ae4df938ba31a8359006e824a880559b3}{search\+Group} (const string \&name, ostream \&os) const 
+\begin{DoxyCompactList}\small\item\em Look for a group with the given name in the group table. \end{DoxyCompactList}\item 
+void \hyperlink{classData_a627fcf83d707dd0cef70245fe7785f4f}{play\+Multimedia\+Object} (const string \&name, ostream \&os) const 
+\begin{DoxyCompactList}\small\item\em Play the multimedia object with the given name, displays error if we can\textquotesingle{}t find the object. \end{DoxyCompactList}\item 
+bool \hyperlink{classData_a1e03c91a77ed0555dae82727dfcc8df9}{process\+Request} (\hyperlink{classcppu_1_1TCPConnection}{T\+C\+P\+Connection} \&cnx, const string \&request, string \&response)
+\begin{DoxyCompactList}\small\item\em Process the request received from the server and sends back the appropriate answer. \end{DoxyCompactList}\item 
+bool \hyperlink{classData_a72951a7406a853d0c05c5b02ca31eba2}{save} (const string \&file\+Name) const 
+\begin{DoxyCompactList}\small\item\em Saves all data in the multimediaobject table. \end{DoxyCompactList}\item 
+bool \hyperlink{classData_a1f31af0bd1cde50acd39b811245fe2c8}{load} (const string \&file\+Name)
+\begin{DoxyCompactList}\small\item\em Loads data from the file in the multimedia object table. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classData}{Data} class. This is the class which is used to keep tracks of all the multimediaobjects and groups created. \hyperlink{classData}{Data} is stored using std\+::map, using names as keys. We use smart pointers everywhere for a better memory usage. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classData_aab31956423290f0d62dcca47ab4d16dd}{}\index{Data@{Data}!````~Data@{$\sim$\+Data}}
+\index{````~Data@{$\sim$\+Data}!Data@{Data}}
+\subsubsection[{$\sim$\+Data}]{\setlength{\rightskip}{0pt plus 5cm}Data\+::$\sim$\+Data (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classData_aab31956423290f0d62dcca47ab4d16dd}
+
+
+Destroys the data object. 
+
+No need to do anything in destructor thanks to smartpointers ! 
+
+\subsection{Member Function Documentation}
+\hypertarget{classData_a792f2e1f05c9d068892aad4940e27ff6}{}\index{Data@{Data}!display\+Elements@{display\+Elements}}
+\index{display\+Elements@{display\+Elements}!Data@{Data}}
+\subsubsection[{display\+Elements}]{\setlength{\rightskip}{0pt plus 5cm}void Data\+::display\+Elements (
+\begin{DoxyParamCaption}
+\item[{ostream \&}]{os}
+\end{DoxyParamCaption}
+) const}\label{classData_a792f2e1f05c9d068892aad4940e27ff6}
+
+
+Displays info on all the elements of the m\+O\+Table. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em os} & The output stream. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classData_a1f31af0bd1cde50acd39b811245fe2c8}{}\index{Data@{Data}!load@{load}}
+\index{load@{load}!Data@{Data}}
+\subsubsection[{load}]{\setlength{\rightskip}{0pt plus 5cm}bool Data\+::load (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{file\+Name}
+\end{DoxyParamCaption}
+)}\label{classData_a1f31af0bd1cde50acd39b811245fe2c8}
+
+
+Loads data from the file in the multimedia object table. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em file\+Name} & The file name from where we read the data.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns true if successful, false otherwise. 
+\end{DoxyReturn}
+Opening file \hypertarget{classData_abf84f4ca94b966ffe9f0a5272e4048d7}{}\index{Data@{Data}!new\+Film@{new\+Film}}
+\index{new\+Film@{new\+Film}!Data@{Data}}
+\subsubsection[{new\+Film}]{\setlength{\rightskip}{0pt plus 5cm}Film\+Ptr Data\+::new\+Film (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{name}
+\end{DoxyParamCaption}
+)}\label{classData_abf84f4ca94b966ffe9f0a5272e4048d7}
+
+
+Used to create a new blank film. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & The name\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Smart pointer to the film created. 
+\end{DoxyReturn}
+\hypertarget{classData_aa14f12c39b4d568353606420b691296f}{}\index{Data@{Data}!new\+Film@{new\+Film}}
+\index{new\+Film@{new\+Film}!Data@{Data}}
+\subsubsection[{new\+Film}]{\setlength{\rightskip}{0pt plus 5cm}Film\+Ptr Data\+::new\+Film (
+\begin{DoxyParamCaption}
+\item[{istream \&}]{is}
+\end{DoxyParamCaption}
+)}\label{classData_aa14f12c39b4d568353606420b691296f}
+
+
+Used to create a new film from a file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em is} & input stream.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Smart pointer to the film created. 
+\end{DoxyReturn}
+We read the data from the input stream \hypertarget{classData_a94d766d884a27444fdca887a60e1162c}{}\index{Data@{Data}!new\+Group@{new\+Group}}
+\index{new\+Group@{new\+Group}!Data@{Data}}
+\subsubsection[{new\+Group}]{\setlength{\rightskip}{0pt plus 5cm}Group\+Ptr Data\+::new\+Group (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{name}
+\end{DoxyParamCaption}
+)}\label{classData_a94d766d884a27444fdca887a60e1162c}
+
+
+Used to create a new blank group. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & The name\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Smart pointer to the group created. 
+\end{DoxyReturn}
+\hypertarget{classData_a1fb51b0d2aee38a233b505c8e4fb862d}{}\index{Data@{Data}!new\+Picture@{new\+Picture}}
+\index{new\+Picture@{new\+Picture}!Data@{Data}}
+\subsubsection[{new\+Picture}]{\setlength{\rightskip}{0pt plus 5cm}Pic\+Ptr Data\+::new\+Picture (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{name}
+\end{DoxyParamCaption}
+)}\label{classData_a1fb51b0d2aee38a233b505c8e4fb862d}
+
+
+Used to create a new blank picture. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & The name\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Smart pointer to the picture created. 
+\end{DoxyReturn}
+\hypertarget{classData_ac0d33face47c9aa31c5ced3bba1ba348}{}\index{Data@{Data}!new\+Picture@{new\+Picture}}
+\index{new\+Picture@{new\+Picture}!Data@{Data}}
+\subsubsection[{new\+Picture}]{\setlength{\rightskip}{0pt plus 5cm}Pic\+Ptr Data\+::new\+Picture (
+\begin{DoxyParamCaption}
+\item[{istream \&}]{is}
+\end{DoxyParamCaption}
+)}\label{classData_ac0d33face47c9aa31c5ced3bba1ba348}
+
+
+Used to create a new picture from a file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em is} & input stream.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Smart pointer to the picture created. 
+\end{DoxyReturn}
+We read the data from the input stream \hypertarget{classData_a9a86e93e191dc4244c18928b908861cc}{}\index{Data@{Data}!new\+Video@{new\+Video}}
+\index{new\+Video@{new\+Video}!Data@{Data}}
+\subsubsection[{new\+Video}]{\setlength{\rightskip}{0pt plus 5cm}Video\+Ptr Data\+::new\+Video (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{name}
+\end{DoxyParamCaption}
+)}\label{classData_a9a86e93e191dc4244c18928b908861cc}
+
+
+Used to create a new blank video. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & The name\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Smart pointer to the video created. 
+\end{DoxyReturn}
+\hypertarget{classData_a9e7919b3ca3390c0002cd2ba2854bbc4}{}\index{Data@{Data}!new\+Video@{new\+Video}}
+\index{new\+Video@{new\+Video}!Data@{Data}}
+\subsubsection[{new\+Video}]{\setlength{\rightskip}{0pt plus 5cm}Video\+Ptr Data\+::new\+Video (
+\begin{DoxyParamCaption}
+\item[{istream \&}]{is}
+\end{DoxyParamCaption}
+)}\label{classData_a9e7919b3ca3390c0002cd2ba2854bbc4}
+
+
+Used to create a new video from a file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em is} & input stream.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Smart pointer to the video created. 
+\end{DoxyReturn}
+We read the data from the input stream \hypertarget{classData_a627fcf83d707dd0cef70245fe7785f4f}{}\index{Data@{Data}!play\+Multimedia\+Object@{play\+Multimedia\+Object}}
+\index{play\+Multimedia\+Object@{play\+Multimedia\+Object}!Data@{Data}}
+\subsubsection[{play\+Multimedia\+Object}]{\setlength{\rightskip}{0pt plus 5cm}void Data\+::play\+Multimedia\+Object (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{name, }
+\item[{ostream \&}]{os}
+\end{DoxyParamCaption}
+) const}\label{classData_a627fcf83d707dd0cef70245fe7785f4f}
+
+
+Play the multimedia object with the given name, displays error if we can\textquotesingle{}t find the object. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & The name of the object we want to play. \\
+\hline
+ & {\em os} & The output stream. \\
+\hline
+\end{DoxyParams}
+We use the find method which returns a iterator on the element of it\textquotesingle{}s in the table, or m\+O\+Table.\+end() if it isn\textquotesingle{}t. \hypertarget{classData_a1e03c91a77ed0555dae82727dfcc8df9}{}\index{Data@{Data}!process\+Request@{process\+Request}}
+\index{process\+Request@{process\+Request}!Data@{Data}}
+\subsubsection[{process\+Request}]{\setlength{\rightskip}{0pt plus 5cm}bool Data\+::process\+Request (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+C\+P\+Connection} \&}]{cnx, }
+\item[{const string \&}]{request, }
+\item[{string \&}]{response}
+\end{DoxyParamCaption}
+)}\label{classData_a1e03c91a77ed0555dae82727dfcc8df9}
+
+
+Process the request received from the server and sends back the appropriate answer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+ & {\em cnx} & The tcp connection \\
+\hline
+\mbox{\tt in}  & {\em request} & The request \\
+\hline
+ & {\em response} & The response\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns true if successful, false otherwise. 
+\end{DoxyReturn}
+Parsing the request to get the function and the parameters.
+
+Calling the appropriate function with the correct parameters.
+
+Sending answer back to client.
+
+Returning true since we don\textquotesingle{}t want to cut communication. \hypertarget{classData_a72951a7406a853d0c05c5b02ca31eba2}{}\index{Data@{Data}!save@{save}}
+\index{save@{save}!Data@{Data}}
+\subsubsection[{save}]{\setlength{\rightskip}{0pt plus 5cm}bool Data\+::save (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{file\+Name}
+\end{DoxyParamCaption}
+) const}\label{classData_a72951a7406a853d0c05c5b02ca31eba2}
+
+
+Saves all data in the multimediaobject table. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em file\+Name} & The file name where we want to save the data.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns true if successful, false otherwise. 
+\end{DoxyReturn}
+Opening file \hypertarget{classData_ae4df938ba31a8359006e824a880559b3}{}\index{Data@{Data}!search\+Group@{search\+Group}}
+\index{search\+Group@{search\+Group}!Data@{Data}}
+\subsubsection[{search\+Group}]{\setlength{\rightskip}{0pt plus 5cm}void Data\+::search\+Group (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{name, }
+\item[{ostream \&}]{os}
+\end{DoxyParamCaption}
+) const}\label{classData_ae4df938ba31a8359006e824a880559b3}
+
+
+Look for a group with the given name in the group table. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & The name of the group we\textquotesingle{}re looking for. \\
+\hline
+ & {\em os} & The output stream. \\
+\hline
+\end{DoxyParams}
+We use the find method which returns a iterator on the element of it\textquotesingle{}s in the table, or m\+O\+Table.\+end() if it isn\textquotesingle{}t. \hypertarget{classData_ada79ae2968738413d48250a684ae63ec}{}\index{Data@{Data}!search\+Multimedia\+Object@{search\+Multimedia\+Object}}
+\index{search\+Multimedia\+Object@{search\+Multimedia\+Object}!Data@{Data}}
+\subsubsection[{search\+Multimedia\+Object}]{\setlength{\rightskip}{0pt plus 5cm}void Data\+::search\+Multimedia\+Object (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{name, }
+\item[{ostream \&}]{os}
+\end{DoxyParamCaption}
+) const}\label{classData_ada79ae2968738413d48250a684ae63ec}
+
+
+Look for a multimedia object with the given name in the multimediaobject table. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em name} & The name of the object we\textquotesingle{}re looking for. \\
+\hline
+ & {\em os} & The output stream. \\
+\hline
+\end{DoxyParams}
+We use the find method which returns a iterator on the element of it\textquotesingle{}s in the table, or m\+O\+Table.\+end() if it isn\textquotesingle{}t. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Data.\+h\item 
+Data.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,151 @@
+\hypertarget{classcppu_1_1TCPServer}{}\section{cppu\+:\+:T\+C\+P\+Server Class Reference}
+\label{classcppu_1_1TCPServer}\index{cppu\+::\+T\+C\+P\+Server@{cppu\+::\+T\+C\+P\+Server}}
+
+
+T\+C\+P/\+I\+P I\+Pv4 server. The server supports T\+C\+P/\+I\+P A\+F\+\_\+\+I\+N\+E\+T connections (following the I\+Pv4 Internet protocol) with multiple clients. One thread is used per client.  
+
+
+
+
+{\ttfamily \#include $<$tcp\+Server.\+h$>$}
+
+
+
+Collaboration diagram for cppu\+:\+:T\+C\+P\+Server\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=338pt]{classcppu_1_1TCPServer__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structcppu_1_1TCPServer_1_1Callback}{Callback}
+\begin{DoxyCompactList}\small\item\em \hyperlink{structcppu_1_1TCPServer_1_1Callback}{Callback} interface. \end{DoxyCompactList}\item 
+struct \hyperlink{structcppu_1_1TCPServer_1_1CallbackMethod}{Callback\+Method}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classcppu_1_1TCPServer_a48074f8409f580f6cf7b0be80200f9f3}{}\hyperlink{classcppu_1_1TCPServer_a48074f8409f580f6cf7b0be80200f9f3}{T\+C\+P\+Server} ()\label{classcppu_1_1TCPServer_a48074f8409f580f6cf7b0be80200f9f3}
+
+\begin{DoxyCompactList}\small\item\em constructor\+: initializes the \hyperlink{classcppu_1_1TCPServer}{T\+C\+P\+Server}. \end{DoxyCompactList}\item 
+\hypertarget{classcppu_1_1TCPServer_ababd20111e0cf4e14396433e56ca086e}{}virtual \hyperlink{classcppu_1_1TCPServer_ababd20111e0cf4e14396433e56ca086e}{$\sim$\+T\+C\+P\+Server} ()\label{classcppu_1_1TCPServer_ababd20111e0cf4e14396433e56ca086e}
+
+\begin{DoxyCompactList}\small\item\em destructor\+: cleans up the \hyperlink{classcppu_1_1TCPServer}{T\+C\+P\+Server}. \end{DoxyCompactList}\item 
+virtual int \hyperlink{classcppu_1_1TCPServer_a98e00d62745812b17bdee9f07f2070c4}{run} (int port)
+\begin{DoxyCompactList}\small\item\em starts the \hyperlink{classcppu_1_1TCPServer}{T\+C\+P\+Server}. \hyperlink{classcppu_1_1TCPServer_a98e00d62745812b17bdee9f07f2070c4}{run()} binds an internal \hyperlink{classcppu_1_1ServerSocket}{Server\+Socket} to {\itshape port} then starts an infinite loop that processes connection requests from clients. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class T $>$ }\\void \hyperlink{classcppu_1_1TCPServer_a7d4fdb93439015934004755fde72945b}{set\+Callback} (T \&object, bool(T\+::$\ast$method)(\hyperlink{classcppu_1_1TCPConnection}{T\+C\+P\+Connection} \&cnx, const std\+::string \&request, std\+::string \&response))
+\begin{DoxyCompactList}\small\item\em changes the callback method of the \hyperlink{classcppu_1_1TCPServer}{T\+C\+P\+Server}. This callback is called each time the \hyperlink{classcppu_1_1TCPServer}{T\+C\+P\+Server} receives a request from a client. It can be any method of {\itshape object} with the following parameters\+: \end{DoxyCompactList}\item 
+void \hyperlink{classcppu_1_1TCPServer_a94d3d97b03d5e3e48609e405d8dd7897}{set\+Callback} (\hyperlink{structcppu_1_1TCPServer_1_1Callback}{Callback} \&callback)
+\begin{DoxyCompactList}\small\item\em changes the callback object of the \hyperlink{classcppu_1_1TCPServer}{T\+C\+P\+Server}. \end{DoxyCompactList}\item 
+\hypertarget{classcppu_1_1TCPServer_a6428b63a4440045050dba4f33bb454bf}{}\hyperlink{classcppu_1_1ServerSocket}{Server\+Socket} \& \hyperlink{classcppu_1_1TCPServer_a6428b63a4440045050dba4f33bb454bf}{server\+Socket} ()\label{classcppu_1_1TCPServer_a6428b63a4440045050dba4f33bb454bf}
+
+\begin{DoxyCompactList}\small\item\em returns the internal \hyperlink{classcppu_1_1ServerSocket}{Server\+Socket}. \end{DoxyCompactList}\item 
+\hypertarget{classcppu_1_1TCPServer_afc47ca4476d9c75d5ea88f73e2acd6d5}{}virtual void \hyperlink{classcppu_1_1TCPServer_afc47ca4476d9c75d5ea88f73e2acd6d5}{error} (const std\+::string \&msg, const \hyperlink{classcppu_1_1TCPConnection}{T\+C\+P\+Connection} $\ast$=nullptr)\label{classcppu_1_1TCPServer_afc47ca4476d9c75d5ea88f73e2acd6d5}
+
+\begin{DoxyCompactList}\small\item\em prints warning and error messages on the terminal. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classcppu_1_1TCPServer_abe314b95a31c88b479c81ec9bf123c65}{}virtual \hyperlink{classcppu_1_1TCPConnection}{T\+C\+P\+Connection} $\ast$ \hyperlink{classcppu_1_1TCPServer_abe314b95a31c88b479c81ec9bf123c65}{create\+Cnx} (\hyperlink{classcppu_1_1Socket}{Socket} $\ast$)\label{classcppu_1_1TCPServer_abe314b95a31c88b479c81ec9bf123c65}
+
+\begin{DoxyCompactList}\small\item\em creates a new connection that starts a new thread for listening this socket. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classcppu_1_1TCPServer_a8e4422abf23dc5bd195d05a3e9eee167}{}\hyperlink{classcppu_1_1ServerSocket}{Server\+Socket} {\bfseries \+\_\+servsock}\label{classcppu_1_1TCPServer_a8e4422abf23dc5bd195d05a3e9eee167}
+
+\item 
+\hypertarget{classcppu_1_1TCPServer_abe36d427d7b047cdd342e282611c841e}{}std\+::shared\+\_\+ptr$<$ \hyperlink{structcppu_1_1TCPServer_1_1Callback}{Callback} $>$ {\bfseries \+\_\+callback\+Ptr}\label{classcppu_1_1TCPServer_abe36d427d7b047cdd342e282611c841e}
+
+\item 
+\hypertarget{classcppu_1_1TCPServer_a68940bd70ac6941ca49d1e51b631f5e9}{}\hyperlink{structcppu_1_1TCPServer_1_1Callback}{Callback} $\ast$ {\bfseries \+\_\+callback}\label{classcppu_1_1TCPServer_a68940bd70ac6941ca49d1e51b631f5e9}
+
+\item 
+\hypertarget{classcppu_1_1TCPServer_aea2dbb4b5762044217096e52cd559b97}{}pthread\+\_\+rwlock\+\_\+t {\bfseries \+\_\+threadlock}\label{classcppu_1_1TCPServer_aea2dbb4b5762044217096e52cd559b97}
+
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classcppu_1_1TCPServer_a94abdeb80587f39a869fde6f24522a78}{}class {\bfseries T\+C\+P\+Lock}\label{classcppu_1_1TCPServer_a94abdeb80587f39a869fde6f24522a78}
+
+\item 
+\hypertarget{classcppu_1_1TCPServer_a9d1c27bdfcdd48c5f07a5d0dce43b346}{}class {\bfseries T\+C\+P\+Connection}\label{classcppu_1_1TCPServer_a9d1c27bdfcdd48c5f07a5d0dce43b346}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+T\+C\+P/\+I\+P I\+Pv4 server. The server supports T\+C\+P/\+I\+P A\+F\+\_\+\+I\+N\+E\+T connections (following the I\+Pv4 Internet protocol) with multiple clients. One thread is used per client. 
+
+Call \hyperlink{classcppu_1_1TCPServer_a7d4fdb93439015934004755fde72945b}{set\+Callback()} to specify the callback method that will be invoked each time a request is sent by a client then \hyperlink{classcppu_1_1TCPServer_a98e00d62745812b17bdee9f07f2070c4}{run()} to start the server.
+
+Requests can be processed concurrently thanks to threads. To avoid concurrency problems the callback can perform a read or write lock (\begin{DoxySeeAlso}{See also}
+\hyperlink{classcppu_1_1TCPLock}{T\+C\+P\+Lock}). 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classcppu_1_1TCPServer_a98e00d62745812b17bdee9f07f2070c4}{}\index{cppu\+::\+T\+C\+P\+Server@{cppu\+::\+T\+C\+P\+Server}!run@{run}}
+\index{run@{run}!cppu\+::\+T\+C\+P\+Server@{cppu\+::\+T\+C\+P\+Server}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}int cppu\+::\+T\+C\+P\+Server\+::run (
+\begin{DoxyParamCaption}
+\item[{int}]{port}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{classcppu_1_1TCPServer_a98e00d62745812b17bdee9f07f2070c4}
+
+
+starts the \hyperlink{classcppu_1_1TCPServer}{T\+C\+P\+Server}. \hyperlink{classcppu_1_1TCPServer_a98e00d62745812b17bdee9f07f2070c4}{run()} binds an internal \hyperlink{classcppu_1_1ServerSocket}{Server\+Socket} to {\itshape port} then starts an infinite loop that processes connection requests from clients. 
+
+For each successful connection request, a \hyperlink{classcppu_1_1TCPConnection}{T\+C\+P\+Connection} object is created. This object starts a thread that processes incoming requests from its client. A callback method (\begin{DoxySeeAlso}{See also}
+\hyperlink{classcppu_1_1TCPServer_a7d4fdb93439015934004755fde72945b}{set\+Callback()}) is invoked for each request.
+\end{DoxySeeAlso}
+\begin{DoxyReturn}{Returns}
+0 on normal termination or a negative value if the \hyperlink{classcppu_1_1ServerSocket}{Server\+Socket} could not be bound (value is then one of \hyperlink{classcppu_1_1Socket_a49ea5cb079bd7ae97ecf7eb30c9d9e5f}{Socket\+::\+Errors}). 
+\end{DoxyReturn}
+\hypertarget{classcppu_1_1TCPServer_a7d4fdb93439015934004755fde72945b}{}\index{cppu\+::\+T\+C\+P\+Server@{cppu\+::\+T\+C\+P\+Server}!set\+Callback@{set\+Callback}}
+\index{set\+Callback@{set\+Callback}!cppu\+::\+T\+C\+P\+Server@{cppu\+::\+T\+C\+P\+Server}}
+\subsubsection[{set\+Callback}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ void cppu\+::\+T\+C\+P\+Server\+::set\+Callback (
+\begin{DoxyParamCaption}
+\item[{T \&}]{object, }
+\item[{bool(T\+::$\ast$)({\bf T\+C\+P\+Connection} \&cnx, const std\+::string \&request, std\+::string \&response)}]{method}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{classcppu_1_1TCPServer_a7d4fdb93439015934004755fde72945b}
+
+
+changes the callback method of the \hyperlink{classcppu_1_1TCPServer}{T\+C\+P\+Server}. This callback is called each time the \hyperlink{classcppu_1_1TCPServer}{T\+C\+P\+Server} receives a request from a client. It can be any method of {\itshape object} with the following parameters\+: 
+
+
+\begin{DoxyItemize}
+\item {\itshape cnx} is the connection with the client sending the request
+\item {\itshape request} contains the data sent by the client
+\item {\itshape response} will be sent to the client as a response The connection is closed if the callback returns false.
+\end{DoxyItemize}
+
+To avoid concurrency problems, the callback should perform a read or write lock (\begin{DoxySeeAlso}{See also}
+\hyperlink{classcppu_1_1TCPLock}{T\+C\+P\+Lock}) before performing a computation. 
+\end{DoxySeeAlso}
+\hypertarget{classcppu_1_1TCPServer_a94d3d97b03d5e3e48609e405d8dd7897}{}\index{cppu\+::\+T\+C\+P\+Server@{cppu\+::\+T\+C\+P\+Server}!set\+Callback@{set\+Callback}}
+\index{set\+Callback@{set\+Callback}!cppu\+::\+T\+C\+P\+Server@{cppu\+::\+T\+C\+P\+Server}}
+\subsubsection[{set\+Callback}]{\setlength{\rightskip}{0pt plus 5cm}void cppu\+::\+T\+C\+P\+Server\+::set\+Callback (
+\begin{DoxyParamCaption}
+\item[{{\bf Callback} \&}]{callback}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{classcppu_1_1TCPServer_a94d3d97b03d5e3e48609e405d8dd7897}
+
+
+changes the callback object of the \hyperlink{classcppu_1_1TCPServer}{T\+C\+P\+Server}. 
+
+\begin{DoxySeeAlso}{See also}
+set\+Callback(object, method). 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+tcp\+Server.\+h\item 
+tcp\+Server.\+cpp\end{DoxyCompactItemize}

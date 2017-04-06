@@ -1,0 +1,33 @@
+QUESTIONS CPP :
+
+	ETAPE 4 :
+
+	La méthode play() de la classe MultimediaObject est une méthode abstraite. On le précise au compilateur en rajoutant = 0 après sa déclaration. On ne peut instancier un objet de la classe MultimediaObject, car possédant une méthode abstraite, cette classe devient elle-même abstraite.
+
+
+	ETAPE 5 :
+
+	Il s'agit de la propriété de polymorphisme. On peut traiter une photo ou une vidéo comme des instances de la classe générique MultimediaObject. Ensuite, les options de liaisons dynamiques proposées par le C++ permettent d'appeler la bonne méthode, ici celles de Video et Picture. Pour que cela se fasse correctement il faut utiliser des pointeurs sur les objets, et non les objets en eux-mêmes, et il faut préciser au compilateur quelles méthodes doivent être liées dynamiquement (celles précédées de virtual) et quelles méthodes doivent être liées statiquement (les autres). En Java, c'est la même idée, mais par défaut la liaison est dynamique (sauf si mot-clef final).
+
+	ETAPE 6 :
+
+	Il faut faire attention lors de la construction de l'objet Film de faire une copie profonde du tableau de durées fournis. En effet, dans le cas contraire le tableau de durées de l'objet Film serait également pointé par l'extérieur de la classe, ce qui romprait l'encapsulation !
+	Pour la fonction getChapters, en C++ on peut utiliser le mot-clé "const" qui nous permet de garantir à la compilation que l'objet ne sera jamais modifié une fois fournis à l'extérieur. On aurait aussi pu faire le choix de prendre un argument un tableau vide (alloué à l'extérieur) et de faire une copie profonde du tableau de la classe Film. 
+
+	ETAPE 7 :
+
+	Il faut modifier la classe Film, car on utilise le mot-clé "new" lors de la création du tableau de durées. On fera donc en sorte dans le destructeur d'appeler delete[] afin de libérer la mémoire allouée. Un problème se pose également lors de la copie d'une instance de Film : en effet par défaut la copie se fait champ par champ, ce qui fait que l'objet copié aura en attribut un pointeur sur les mêmes données que l'original. 
+
+	ETAPE 8 :
+
+	Il est nécessaire d'avoir une liste de pointeur d'objets pour utiliser la propriété de polymorphisme en C++. En java, les objets sont stockés sous forme de "références Java", équivalentes à des pointeurs, le problème ne se pose donc pas.
+
+	ETAPE 9 :
+
+	Pour interdire new, delete... depuis l'extérieur, on peut préciser ces fonctions comme étant privées dans la classe. Cela pose des problèmes cependant. Par exemple les smart_ptr en ont besoin pour fonctionner ! On pourrait déclarer la classe "smart_ptr" comme étant amie, mais on s'aperçoit que cela devient vite brouillon. 
+
+QUESTIONS SWING :
+
+	ETAPE 1 :
+
+	Si l'on écrit trop le texte sort de la partie visible par l'utilisateur, qui ne voit plus ce qu'il est en train d'écrire !

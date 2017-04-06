@@ -1,6 +1,6 @@
 #include "Film.h"
 
-///Desctructor useful here : we need to delete allocated memory.
+///Destructor useful here : we need to delete allocated memory.
 Film::~Film() { delete[] chapters; }
 Film::Film(): Video::Video(), chapters(nullptr), numberOfChapters(0) { }
 Film::Film (string _name, string _pathname, 
@@ -59,3 +59,4 @@ void Film::read(istream &is) {
 
 	for(int i = 0; i < numberOfChapters; i++)
 		is >> chapters[i];
+}

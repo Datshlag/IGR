@@ -1,0 +1,1 @@
+LightRay.o: LightRay.cpp LightRay.h Vec3.h BVH.h Bbox.h Mesh.h Triangle.h

@@ -1,0 +1,43 @@
+\hypertarget{classcppu_1_1TCPLock}{}\section{cppu\+:\+:T\+C\+P\+Lock Class Reference}
+\label{classcppu_1_1TCPLock}\index{cppu\+::\+T\+C\+P\+Lock@{cppu\+::\+T\+C\+P\+Lock}}
+
+
+Locks the server in read mode or in write mode. Must be created {\itshape in the stack} by the callback method.  
+
+
+
+
+{\ttfamily \#include $<$tcp\+Server.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classcppu_1_1TCPLock_ad9ff8205f334918a69746ef90f731877}{T\+C\+P\+Lock} (\hyperlink{classcppu_1_1TCPConnection}{T\+C\+P\+Connection} \&cnx, bool write\+Mode=false)
+\begin{DoxyCompactList}\small\item\em locks the server in {\itshape write} or {\itshape read} mode. In order to avoid concurrency problems between threads, the callback method ( \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Locks the server in read mode or in write mode. Must be created {\itshape in the stack} by the callback method. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classcppu_1_1TCPLock_ad9ff8205f334918a69746ef90f731877}{}\index{cppu\+::\+T\+C\+P\+Lock@{cppu\+::\+T\+C\+P\+Lock}!T\+C\+P\+Lock@{T\+C\+P\+Lock}}
+\index{T\+C\+P\+Lock@{T\+C\+P\+Lock}!cppu\+::\+T\+C\+P\+Lock@{cppu\+::\+T\+C\+P\+Lock}}
+\subsubsection[{T\+C\+P\+Lock}]{\setlength{\rightskip}{0pt plus 5cm}cppu\+::\+T\+C\+P\+Lock\+::\+T\+C\+P\+Lock (
+\begin{DoxyParamCaption}
+\item[{{\bf T\+C\+P\+Connection} \&}]{cnx, }
+\item[{bool}]{write\+Mode = {\ttfamily false}}
+\end{DoxyParamCaption}
+)}\label{classcppu_1_1TCPLock_ad9ff8205f334918a69746ef90f731877}
+
+
+locks the server in {\itshape write} or {\itshape read} mode. In order to avoid concurrency problems between threads, the callback method ( 
+
+\begin{DoxySeeAlso}{See also}
+set\+Callback()) can create a \hyperlink{classcppu_1_1TCPLock}{T\+C\+P\+Lock} object {\itshape in the stack} before performing a computation.
+\end{DoxySeeAlso}
+{\itshape write\+Mode} must be true if the callback changes data and false (the default) otherwise. A write\+Mode lock blocks all other locks (and the corresponding threads) until the callback method returns. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+tcp\+Server.\+h\item 
+tcp\+Server.\+cpp\end{DoxyCompactItemize}

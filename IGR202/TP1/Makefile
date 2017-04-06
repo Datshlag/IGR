@@ -7,7 +7,7 @@ LIBS = -L$(OPENGL_PATH) -lglut -lGLU -lGL -lGLEW -lm -lpthread
 CC = g++
 CXX = g++
 
-FLAGS = -g -Wall  -O3 -pthread -std=c++11
+FLAGS = -g -O3 -pthread -std=c++11
 
 CFLAGS = $(FLAGS)
 CXXFLAGS = $(FLAGS)
@@ -20,8 +20,7 @@ $(CIBLE): $(OBJS)
 -include $(subst .cpp,.d,$(SRCS))
 
 %.d : %.cpp
-	 $(CXX) -std=c++11 -MM -MF $@\
-		  -MP $<
+	 $(CXX) -std=c++11 -MM -MF $@ -MP $<
 
 clean:
 	rm -f $(CIBLE)
